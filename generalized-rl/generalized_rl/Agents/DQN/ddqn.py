@@ -1,8 +1,8 @@
 import tensorflow as tf
 from ...agent import Agent
 from ....environment import Environment
-from .experience_replay import ExperienceReplay
-from .prioritized_experience_replay import PrioritizedExperienceReplay
+from .replay import ExperienceReplay
+from .prioritized_replay import PrioritizedExperienceReplay
 from .network import Network
 from ...Utilities.lr_scheduler import LRScheduler
 
