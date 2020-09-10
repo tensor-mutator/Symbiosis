@@ -2,6 +2,8 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Sequence, Dict
 import numpy as np
 
+__all__ = ["Environment"]
+
 class Environment(metaclass=ABCMeta):
 
       @abstractmethod
