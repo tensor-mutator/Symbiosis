@@ -1,5 +1,5 @@
-from .DQN.dqn import DeepQNetwork
+from .DQN.dqn import DQN
 from .loop import Loop
 from .agent import Agent
 
-__all__ = ["DeepQNetwork"]
+__all__ = ["DQN"]
