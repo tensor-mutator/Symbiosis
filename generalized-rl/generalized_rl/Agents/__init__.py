@@ -1,5 +1,5 @@
-from .DQN.dqn import DQN
+from .DQN.ddqn import DDQN
 from .loop import Loop
 from .agent import Agent
 
-__all__ = ["DQN"]
+__all__ = ["DDQN"]
