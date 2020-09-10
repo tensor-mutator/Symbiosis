@@ -1,5 +1,5 @@
 from .per import PrioritizedExperienceReplay
 from .policy import Policy
-from .dqn import DeepQNetwork
+from .ddqn import DDQN
 
-__all__ = ["DeepQNetwork"]
+__all__ = ["DDQN"]
