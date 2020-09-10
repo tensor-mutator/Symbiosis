@@ -1,8 +1,22 @@
 from abc import ABCMeta, abstractmethod
-from typing import Any, Sequence, Dict
+from typing import Any, Sequence, Dict, Tuple
 import numpy as np
 
 __all__ = ["Environment"]
+
+class State(metaclass=ABCMeta):
+
+      @property
+      @abstractmethod
+      def size(self) -> Tuple:
+          ...
+
+class Action(metaclass=ABCMeta):
+
+      @property
+      @abstractmethod
+      def size(self) -> int:
+          ...
 
 class Environment(metaclass=ABCMeta):
 
@@ -20,4 +34,14 @@ class Environment(metaclass=ABCMeta):
 
       @abstractmethod
       def render(self) -> np.ndarray:
+          ...
+ 
+      @property
+      @abstractmethod
+      def state(self) -> State:
+          ...
+
+      @property
+      @abstractmethod
+      def action(self) -> Action:
           ...
