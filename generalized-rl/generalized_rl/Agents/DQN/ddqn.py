@@ -1,12 +1,13 @@
 import tensorflow as tf
-from ...agent import Agent
-from ...loop import Loop
-from ....environment import Environment
+import numpy as np
+from typing import Dict
 from .replay import ExperienceReplay
 from .prioritized_replay import PrioritizedExperienceReplay
 from .network import Network
+from ...agent import Agent
+from ...loop import Loop
 from ...Utilities.lr_scheduler import LRScheduler
-from typing import Dict
+from ....environment import Environment
 
 class DDQN(Agent):
 
@@ -36,9 +37,10 @@ class DDQN(Agent):
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr)
           self._session = self._build_network_graph(hyperparams)
           self._q_update_session = self._build_td_update_graph()
-          self._mutate_alias(self._alias)
+          self._alias = self._mutate_alias(self._alias)
 
-      def __repr__(self) -> str:
+      @property
+      def alias(self) -> str:
           return self._alias
 
       def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
@@ -97,6 +99,29 @@ class DDQN(Agent):
                     self._updated_q_values = tf.where(filter_tensor, q_masked_inverted + reward_masked, q_masked_inverted + updated_q_vals_masked)
           return session
 
+      def _train(self) -> float:
+          samples, importance_sampling_weights = self._replay.sample
+          update_input = np.vstack(samples[:, 0])
+          update_target = np.vstack(samples[:, 3])
+          actions = samples[:, 1]
+          rewards = samples[:, 2]
+          terminated = samples[:, 4]
+          q_values = self._session.run(self._local_network.q_predicted, feed_dict={self._local_network.state: update_input})
+          q_values_next = self._session.run(self._local_network.q_predicted, feed_dict={self._local_network.state: update_target})
+          q_values_next_target = self._session.run(self._target_network.q_predicted, feed_dict={self._target_network.state: update_target})
+          q_values = self._session_q_update.run(self._updated_q_values, feed_dict={self._q_values: q_values, self._q_values_next: q_values_next,
+                                                                                   self._q_values_next_target: q_values_next_target,
+                                                                                   self._actions: actions,
+                                                                                   self._rewards: rewards, self._terminated: terminated})
+          error, loss, _ = self._session.run([self._local_network.error, self._local_network.loss, self._local_network.apply_grads], 
+                                             feed_dict={self._local_network.state: update_input, self._local_network.q_target: q_values,
+                                                        self._local_network.actions: actions,
+                                                        self._local_network.importance_sampling_weights: importance_sampling_weights,
+                                                        self._local_network.learning_rate: self._lr_scheduler.value})
+          self._replay.update_priorities(error)
+          self.save_loss(loss)
+          return loss
+
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
           optional_network_params = ['gradient_network_params']
           params_dict = dict()
@@ -105,3 +130,6 @@ class DDQN(Agent):
                  params_dict[param] = hyperparams[param]
           return params_dict
           
+      def __del__(self) -> None:
+          self._session.close()
+          self._q_update_session.close()
