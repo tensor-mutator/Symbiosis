@@ -15,6 +15,10 @@ class Agent(metaclass=ABCMeta):
       def _train(self) -> float:
           ...
 
+      @property
       @abstractmethod
-      def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
+      def alias(self) -> str:
           ...
+      
+      def save_loss(self, loss: float) -> None:
+          pass
