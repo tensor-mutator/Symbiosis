@@ -1,12 +1,13 @@
 import tensorflow as tf
 import numpy as np
 from typing import Dict
+import json
 from .replay import ExperienceReplay
 from .prioritized_replay import PrioritizedExperienceReplay
 from .network import Network
 from ...agent import Agent
 from ...loop import Loop
-from ...Utilities.lr_scheduler import LRScheduler
+from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
 class DDQN(Agent):
@@ -24,6 +25,7 @@ class DDQN(Agent):
           self._network = hyperparams.get('network', 'dueling')
           self._replay_type = hyperparams.get('replay', 'prioritized')
           self._decay_type = hyperparams.get('decay_type', 'linear')
+          self._greedy_epsilon = GreedyEpsilon(self._epsilon_range, self._decay_type)
           self._gamma = hyperparams.get('gamma', 0.9)
           self._alpha = hyperparams.get('alpha', 0.7)
           self._beta = hyperparams.get('beta', 0.5)
@@ -38,27 +40,31 @@ class DDQN(Agent):
           self._session = self._build_network_graph(hyperparams)
           self._q_update_session = self._build_td_update_graph()
           self._alias = self._mutate_alias(self._alias)
-
-      @property
-      def alias(self) -> str:
-          return self._alias
+          self._memory_path = self.workspace()
+          self._progress = Progress()
 
       def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
+          self._components = ["DQN", "Double"]
           components = 2
           extended_alias = '' 
           if hyperparams.get("n_step", None):
+             self._components.append("N-Step")
              extended_alias += "NStep"
              components += 1
           if hyperparams.get("distributional", None):
+             self._components.append("Distributional")
              extended_alias += "Distributional"
              components += 1
           if hyperparams.get("noisy", None):
+             self._components.append("Noisy")
              extended_alias += "Noisy"
              components += 1
           if hyperparams["replay"] == "prioritized":
+             self._components.append("Prioritized")
              extended_alias += "Prioritized"
              components += 1
           if hyperparams["network"] == "dueling":
+             self._components.append("Dueling")
              extended_alias += "Dueling"
              components += 1
           else:
@@ -68,9 +74,9 @@ class DDQN(Agent):
           return alias
 
       def _build_network_graph(self) -> tf.Session:
-          graph = tf.Graph()
-          session = tf.Session(graph=graph)
-          with graph.as_default():
+          self._graph = tf.Graph()
+          session = tf.Session(graph=self._graph)
+          with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
                self._local_network = getattr(Network, self._network)(self._env.state.size, self._env.action.size,
                                                                      optional_network_params, 'local')
@@ -119,7 +125,7 @@ class DDQN(Agent):
                                                         self._local_network.importance_sampling_weights: importance_sampling_weights,
                                                         self._local_network.learning_rate: self._lr_scheduler.value})
           self._replay.update_priorities(error)
-          self.save_loss(loss)
+          self._save_loss(loss)
           return loss
 
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
@@ -129,6 +135,25 @@ class DDQN(Agent):
               if hyperparams.get(param, None):
                  params_dict[param] = hyperparams[param]
           return params_dict
+
+      def save(self) -> None:
+          super(self.__class__, self).save()
+          self._replay.save()
+          param_dict = dict(time=self.progress.clock, epsilon=self._greedy_epsilon.epsilon)
+          if "Prioritized" in self._components:
+             params_dict.update(dict(beta=self._replay.beta))
+          with open(f"{os.path.join(self._memory_path, self.alias)}.params", "w") as f_obj:
+               json.dump(params_dict, f_obj)               
+
+      def load(self) -> None:
+          super(self.__class__, self).load()
+          self._replay.load()
+          with open(f"{os.path.join(self._memory_path, self.alias)}.params", "w") as f_obj:
+               params_dict = json.load(f_obj)
+          if "Prioritized" in self._components:
+             self._replay.beta = params_dict["beta"]
+          self.progress.clock = params_dict["time"]
+          self._greedy_epsilon.epsilon = params_dict["epsilon"]
           
       def __del__(self) -> None:
           self._session.close()
