@@ -20,5 +20,11 @@ class Agent(metaclass=ABCMeta):
       def alias(self) -> str:
           ...
       
-      def save_loss(self, loss: float) -> None:
+      def _save_loss(self, loss: float) -> None:
+          pass
+
+      def _save(self) -> None:
+          pass
+
+      def _load(self) -> None:
           pass
