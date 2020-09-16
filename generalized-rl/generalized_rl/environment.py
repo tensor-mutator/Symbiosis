@@ -20,6 +20,11 @@ class Action(metaclass=ABCMeta):
 
 class Environment(metaclass=ABCMeta):
 
+      @property
+      @abstractmethod
+      def name(self) -> str:
+          ...
+
       @abstractmethod
       def make(self) -> Any:
           ...
