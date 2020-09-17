@@ -7,7 +7,7 @@ from .prioritized_replay import PrioritizedExperienceReplay
 from .network import Network
 from ...agent import Agent
 from ...loop import Loop
-from ...utilities import LRScheduler, GreedyEpsilon, Progress
+from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
 class DDQN(Agent):
