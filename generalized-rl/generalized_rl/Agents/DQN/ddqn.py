@@ -41,7 +41,7 @@ class DDQN(Agent):
           self._q_update_session = self._build_td_update_graph()
           self._alias = self._mutate_alias(self._alias)
           self._memory_path = self.workspace()
-          self._progress = Progress()
+          self._progress = Progress(self._observe, self._explore)
 
       def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
           self._components = ["DQN", "Double"]
