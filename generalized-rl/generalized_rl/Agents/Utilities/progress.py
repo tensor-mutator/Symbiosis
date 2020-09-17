@@ -1,3 +1,5 @@
+__all__ = ["Progress"]
+
 class Progress:
 
       def __init__(self, observe: int = 0, explore: int = 0) -> None:
