@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from typing import Dict
+from typing import Dict, Any
 import json
 from .replay import ExperienceReplay
 from .prioritized_replay import PrioritizedExperienceReplay
@@ -89,23 +89,33 @@ class DDQN(Agent):
           session = tf.Session(graph=graph)
           with graph.as_default():
                with tf.device('/cpu:0'):
-                    self._q_values = tf.placeholder(shape=[None, self._action_size], dtype=tf.float32)
-                    self._q_values_next = tf.placeholder(shape=[None, self._action_size], dtype=tf.float32)
-                    self._q_values_next_target = tf.placeholder(shape=[None, self._action_size], dtype=tf.float32)
+                    self._q_values = tf.placeholder(shape=[None, self._env.action.size], dtype=tf.float32)
+                    self._q_values_next = tf.placeholder(shape=[None, self._env.action.size], dtype=tf.float32)
+                    self._q_values_next_target = tf.placeholder(shape=[None, self._env.action.size], dtype=tf.float32)
                     self._actions = tf.placeholder(shape=[None], dtype=tf.int32)
                     self._rewards = tf.placeholder(shape=[None], dtype=tf.float32)
                     self._terminated = tf.placeholder(shape=[None], dtype=tf.bool)
-                    filter_tensor = tf.tile(tf.expand_dims(self._terminated, axis=1), [1, self._action_size])
-                    mask_tensor = tf.one_hot(indices=self._actions, depth=self._action_size)
+                    filter_tensor = tf.tile(tf.expand_dims(self._terminated, axis=1), [1, self._env.action.size])
+                    mask_tensor = tf.one_hot(indices=self._actions, depth=self._env.action.size)
                     reward_masked = mask_tensor * tf.expand_dims(self._rewards, axis=1)
                     q_masked_inverted = tf.cast(tf.equal(mask_tensor, 0), tf.float32) * self._q_values
-                    q_next_mask = tf.one_hot(indices=tf.argmax(self._q_values_next, axis=1), depth=self._action_size)
+                    q_next_mask = tf.one_hot(indices=tf.argmax(self._q_values_next, axis=1), depth=self._env.action.size)
                     updated_q_vals = self._rewards + self._gamma * tf.reduce_sum(q_next_mask * self._q_values_next_target, axis=1)
                     updated_q_vals_masked = mask_tensor * tf.expand_dims(updated_q_vals, axis=1)
                     self._updated_q_values = tf.where(filter_tensor, q_masked_inverted + reward_masked, q_masked_inverted + updated_q_vals_masked)
           return session
 
-      def _train(self) -> float:
+      @property
+      def action(self) -> Any:
+          if np.random.rand() <= self._greedy_epsilon.epsilon:
+             action = np.random.choice(self._env.action.size, 1)[0]
+          else:
+             q_values = self._session.run(self._local_model.q_predicted, feed_dict={self._local_model.state: state})
+             action = np.argmax(q_values)
+          self._greedy_epsilon.decay()
+          return action
+
+      def train(self) -> float:
           samples, importance_sampling_weights = self._replay.sample
           update_input = np.vstack(samples[:, 0])
           update_target = np.vstack(samples[:, 3])
