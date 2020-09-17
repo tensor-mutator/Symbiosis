@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict
+from typing import Dict, Any
 import tensorflow as tf
 import os
 from .utilities import Progress
@@ -14,6 +14,11 @@ class Agent(metaclass=ABCMeta):
       def train(self) -> float:
           ...
 
+      @property
+      @abstractmethod
+      def action(self) -> Any:
+          ...
+      
       @property
       def session(self) -> tf.Session:
           return self._session
