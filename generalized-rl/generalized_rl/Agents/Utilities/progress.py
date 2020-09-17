@@ -12,13 +12,25 @@ class Progress:
           return self._clock
 
       @clock.setter
-      def clock(self, clock) -> None:
+      def clock(self, clock: int) -> None:
           self._clock = clock
 
       @property
-      def episode(self) -> None:
+      def episode(self) -> int:
           return self._episode
 
+      @episode.setter
+      def episode(self, episode: int) -> None:
+          self._episode = episode
+
+      @property
+      def epi_clock(self) -> int:
+          return self._episodic_clock
+
+      @epi_clock.setter
+      def epi_clock(self, epi_clock: int) -> None:
+          self._episodic_clock = epi_clock
+      
       @property
       def observe(self) -> int:
           return self._observe
