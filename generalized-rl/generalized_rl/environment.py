@@ -8,7 +8,7 @@ class State(metaclass=ABCMeta):
 
       @property
       @abstractmethod
-      def size(self) -> Tuple:
+      def shape(self) -> Tuple:
           ...
 
 class Action(metaclass=ABCMeta):
