@@ -115,7 +115,7 @@ class DDQN(Agent):
           return action
 
       def train(self) -> float:
-          samples, importance_sampling_weights = self._replay.sample
+          samples, importance_sampling_weights = self._replay.sample()
           update_input = np.vstack(samples[:, 0])
           update_target = np.vstack(samples[:, 3])
           actions = samples[:, 1]
