@@ -133,8 +133,8 @@ class DDQN(Agent):
                                                         self._local_network.actions: actions,
                                                         self._local_network.importance_sampling_weights: importance_sampling_weights,
                                                         self._local_network.learning_rate: self._lr_scheduler.value})
-          self._replay.update_priorities(error)
-          self._save_loss(loss)
+          self._replay.update(error)
+          self.save_loss(loss)
           return loss
 
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
