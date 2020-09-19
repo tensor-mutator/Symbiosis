@@ -147,7 +147,7 @@ class DDQN(Agent):
 
       def save(self) -> None:
           super(self.__class__, self).save()
-          self._replay.save()
+          self._replay.save(self._memory_path)
           param_dict = dict(time=self.progress.clock, epsilon=self._greedy_epsilon.epsilon)
           if "Prioritized" in self._components:
              params_dict.update(dict(beta=self._replay.beta))
@@ -156,7 +156,7 @@ class DDQN(Agent):
 
       def load(self) -> None:
           super(self.__class__, self).load()
-          self._replay.load()
+          self._replay.load(self._memory_path)
           with open(f"{os.path.join(self._memory_path, self.alias)}.params", "w") as f_obj:
                params_dict = json.load(f_obj)
           if "Prioritized" in self._components:
