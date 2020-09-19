@@ -28,9 +28,11 @@ class DDQN(Agent):
           self._gamma = hyperparams.get('gamma', 0.9)
           self._alpha = hyperparams.get('alpha', 0.7)
           self._beta = hyperparams.get('beta', 0.5)
+          self._offset = hyperparams.get('offset', 1)
           self._replay = ExperienceReplay(self._replay_limit,
                                           self._batch_size) if replay_type == 'regular' else PrioritizedExperienceReplay(self._alpha,
                                                                                                                          self._beta,
+                                                                                                                         self._offset,
                                                                                                                          self._replay_limit,
                                                                                                                          self._batch_size)
           self._lr = hyperparams.get('learning_rate', 0.0001)
