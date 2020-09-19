@@ -2,8 +2,7 @@ import tensorflow as tf
 import numpy as np
 from typing import Dict, Any
 import json
-from .replay import ExperienceReplay
-from .prioritized_replay import PrioritizedExperienceReplay
+from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import Network
 from ...agent import Agent
 from ...loop import Loop
