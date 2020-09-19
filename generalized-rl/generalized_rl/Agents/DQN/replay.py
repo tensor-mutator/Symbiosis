@@ -5,6 +5,7 @@ from typing import Tuple
 from glob import glob
 from collections import deque
 from ...Utlities.exceptions import *
+from ...Utilities import Progress
 
 __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 
@@ -60,3 +61,29 @@ class ExperienceReplay:
           for file_ in replay_files:
               with open(file_, 'rb') as f_obj:
                    self._buffer.extend(dill.load(f_obj))
+
+class PrioritizedExperienceReplay(ExperienceReplay):
+
+      def __init__(self, alpha: float, beta: float, offset: float,
+                   limit: int, batch_size: int, progress: Progress) -> None:
+          self._alpha = alpha
+          self._beta = beta
+          self._offset = offset
+          self._priorities = deque(maxlen=limit)
+          self._progress = progress
+          self._base = super(PrioritizedExperienceReplay, self)
+          self._base.__init__(limit, batch_size)
+
+      @property
+      def beta(self) -> float:
+          return self._beta
+
+      @beta.setter
+      def beta(self, beta: float) -> None:
+          self._beta = beta
+
+      def add(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None
+          self._base.add(transition)
+          self._priorities.append(max(self._priorities, default=1))
+          
+   
