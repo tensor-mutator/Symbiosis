@@ -107,7 +107,6 @@ class DDQN(Agent):
                     self._updated_q_values = tf.where(filter_tensor, q_masked_inverted + reward_masked, q_masked_inverted + updated_q_vals_masked)
           return session
 
-      @property
       def action(self, state: np.ndarray) -> Any:
           if np.random.rand() <= self._greedy_epsilon.epsilon:
              action = np.random.choice(self._env.action.size, 1)[0]
