@@ -15,7 +15,6 @@ class DDQN(Agent):
 
       def __init__(self, env: Environment, **hyperparams) -> None:
           self._env = env
-          self._alias = 'DDQN'
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
           self._batch_size = hyperparams.get('batch_size', 32)
@@ -31,7 +30,7 @@ class DDQN(Agent):
           self._alpha = hyperparams.get('alpha', 0.7)
           self._beta = hyperparams.get('beta', 0.5)
           self._offset = hyperparams.get('offset', 1)
-          self._alias = self._mutate_alias(self._alias, hyperparams)
+          self._alias = self._define_alias(hyperparams)
           self._progress = self.load_progress()
           self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
           self._replay = ExperienceReplay(self._replay_limit,
@@ -48,7 +47,8 @@ class DDQN(Agent):
           self._q_update_session = self._build_td_update_graph()
           self._memory_path = self.workspace()
 
-      def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
+      def _define_alias(self, hyperparams: Dict) -> str:
+          alias = self.__class__.__name__
           self._components = ["DQN", "Double"]
           components = 2
           extended_alias = '' 
