@@ -1,23 +1,74 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, Any
+from contextlib import contextmanager
+from glob import glob
 import tensorflow as tf
 import os
 import dill
-from .utilities import Progress
+from typing import Callable, Dict
+from .DQN.replay import ExperienceReplay
+from .Utilities import Progress, RewardManager
+from .Utilities.exceptions import *
+from ..environment import Environment
 
 class Agent(metaclass=ABCMeta):
 
+      suite_map: Dict = dict(DDQN=self._episode_suite_dqn)
+
+      def __getattr__(self, func: Callable) -> Callable:
+          agent = self.__class__.__name__
+          if Agent.suite_map.get(agent, None):
+             return lambda: Agent.suite_map[agent](self)
+          raise MissingSuiteError("Matching suite not found for class: {}".format(agent))
+
+      @contextmanager
+      def _episode_context(self, env: Environment, progress: Progress,
+                           reward_manager: RewardManager):
+          env.make()
+          env.reset()
+          state = self.state(env.render())
+          yield env, progress, reward_manager, state
+          progress.bump_episode()
+          env.close()
+          reward_manager.rollout()
+          self.save()
+
+      def _episode_suite_dqn(self) -> None:
+          with self._episode_context(self._env, self._progress, self._reward_manager) as env, progress, reward_manager, s_t:
+               while not env.ended:
+                     a_t = self.action(s_t)
+                     x_t1, r_t, done, _ = env.step(a_t)
+                     s_t1 = self.state(x_t1, s_t)
+                     self.replay.add((s_t, a_t, r_t, s_t1, done,))
+                     s_t = s_t1
+                     if progress.explore_clock and progress.explore_clock%self.training_interval == 0:
+                        self.train()
+                     if progress.explore_clock and progress.explore_clock%self.target_frequency == 0:
+                        self.update_target()
+                     progress.bump()
+
+      def _load_artifacts(self) -> None:
+          path = self.workspace()
+          if glob(os.path.join(path, "{}.ckpt.*".format(self._alias))):
+             self.load()
+
       @abstractmethod
       def run(self) -> None:
-          ...
+          self._reward_manager = RewardManager(self._env)
+          self._load_artifacts()
+          while True:
+                self._episode_suite()
 
       @abstractmethod
       def train(self) -> float:
           ...
 
       @property
+      def training_interval(self) -> int:
+          return self._training_interval
+
       @abstractmethod
-      def action(self) -> Any:
+      def action(self, state: np.ndarray) -> Any:
           ...
       
       @property
@@ -31,6 +82,10 @@ class Agent(metaclass=ABCMeta):
       @property
       def alias(self) -> str:
           return self._alias
+
+      @property
+      def replay(self) -> ExperienceReplay:
+          return self._replay
 
       @property
       def progress(self) -> Progress:
@@ -50,6 +105,7 @@ class Agent(metaclass=ABCMeta):
           saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
           with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self._progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
+          self._reward_manager.save(path, self.alias, self._session)
 
       def load_progress(self) -> Progress:
           path = self.workspace()
@@ -63,9 +119,21 @@ class Agent(metaclass=ABCMeta):
                saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(self.workspace())
           saver.restore(self.session, ckpt.model_checkpoint_path)
+          self._reward_manager.load(path, self.alias)
 
       def workspace(self) -> str:
-          path = os.path.join(self.env, self.alias)
+          path = os.path.join(self.env.name, self.alias)
           if not os.path.exists(path):
              os.makedirs(path)
           return path
+
+      @property
+      def update_ops(self) -> tf.group:
+          return self._update_ops
+
+      def update_target(self) -> None:
+          self.session.run(self.update_ops)
+
+      @property
+      def target_frequency(self) -> int:
+          return self._target_frequency
