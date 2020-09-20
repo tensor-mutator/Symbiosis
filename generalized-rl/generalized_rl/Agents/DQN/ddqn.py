@@ -24,12 +24,13 @@ class DDQN(Agent):
           self._network = hyperparams.get('network', 'dueling')
           self._replay_type = hyperparams.get('replay', 'prioritized')
           self._decay_scheme = hyperparams.get('decay_scheme', 'linear')
-          self._greedy_epsilon = GreedyEpsilon(self._epsilon_range, self._decay_scheme)
           self._gamma = hyperparams.get('gamma', 0.9)
           self._alpha = hyperparams.get('alpha', 0.7)
           self._beta = hyperparams.get('beta', 0.5)
           self._offset = hyperparams.get('offset', 1)
-          self._progress = Progress(self._observe, self._explore)
+          self._alias = self._mutate_alias(self._alias, hyperparams)
+          self._progress = self.load_progress()
+          self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
           self._replay = ExperienceReplay(self._replay_limit,
                                           self._batch_size) if replay_type == 'regular' else PrioritizedExperienceReplay(self._alpha,
                                                                                                                          self._beta,
@@ -42,7 +43,6 @@ class DDQN(Agent):
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr)
           self._session = self._build_network_graph(hyperparams)
           self._q_update_session = self._build_td_update_graph()
-          self._alias = self._mutate_alias(self._alias)
           self._memory_path = self.workspace()
 
       def _mutate_alias(self, alias: str, hyperparams: Dict) -> str:
