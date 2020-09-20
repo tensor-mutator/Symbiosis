@@ -13,7 +13,7 @@ class DDQN(Agent):
 
       def __init__(self, env: Environment, **hyperparams) -> None:
           self._env = env
-          self._alias = 'ddqn'
+          self._alias = 'DDQN'
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
           self._batch_size = hyperparams.get('batch_size', 32)
