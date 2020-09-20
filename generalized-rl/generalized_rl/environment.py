@@ -50,3 +50,7 @@ class Environment(metaclass=ABCMeta):
       @abstractmethod
       def action(self) -> Action:
           ...
+
+      @abstractmethod
+      def close(self) -> bool:
+          ...
