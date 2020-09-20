@@ -40,7 +40,7 @@ class Environment(metaclass=ABCMeta):
       @abstractmethod
       def render(self) -> np.ndarray:
           ...
- 
+
       @property
       @abstractmethod
       def state(self) -> State:
