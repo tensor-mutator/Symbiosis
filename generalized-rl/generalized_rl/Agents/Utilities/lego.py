@@ -9,7 +9,7 @@ class NetBlocks:
       @staticmethod
       def Conv2D(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int],
                  activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False) -> Callable:
-          def op(tensor: tf.Tensor) -> tf.Tensor:
+          def _op(tensor: tf.Tensor) -> tf.Tensor:
               if time_distributed:
                  tensor_out = layers.TimeDistributed(layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides))(tensor)
               else:
@@ -24,11 +24,11 @@ class NetBlocks:
               else:
                  tensor_out = layers.Activation(activation)(tensor_out)
               return tensor_out
-          return op
+          return _op
 
       @staticmethod
       def Dense(units: int, activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False) -> Callable:
-          def op(tensor: tf.Tensor) -> tf.Tensor:
+          def _op(tensor: tf.Tensor) -> tf.Tensor:
               if time_distributed:
                  tensor_out = layers.TimeDistributed(layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal()))(tensor)
               else:
@@ -43,4 +43,4 @@ class NetBlocks:
               else:
                  tensor_out = layers.Activation(activation)(tensor_out)
               return tensor_out
-          return op
+          return _op
