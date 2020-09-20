@@ -6,7 +6,6 @@ import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import Network
 from ...agent import Agent, register
-from ...loop import Loop
 from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
