@@ -1,3 +1,5 @@
+from ...Utilities import NetBlocks
+
 class Network:
 
       class DQN:
