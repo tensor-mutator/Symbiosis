@@ -11,14 +11,18 @@ from .Utilities import Progress, RewardManager
 from .Utilities.exceptions import *
 from ..environment import Environment
 
+def register(suite: str) -> Callable:
+    def wrapper(func) -> Callable:
+        def run(self) -> None:
+            super(self.__class__, self).run(suite)
+        return run
+    return wrapper
+
 class Agent(metaclass=ABCMeta):
 
-      suite_map: Dict = dict(DDQN=self._episode_suite_dqn)
-
       def __getattr__(self, func: Callable) -> Callable:
-          agent = self.__class__.__name__
-          if Agent.suite_map.get(agent, None):
-             return lambda: Agent.suite_map[agent](self)
+          if getattr(self, "_{}".format(func), None):
+             return lambda: self.__class__.__dict__["_{}".format(func)](self)
           raise MissingSuiteError("Matching suite not found for class: {}".format(agent))
 
       @contextmanager
@@ -51,13 +55,15 @@ class Agent(metaclass=ABCMeta):
           path = self.workspace()
           if glob(os.path.join(path, "{}.ckpt.*".format(self._alias))):
              self.load()
+          else:
+             self.session.run(tf.global_variables_initializer())
 
       @abstractmethod
-      def run(self) -> None:
+      def run(self, suite) -> None:
           self._reward_manager = RewardManager(self._env)
           self._load_artifacts()
           while True:
-                self._episode_suite()
+                suite()
 
       @abstractmethod
       def train(self) -> float:
