@@ -5,7 +5,7 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import Network
-from ...agent import Agent
+from ...agent import Agent, register
 from ...loop import Loop
 from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
@@ -176,8 +176,9 @@ class DDQN(Agent):
           super(self.__class__, self).load()
           self._replay.load(self._memory_path, self._alias)
 
+      @register("episode_suite_dqn")
       def run(self) -> None:
-          super(DDQN, self).run()
+          ...
 
       def __del__(self) -> None:
           self._session.close()
