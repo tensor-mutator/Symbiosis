@@ -47,6 +47,9 @@ class Progress:
 
       def bump_episode(self) -> None:
           self._episode += 1
+          self._episodic_clock = 0
 
       def reset(self) -> None:
+          self._clock = 0
           self._episodic_clock = 0
+          self._episode = 0
