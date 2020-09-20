@@ -144,7 +144,7 @@ class DDQN(Agent):
                                              feed_dict={self._local_network.state: update_input, self._local_network.q_target: q_values,
                                                         self._local_network.actions: actions,
                                                         self._local_network.importance_sampling_weights: importance_sampling_weights,
-                                                        self._local_network.learning_rate: self._lr_scheduler.value})
+                                                        self._local_network.learning_rate: self._lr_scheduler.lr})
           self._replay.update(error)
           self.save_loss(loss)
           return loss
