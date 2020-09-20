@@ -3,5 +3,6 @@ from .progress import Progress
 from .greedy_epsilon import GreedyEpsilon
 from .exceptions import Exceptions
 from .reward_manager import RewardManager
+from .lego import NetBlocks
 
-__all__ = ["LRScheduler", "Progress", "GreedyEpsilon", "Exceptions", "RewardManager"]
+__all__ = ["LRScheduler", "Progress", "GreedyEpsilon", "Exceptions", "RewardManager", "NetBlocks"]
