@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from typing import Dict, Any
 import json
+import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import Network
 from ...agent import Agent
@@ -17,6 +18,7 @@ class DDQN(Agent):
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
           self._batch_size = hyperparams.get('batch_size', 32)
+          self._trace = hyperparams.get('trace', 4)
           self._replay_limit = hyperparams.get('replay_limit', 10000)
           self._epsilon_range = hyperparams.get('epsilon_range', (1, 0.0001))
           self._training_interval = hyperparams.get('training_interval', 5)
@@ -115,6 +117,14 @@ class DDQN(Agent):
              action = np.argmax(q_values)
           self._greedy_epsilon.decay()
           return action
+
+      def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
+          x_t1 = cv2.cvtColor(x_t1, cv2.COLOR_BGR2GRAY)
+          if not s_t:
+             return np.expand_dims(np.stack([x_t1]*self._trace, axis=2), axis=0)
+          if self._trace > 1:
+             return np.append(np.expand_dims(np.expand_dims(x_t1, axis=0), axis=3), s_t[:, :, :, :self._trace - 1], axis=3)
+          return np.expand_dims(np.expand_dims(x_t1, axis=0), axis=3)
 
       def train(self) -> float:
           samples, importance_sampling_weights = self._replay.sample()
