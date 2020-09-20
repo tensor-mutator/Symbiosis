@@ -156,6 +156,9 @@ class DDQN(Agent):
           super(self.__class__, self).load()
           self._replay.load(self._memory_path, self._alias)
 
+      def run(self) -> None:
+          super(DDQN, self).run()
+
       def __del__(self) -> None:
           self._session.close()
           self._q_update_session.close()
