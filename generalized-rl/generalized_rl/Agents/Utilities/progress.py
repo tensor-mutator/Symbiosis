@@ -6,6 +6,7 @@ class Progress:
           self._observe = observe
           self._explore = explore
           self._clock = 0
+          self._explore_clock = 0
           self._episodic_clock = 0
           self._episode = 0
 
@@ -16,6 +17,10 @@ class Progress:
       @clock.setter
       def clock(self, clock: int) -> None:
           self._clock = clock
+
+      @property
+      def explore_clock(self) -> int:
+          return self._explore_clock
 
       @property
       def episode(self) -> int:
@@ -44,6 +49,8 @@ class Progress:
       def bump(self) -> None:
           self._clock += 1
           self._episodic_clock += 1
+          if self._clock > self._observe:
+             self._explore_clock += 1
 
       def bump_episode(self) -> None:
           self._episode += 1
