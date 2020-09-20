@@ -113,3 +113,4 @@ class RewardManager:
                    obj.extend(dill.load(f_obj))
           _load(self._episodic_reward, self._episode_buffer)
           _load(self._reward, self._buffer, raise=False)
+          self._n_steps = len(self._buffer)
