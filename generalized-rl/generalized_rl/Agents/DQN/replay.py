@@ -19,7 +19,7 @@ class ExperienceReplay:
 
       def sample(self) -> np.ndarray:
           samples = sample(self._buffer, min(self._batch_size, len(self._buffer)))
-          return np.array(samples), np.zeros((samples, 1), dtype=np.float32)
+          return np.array(samples), np.ones((samples, 1), dtype=np.float32)
 
       def update(self, errors: np.ndarray) -> None:
           ...
