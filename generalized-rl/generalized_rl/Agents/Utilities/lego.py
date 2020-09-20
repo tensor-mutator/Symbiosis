@@ -27,3 +27,20 @@ class NetBlocks:
           return op
 
       @staticmethod
+      def Dense(units: int, activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False) -> Callable:
+          def op(tensor: tf.Tensor) -> tf.Tensor:
+              if time_distributed:
+                 tensor_out = layers.TimeDistributed(layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal()))(tensor)
+              else:
+                 tensor_out = layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal())(tensor)
+              if batch_norm:
+                 if time_distributed:
+                    tensor_out = layers.TimeDistributed(layers.BatchNomalization())(tensor_out)
+                 else:
+                    tensor_out = layers.BatchNormalization()(tensor_out)
+              if time_distributed:
+                 tensor_out = layers.TimeDistributed(layers.Activation(activation))(tensor_out)
+              else:
+                 tensor_out = layers.Activation(activation)(tensor_out)
+              return tensor_out
+          return op
