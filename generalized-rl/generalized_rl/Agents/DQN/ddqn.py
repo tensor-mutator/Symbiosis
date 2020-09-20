@@ -87,7 +87,9 @@ class DDQN(Agent):
 
       def _build_network_graph(self) -> tf.Session:
           self._graph = tf.Graph()
-          session = tf.Session(graph=self._graph)
+          config = tf.ConfigProto()
+          config.gpu_options.allow_growth = True
+          session = tf.Session(graph=self._graph, config=config)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
                self._local_network = getattr(Network, self._network)(self._env.state.shape, self._env.action.size,
