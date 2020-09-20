@@ -51,7 +51,7 @@ class Agent(metaclass=ABCMeta):
           with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self._progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
 
-      def load_progress(self) -> None:
+      def load_progress(self) -> Progress:
           path = self.workspace()
           if os.path.exists(os.path.join(path, "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
