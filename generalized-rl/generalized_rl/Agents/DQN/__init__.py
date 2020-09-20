@@ -1,5 +1,5 @@
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
-from .policy import Policy
+from .network import Network
 from .ddqn import DDQN
 
 __all__ = ["DDQN"]
