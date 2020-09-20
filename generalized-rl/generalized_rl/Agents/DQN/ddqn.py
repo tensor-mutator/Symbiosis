@@ -108,7 +108,7 @@ class DDQN(Agent):
           return session
 
       @property
-      def action(self) -> Any:
+      def action(self, state: np.ndarray) -> Any:
           if np.random.rand() <= self._greedy_epsilon.epsilon:
              action = np.random.choice(self._env.action.size, 1)[0]
           else:
