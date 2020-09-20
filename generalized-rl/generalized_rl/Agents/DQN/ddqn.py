@@ -77,15 +77,24 @@ class DDQN(Agent):
           alias = extended_alias + alias if components < 7 else "RAINBOW"
           return alias
 
+      def _initiate_update_ops(self, from_scope, to_scope) -> tf.group:
+          to_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, to_scope)
+          from_params = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, from_scope)
+          update_ops = list()
+          for to_, from_ in zip(to_params, from_params):
+              update_ops.append(to_.assign(from_))
+          return tf.group(*update_ops)
+
       def _build_network_graph(self) -> tf.Session:
           self._graph = tf.Graph()
           session = tf.Session(graph=self._graph)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
                self._local_network = getattr(Network, self._network)(self._env.state.shape, self._env.action.size,
-                                                                     optional_network_params, 'local')
+                                                                     optional_network_params, "local")
                self._target_network = getattr(Network, self._network)(self._env.state.shape, self._env.action.size,
-                                                                      optional_network_params, 'target')
+                                                                      optional_network_params, "target")
+               self._update_ops = self._initiate_update_ops("local", "target")
           return session
 
       def _build_td_update_graph(self) -> tf.Session:
