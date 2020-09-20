@@ -56,6 +56,11 @@ class Environment(metaclass=ABCMeta):
       def ended(self) -> bool:
           ...
 
+      @property
+      @abstractmethod
+      def reward(self) -> float:
+          ...
+
       @abstractmethod
       def close(self) -> bool:
           ...
