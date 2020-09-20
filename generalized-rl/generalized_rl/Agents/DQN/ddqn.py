@@ -11,6 +11,8 @@ from ....environment import Environment
 
 class DDQN(Agent):
 
+      architecture_network_map = dict(standard="DQN", dueling="DuelingDQN", rnn="DRQN")
+
       def __init__(self, env: Environment, **hyperparams) -> None:
           self._env = env
           self._alias = 'DDQN'
@@ -89,11 +91,12 @@ class DDQN(Agent):
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
           session = tf.Session(graph=self._graph, config=config)
+          network = DDQN.architecture_network_map.get(self._network)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
-               self._local_network = getattr(Network, self._network)(self._env.state.shape, self._env.action.size,
+               self._local_network = getattr(Network, network)(self._env.state.shape, self._env.action.size,
                                                                      optional_network_params, "local")
-               self._target_network = getattr(Network, self._network)(self._env.state.shape, self._env.action.size,
+               self._target_network = getattr(Network, network)(self._env.state.shape, self._env.action.size,
                                                                       optional_network_params, "target")
                self._update_ops = self._initiate_update_ops("local", "target")
           return session
