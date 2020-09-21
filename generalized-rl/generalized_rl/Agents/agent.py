@@ -58,7 +58,6 @@ class Agent(metaclass=ABCMeta):
           else:
              self.session.run(tf.global_variables_initializer())
 
-      @abstractmethod
       def run(self, suite) -> None:
           self._reward_manager = RewardManager(self._env)
           self._load_artifacts()
