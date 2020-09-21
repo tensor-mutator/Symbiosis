@@ -93,7 +93,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           return sampling_probabilities
 
       @property
-      def _max_weight(self) -> float:
+      def _scaling_factor(self) -> float:
           scaled_priorities = np.array(self._priorities)**self._alpha
           min_probability = np.min(scaled_priorities)/np.sum(scaled_priorities)
           return (min_probability*len(self._buffer))**-self._beta
@@ -101,7 +101,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
       def _importance_sampling_weights(self, sample_probabilities: np.ndarray) -> np.ndarray:
           self._anneal_beta()
           importance_sampling_weights = (sample_probabilities*len(self._buffer))**-self._beta
-          return importance_sampling_weights/self._max_weight
+          return importance_sampling_weights/self._scaling_factor
 
       def sample(self) -> np.ndarray:
           n_samples = min(self._batch_size, len(self._buffer))
