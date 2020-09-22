@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Any
+from typing import Dict, Any, Generator
 from contextlib import contextmanager
 from glob import glob
 import tensorflow as tf
@@ -28,7 +28,7 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _episode_context(self, env: Environment, progress: Progress,
-                           reward_manager: RewardManager):
+                           reward_manager: RewardManager) -> Generator:
           env.make()
           env.reset()
           state = self.state(env.render())
