@@ -4,8 +4,8 @@ from typing import Dict, Any
 import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
-from .network import Network
-from ...agent import Agent, register
+from .network import *
+from ...agent import Agent, register, NetworkBase
 from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
@@ -13,7 +13,7 @@ class DDQN(Agent):
 
       architecture_network_map = dict(standard="DQN", dueling="DuelingDQN", rnn="DRQN")
 
-      def __init__(self, env: Environment, **hyperparams) -> None:
+      def __init__(self, env: Environment, network: NetworkBase = DQN, **hyperparams) -> None:
           self._env = env
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
@@ -43,7 +43,7 @@ class DDQN(Agent):
           self._lr = hyperparams.get('learning_rate', 0.0001)
           self._lr_scheduler_scheme = hyperparams.get('lr_scheduler_scheme', 'linear')
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._explore, self._progress)
-          self._session = self._build_network_graph(hyperparams)
+          self._session = self._build_network_graph(network, hyperparams)
           self._q_update_session = self._build_td_update_graph()
           self._memory_path = self.workspace()
 
@@ -86,7 +86,7 @@ class DDQN(Agent):
               update_ops.append(to_.assign(from_))
           return tf.group(*update_ops)
 
-      def _build_network_graph(self) -> tf.Session:
+      def _build_network_graph(self, network: NetworkBase, hyperparams: Dict) -> tf.Session:
           self._graph = tf.Graph()
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
@@ -94,9 +94,9 @@ class DDQN(Agent):
           network = DDQN.architecture_network_map.get(self._network)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
-               self._local_network = getattr(Network, network)(self._env.state.shape, self._env.action.size,
+               self._local_network = network(self._env.state.shape, self._env.action.size,
                                                                      optional_network_params, "local")
-               self._target_network = getattr(Network, network)(self._env.state.shape, self._env.action.size,
+               self._target_network = network(self._env.state.shape, self._env.action.size,
                                                                       optional_network_params, "target")
                self._update_ops = self._initiate_update_ops("local", "target")
           return session
