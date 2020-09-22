@@ -34,3 +34,6 @@ class NetworkBaseDQN:
       @property
       def loss(self) -> tf.Tensor:
           return self._loss
+
+      def __repr__(self) -> str:
+          return "DQN"
