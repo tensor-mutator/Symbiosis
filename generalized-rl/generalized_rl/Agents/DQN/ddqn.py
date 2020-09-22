@@ -12,8 +12,6 @@ from ....environment import Environment
 
 class DDQN(Agent):
 
-      architecture_network_map = dict(standard="DQN", dueling="DuelingDQN", rnn="DRQN")
-
       def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, **hyperparams) -> None:
           self._env = env
           self._observe = hyperparams.get('observe', 5000)
@@ -24,14 +22,13 @@ class DDQN(Agent):
           self._epsilon_range = hyperparams.get('epsilon_range', (1, 0.0001))
           self._training_interval = hyperparams.get('training_interval', 5)
           self._target_frequency = hyperparams.get('target_frequency', 3000)
-          self._network = hyperparams.get('network', 'dueling')
           self._replay_type = hyperparams.get('replay', 'prioritized')
           self._decay_scheme = hyperparams.get('decay_scheme', 'linear')
           self._gamma = hyperparams.get('gamma', 0.9)
           self._alpha = hyperparams.get('alpha', 0.7)
           self._beta = hyperparams.get('beta', 0.5)
           self._offset = hyperparams.get('offset', 1)
-          self._alias = self._define_alias(hyperparams)
+          self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
           self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
           self._replay = ExperienceReplay(self._replay_limit,
@@ -48,7 +45,7 @@ class DDQN(Agent):
           self._q_update_session = self._build_td_update_graph()
           self._memory_path = self.workspace()
 
-      def _define_alias(self, hyperparams: Dict) -> str:
+      def _define_alias(self, network: str, hyperparams: Dict) -> str:
           alias = self.__class__.__name__
           self._components = ["DQN", "Double"]
           components = 2
@@ -69,12 +66,12 @@ class DDQN(Agent):
              self._components.append("Prioritized")
              extended_alias += "Prioritized"
              components += 1
-          if hyperparams["network"] == "dueling":
+          if network == "DuelingDQN":
              self._components.append("Dueling")
              extended_alias += "Dueling"
              components += 1
           else:
-             if hyperparams["network"] == "rnn"
+             if network == "DRQN"
                 extended_alias += "Recurrent"
           alias = extended_alias + alias if components < 7 else "RAINBOW"
           return alias
