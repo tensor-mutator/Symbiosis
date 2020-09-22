@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.layers as layers
 import tensorflow.compat.v1.keras.layers as layers_compat
-from typing import Callable, Tuple
+from typing import Callable, Tuple, Any
 
 class NetBlocks:
 
@@ -84,5 +84,7 @@ class NetBlocks:
                  gradients[i] = (tf.clip_by_norm(grad, clip_norm), var)
 
       @staticmethod
-      def placeholder(shape: Tuple, name: str = None) -> tf.Tensor:
+      def placeholder(shape: Any, name: str = None) -> tf.Tensor:
+          if type(shape).__name__ == "str":
+             return tf.placeholder(dtype=tf.float32, shape=[], name=name)
           return tf.placeholder(dtype=tf.float32, shape=[None] + list(shape), name=name)
