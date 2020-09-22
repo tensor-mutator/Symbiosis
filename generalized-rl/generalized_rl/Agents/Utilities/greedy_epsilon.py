@@ -5,7 +5,7 @@ __all__ = ["GreedyEpsilon"]
 
 class GreedyEpsilon:
 
-      def __init__(self, progress: Progress, epsilon_range: Tuple = (1, 0.0001), scheme: str = 'linear') -> None:
+      def __init__(self, progress: Progress, epsilon_range: Tuple = (1, 0.0001), scheme: str = "linear") -> None:
           self._max_epsilon, self._min_epsilon = epsilon_range
           self._scheme = getattr(self, scheme)
           self._progress = progress
