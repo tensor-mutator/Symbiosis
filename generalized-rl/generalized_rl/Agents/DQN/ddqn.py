@@ -5,7 +5,8 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
-from ...agent import Agent, register, NetworkBase
+from ...agent import Agent, register
+from ...network_base import NetworkBase
 from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
