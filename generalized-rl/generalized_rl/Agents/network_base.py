@@ -3,6 +3,8 @@ import tensorflow as tf
 
 class NetworkBaseDQN:
 
+      name: str = "DQN"
+
       @property
       def state(self) -> tf.Tensor:
           return self._state
@@ -34,6 +36,3 @@ class NetworkBaseDQN:
       @property
       def loss(self) -> tf.Tensor:
           return self._loss
-
-      def __repr__(self) -> str:
-          return "DQN"
