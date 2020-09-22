@@ -154,7 +154,7 @@ class DDQN(Agent):
                                                                                    self._q_values_next_target: q_values_next_target,
                                                                                    self._actions: actions,
                                                                                    self._rewards: rewards, self._terminated: terminated})
-          error, loss, _ = self._session.run([self._local_network.error, self._local_network.loss, self._local_network.apply_grads], 
+          error, loss, _ = self._session.run([self._local_network.error, self._local_network.loss, self._local_network.grad], 
                                              feed_dict={self._local_network.state: update_input, self._local_network.q_target: q_values,
                                                         self._local_network.actions: actions,
                                                         self._local_network.importance_sampling_weights: importance_sampling_weights,
