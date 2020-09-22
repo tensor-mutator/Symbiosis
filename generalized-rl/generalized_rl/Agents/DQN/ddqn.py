@@ -14,7 +14,7 @@ class DDQN(Agent):
 
       architecture_network_map = dict(standard="DQN", dueling="DuelingDQN", rnn="DRQN")
 
-      def __init__(self, env: Environment, network: NetworkBaseDQN = DQN, **hyperparams) -> None:
+      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, **hyperparams) -> None:
           self._env = env
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
