@@ -22,6 +22,10 @@ class NetworkBaseDQN:
           return self._q_target
 
       @property
+      def importance_sampling_weights(self) -> tf.Tensor:
+          return self._importance_sampling_weights
+
+      @property
       def learning_rate(self) -> float:
           return self._learning_rate
 
