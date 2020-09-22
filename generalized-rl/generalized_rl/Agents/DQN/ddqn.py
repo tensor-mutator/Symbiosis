@@ -6,7 +6,7 @@ import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
 from ...agent import Agent, register
-from ...network_base import NetworkBase
+from ...network_base import NetworkBaseDQN
 from ...Utilities import LRScheduler, GreedyEpsilon, Progress
 from ....environment import Environment
 
@@ -14,7 +14,7 @@ class DDQN(Agent):
 
       architecture_network_map = dict(standard="DQN", dueling="DuelingDQN", rnn="DRQN")
 
-      def __init__(self, env: Environment, network: NetworkBase = DQN, **hyperparams) -> None:
+      def __init__(self, env: Environment, network: NetworkBaseDQN = DQN, **hyperparams) -> None:
           self._env = env
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
@@ -87,7 +87,7 @@ class DDQN(Agent):
               update_ops.append(to_.assign(from_))
           return tf.group(*update_ops)
 
-      def _build_network_graph(self, network: NetworkBase, hyperparams: Dict) -> tf.Session:
+      def _build_network_graph(self, network: NetworkBaseDQN, hyperparams: Dict) -> tf.Session:
           self._graph = tf.Graph()
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
