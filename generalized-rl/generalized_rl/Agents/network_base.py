@@ -1,9 +1,14 @@
-from abc import ABCMeta, abstractmethod
+from typing import Dict, Tuple
 import tensorflow as tf
 
-class NetworkBaseDQN:
+class NetworkMeta(type):
 
-      name: type = "DQN"
+      def __new__(cls, name: str, base: Tuple, body: Dict) -> "<NetworkMeta inst>":
+          if "type" not in list(body.keys()):
+             raise TypeError("Missing type attribute")
+          return super(NetworkMeta, cls).__new__(cls, name, base, body)
+
+class NetworkBaseDQN(metaclass=NetworkMeta):
 
       @property
       def state(self) -> tf.Tensor:
