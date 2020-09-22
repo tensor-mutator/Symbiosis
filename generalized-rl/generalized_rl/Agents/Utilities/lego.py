@@ -74,6 +74,21 @@ class NetBlocks:
           return _op
 
       @staticmethod
+      def Conv2DNatureDueling(batch_norm: bool = False, time_distributed: bool = False) -> Callable:
+          def _op(tensor: tf.Tensor) -> tf.Tensor:
+              conv1 = NetBlocks.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
+                                       batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
+              conv2 = NetBlocks.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2),
+                                       batch_norm=batch_norm, time_distributed=time_distributed)(conv1)
+              conv3 = NetBlocks.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
+                                       time_distributed=time_distributed)(conv2)
+              flattened = layers.TimeDistributed(layers.Flatten())(conv3) if timedistributed else layers.Flatten()(conv3)
+              return [NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
+                      NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
+                      ]
+          return _op
+
+      @staticmethod
       def huber_loss(errors: tf.Tensor) -> Tf.Tensor:
           return tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
 
