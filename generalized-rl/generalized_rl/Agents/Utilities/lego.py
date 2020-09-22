@@ -84,5 +84,5 @@ class NetBlocks:
                  gradients[i] = (tf.clip_by_norm(grad, clip_norm), var)
 
       @staticmethod
-      def placeholder(shape: Tuple[int, int], name: str = None) -> tf.Tensor:
+      def placeholder(shape: Tuple, name: str = None) -> tf.Tensor:
           return tf.placeholder(dtype=tf.float32, shape=[None] + list(shape), name=name)
