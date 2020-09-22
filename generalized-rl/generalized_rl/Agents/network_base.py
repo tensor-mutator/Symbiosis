@@ -3,7 +3,7 @@ import tensorflow as tf
 
 class NetworkBaseDQN:
 
-      name: str = "DQN"
+      name: type = "DQN"
 
       @property
       def state(self) -> tf.Tensor:
