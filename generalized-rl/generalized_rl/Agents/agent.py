@@ -2,7 +2,10 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Any, Generator, Callable
 from contextlib import contextmanager
 from glob import glob
-import tensorflow.compat.v1 as tf
+import warnings
+with warnings.catch_warnings():  
+     warnings.filterwarnings("ignore", category=FutureWarning)
+     import tensorflow.compat.v1 as tf
 import numpy as np
 import os
 import dill
