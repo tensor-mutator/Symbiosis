@@ -69,7 +69,8 @@ class Agent(metaclass=ABCMeta):
 
       def run(self, suite: Callable) -> None:
           self._reward_manager = RewardManager(self._env, self.config)
-          self._load_artifacts()
+          if self.config & config.LOAD_WEIGHTS:
+             self._load_artifacts()
           while True:
                 suite()
 
