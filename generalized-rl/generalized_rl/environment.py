@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Sequence, Dict, Tuple
 import numpy as np
 
-__all__ = ["Environment"]
+__all__ = ["Environment", "State", "Action"]
 
 class State(metaclass=ABCMeta):
 
