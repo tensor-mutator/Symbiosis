@@ -3,6 +3,7 @@ from typing import Dict, Any, Generator
 from contextlib import contextmanager
 from glob import glob
 import tensorflow as tf
+import numpy as np
 import os
 import dill
 from typing import Callable, Dict
@@ -83,7 +84,7 @@ class Agent(metaclass=ABCMeta):
 
       @property
       def graph(self) -> tf.Graph:
-          retrun self._graph
+          return self._graph
 
       @property
       def alias(self) -> str:

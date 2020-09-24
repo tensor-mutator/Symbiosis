@@ -29,12 +29,12 @@ class Environment(metaclass=ABCMeta):
       def make(self) -> Any:
           ...
      
-      @astractmethod
+      @abstractmethod
       def reset(self) -> np.ndarray:
           ...
 
       @abstractmethod
-      def step(self, action: Any) -> Sequence[np.ndarray, float, bool, Dict]:
+      def step(self, action: Any) -> Sequence:
           ...
 
       @abstractmethod

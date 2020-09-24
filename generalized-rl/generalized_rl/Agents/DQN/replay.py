@@ -5,8 +5,8 @@ from random import choices, sample
 from typing import Tuple
 from glob import glob
 from collections import deque
-from ...Utlities.exceptions import *
-from ...Utilities import Progress
+from ..Utilities.exceptions import *
+from ..Utilities import Progress
 
 __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 
@@ -111,12 +111,12 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           importance_sampling_weights = self._importance_sampling_weights(sampling_probabilities[self._sampling_ids])
           return samples, np.expand_dims(importance_sampling_weights, axis=1)
 
-      def add(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None
+      def add(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
           self._base.add(transition)
           self._priorities.append(max(self._priorities, default=1))
           
       def update(self, errors: np.ndarray) -> None:
-          for idx, err in zip(self._sampling_ids, errors)
+          for idx, err in zip(self._sampling_ids, errors):
               self._priorities[idx] = abs(err) + self._offset
           self._sampling_ids = None
 

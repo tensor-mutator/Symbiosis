@@ -10,6 +10,8 @@ class NetworkMeta(type):
 
 class NetworkBaseDQN(metaclass=NetworkMeta):
 
+      type: str = "DQN"
+
       @property
       def state(self) -> tf.Tensor:
           return self._state

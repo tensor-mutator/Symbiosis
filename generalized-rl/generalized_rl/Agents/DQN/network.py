@@ -1,6 +1,7 @@
 from typing import Tuple
-from ...network_base import NetworkBaseDQN
-from ...Utilities import NetBlocks
+import tensorflow as tf
+from ..network_base import NetworkBaseDQN
+from ..Utilities import NetBlocks
 
 class DQNNet(NetworkBaseDQN):
 

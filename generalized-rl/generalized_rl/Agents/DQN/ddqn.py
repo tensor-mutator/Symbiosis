@@ -5,10 +5,10 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
-from ...agent import Agent, register
-from ...network_base import NetworkBaseDQN
-from ...Utilities import LRScheduler, GreedyEpsilon, Progress
-from ....environment import Environment
+from ..agent import Agent, register
+from ..network_base import NetworkBaseDQN
+from ..Utilities import LRScheduler, GreedyEpsilon, Progress
+from ...environment import Environment
 
 class DDQN(Agent):
 
@@ -71,7 +71,7 @@ class DDQN(Agent):
              extended_alias += "Dueling"
              components += 1
           else:
-             if network == "DRQN"
+             if network == "DRQN":
                 extended_alias += "Recurrent"
           alias = extended_alias + alias if components < 7 else "RAINBOW"
           return alias

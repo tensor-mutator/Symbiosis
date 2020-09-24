@@ -1,6 +1,6 @@
-from ....generalized_rl import Environment, State, Action
-from ....generalized_rl.Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
-from typing import Tuple, Sequence
+from generalized_rl import Environment, State, Action
+from generalized_rl.Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
+from typing import Tuple, Sequence, Any
 import numpy as np
 import gym
 import cv2
@@ -34,7 +34,7 @@ class Enduro(Environment):
           self._state_shape = (state.shape[0], state.shape[1],)
           return state
 
-      def step(self, action: Any) -> Sequence[np.ndarray, float, bool, Dict]:
+      def step(self, action: Any) -> Sequence:
           state, self._reward, self._ended, info = self._env.step(action)
           return cv2.resize(state, (64, 64,)), self._reward, self._ended, info
 

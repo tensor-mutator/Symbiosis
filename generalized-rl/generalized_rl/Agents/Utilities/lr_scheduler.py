@@ -6,13 +6,13 @@ __all__ = ["LRScheduler"]
 class LRScheduler:
 
       def __init__(self, scheme: str, learning_rate: float, training_steps: int,
-                   progress: Progress) -> None
+                   progress: Progress) -> None:
           self._lr = learning_rate
           self._scheme = getattr(self, scheme)
           self._n_steps = training_steps
           self._progress = progress
 
-      def __getattr__(self, func: str) -> Callable
+      def __getattr__(self, func: str) -> Callable:
           return lambda x: self.__class__.__dict__.get("_{}".format(func))(self, x)
       
       def _constant(self, p: float) -> float:

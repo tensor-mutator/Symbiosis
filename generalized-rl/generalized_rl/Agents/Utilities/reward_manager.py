@@ -1,11 +1,11 @@
-from typing import List
+from typing import List, Callable
 from collections import deque
 from glob import glob
 import numpy as np
 import tensorflow as tf
 import itertools
 import dill
-from ..environment import Environment
+from ...environment import Environment
 from .exceptions import *
 
 __all__ = ["RewardManager"]
@@ -87,7 +87,7 @@ class RewardManager:
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
 
       def save(self, path: str, file: str, session: tf.Session) -> None:
-          def _save(obj, func):
+          def _save(obj: deque, func: Callable):
               mem_size = self.mem_size(obj)
               if mem_size == 0:
                  return
@@ -103,14 +103,14 @@ class RewardManager:
           self._create_tensorflow_event_file(path, file, session.graph)
 
       def load(self, path: str, file: str) -> None:
-          def _load(func, obj, raise=True):
+          def _load(obj: deque, func: Callable, raise_: bool = True):
               files = glob(os.path.join(path, func()))
               if len(files) == 0:
-                 if raise:
+                 if raise_:
                     raise MissingRewardArtifactError('Reward Artifact not found')
               for file_ in files:
-              with open(file_, 'rb') as f_obj:
-                   obj.extend(dill.load(f_obj))
-          _load(self._episodic_reward, self._episode_buffer)
-          _load(self._reward, self._buffer, raise=False)
+                  with open(file_, 'rb') as f_obj:
+                       obj.extend(dill.load(f_obj))
+          _load(self._episode_buffer, self._episodic_reward)
+          _load(self._buffer, self._reward, raise_=False)
           self._n_steps = len(self._buffer)

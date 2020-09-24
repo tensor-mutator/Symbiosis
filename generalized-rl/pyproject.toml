@@ -10,7 +10,8 @@ enduro-agent = { path = "enduro-agent/" }
 
 [tool.poetry.dev-dependencies]
 tensorflow = "1.15.3"
-opencv-python = "^4.4.0.42"
+opencv-python = "^4.4.0.44"
+dill = "^0.3.2"
 
 [build-system]
 requires = ["poetry>=0.12"]

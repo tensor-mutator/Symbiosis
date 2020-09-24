@@ -89,7 +89,7 @@ class NetBlocks:
           return _op
 
       @staticmethod
-      def huber_loss(errors: tf.Tensor) -> Tf.Tensor:
+      def huber_loss(errors: tf.Tensor) -> tf.Tensor:
           return tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
 
       @staticmethod
