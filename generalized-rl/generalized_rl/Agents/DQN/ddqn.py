@@ -1,4 +1,6 @@
-import tensorflow.compat.v1 as tf
+with warnings.catch_warnings():  
+     warnings.filterwarnings("ignore", category=FutureWarning)
+     import tensorflow.compat.v1 as tf
 import numpy as np
 from typing import Dict, Any
 import json
