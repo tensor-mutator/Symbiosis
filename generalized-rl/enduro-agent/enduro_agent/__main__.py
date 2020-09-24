@@ -41,9 +41,11 @@ class Enduro(Environment):
       def render(self) -> np.ndarray:
           return cv2.resize(self._env.render(mode="rgb_array"), (64, 64,))
 
+      @property
       def state(self) -> State:
           return EnduroState()
 
+      @property
       def action(self) -> Action:
           return EnduroAction()
 

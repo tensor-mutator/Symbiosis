@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Any, Generator
 from contextlib import contextmanager
 from glob import glob
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import os
 import dill
@@ -100,7 +100,7 @@ class Agent(metaclass=ABCMeta):
 
       @property
       def env(self) -> str:
-          return self._env.name
+          return self._env
       
       def save_loss(self, loss: float) -> None:
           pass

@@ -1,4 +1,4 @@
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from typing import Dict, Any
 import json
@@ -32,12 +32,12 @@ class DDQN(Agent):
           self._progress = self.load_progress()
           self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
           self._replay = ExperienceReplay(self._replay_limit,
-                                          self._batch_size) if replay_type == 'regular' else PrioritizedExperienceReplay(self._alpha,
-                                                                                                                         self._beta,
-                                                                                                                         self._offset,
-                                                                                                                         self._replay_limit,
-                                                                                                                         self._batch_size,
-                                                                                                                         self._progress)
+                                          self._batch_size) if self._replay_type == 'regular' else PrioritizedExperienceReplay(self._alpha,
+                                                                                                                               self._beta,
+                                                                                                                               self._offset,
+                                                                                                                               self._replay_limit,
+                                                                                                                               self._batch_size,
+                                                                                                                               self._progress)
           self._lr = hyperparams.get('learning_rate', 0.0001)
           self._lr_scheduler_scheme = hyperparams.get('lr_scheduler_scheme', 'linear')
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._explore, self._progress)
@@ -62,7 +62,7 @@ class DDQN(Agent):
              self._components.append("Noisy")
              extended_alias += "Noisy"
              components += 1
-          if hyperparams["replay"] == "prioritized":
+          if self._replay_type == "prioritized":
              self._components.append("Prioritized")
              extended_alias += "Prioritized"
              components += 1
@@ -89,7 +89,6 @@ class DDQN(Agent):
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
           session = tf.Session(graph=self._graph, config=config)
-          network = DDQN.architecture_network_map.get(self._network)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
                self._local_network = network(self._env.state.shape, self._env.action.size,

@@ -1,5 +1,5 @@
 from typing import Tuple
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 from ..network_base import NetworkBaseDQN
 from ..Utilities import NetBlocks
 

@@ -2,7 +2,7 @@ from typing import List, Callable
 from collections import deque
 from glob import glob
 import numpy as np
-import tensorflow as tf
+import tensorflow.compat.v1 as tf
 import itertools
 import dill
 from ...environment import Environment
