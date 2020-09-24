@@ -40,7 +40,7 @@ class ExperienceReplay:
                 mem_size += sys.getsizeof(x)
           return mem_size
 
-      def _replay(self, file: str = None, idx: int = None) -> str:
+      def _replay(self, file: str, idx: int = None) -> str:
           if idx is None:
              return f'{file}.replay.*'
           return '%(file)s.replay.%(index)d' %{'file': file, 'index': idx}
@@ -58,7 +58,7 @@ class ExperienceReplay:
                    dill.dump(deque(itertools.islice(self._buffer, x, x + step)), f_obj, protocol=dill.HIGHEST_PROTOCOL)
 
       def load(self, path: str, file: str) -> None:
-          replay_files = glob(os.path.join(path, self._replay()))
+          replay_files = glob(os.path.join(path, self._replay(file)))
           if len(replay_files) == 0:
              raise MissingReplayError('Experience Replay not found')
           for file_ in replay_files:
@@ -122,7 +122,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
               self._priorities[idx] = abs(err) + self._offset
           self._sampling_ids = None
 
-      def _priority(self, file: str = None, idx: int = None) -> str:
+      def _priority(self, file: str, idx: int = None) -> str:
           if idx is None:
              return f'{file}.priorities.*'
           return '%(file)s.priorities.%(index)d' %{'file': file, 'index': idx}
@@ -142,7 +142,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
 
       def load(self, path: str, file: str) -> None:
           self._base.load(path, file)
-          priority_files = glob(os.path.join(path, self._priority()))
+          priority_files = glob(os.path.join(path, self._priority(file)))
           if len(priority_files) == 0:
              raise MissingReplayError('Experience Replay not found')
           for file_ in priority_files:
