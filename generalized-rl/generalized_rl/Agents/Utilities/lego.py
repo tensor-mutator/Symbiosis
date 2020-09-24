@@ -3,6 +3,8 @@ with warnings.catch_warnings():
      warnings.filterwarnings("ignore", category=FutureWarning)
      import tensorflow.compat.v1 as tf
      import tensorflow.compat.v1.keras.layers as layers
+tf.logging.set_verbosity(tf.logging.WARN)
+tf.logging.set_verbosity(tf.logging.ERROR)
 from typing import Callable, Tuple, Any
 
 class NetBlocks:
