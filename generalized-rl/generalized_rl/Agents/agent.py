@@ -109,9 +109,9 @@ class Agent(metaclass=ABCMeta):
       def env(self) -> str:
           return self._env
 
-     @property
-     def config(self) -> config:
-         return self._config
+      @property
+      def config(self) -> config:
+          return self._config
 
       def save_loss(self, loss: float) -> None:
           pass
