@@ -19,16 +19,13 @@ class EnduroAction(Action):
 
 class Enduro(Environment):
 
-      def __init__(self) -> None:
-          self._env = None
-          self._ended = False
-
       @property
       def name(self) -> str:
           return "Enduro-v0"
 
       def make(self) -> None:
           self._env = gym.make("Enduro-v0")
+          self._ended = False
 
       def reset(self) -> np.ndarray:
           state = self._env.reset()
