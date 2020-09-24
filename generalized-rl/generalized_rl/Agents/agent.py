@@ -13,6 +13,7 @@ from .DQN.replay import ExperienceReplay
 from .Utilities import Progress, RewardManager
 from .Utilities.exceptions import *
 from ..environment import Environment
+from ..config import config
 
 def register(suite: str) -> Callable:
     def wrapper(func) -> Callable:
@@ -66,7 +67,7 @@ class Agent(metaclass=ABCMeta):
                   self.session.run(tf.global_variables_initializer())
 
       def run(self, suite: Callable) -> None:
-          self._reward_manager = RewardManager(self._env)
+          self._reward_manager = RewardManager(self._env, self.config)
           self._load_artifacts()
           while True:
                 suite()
@@ -106,7 +107,11 @@ class Agent(metaclass=ABCMeta):
       @property
       def env(self) -> str:
           return self._env
-      
+
+     @property
+     def config(self) -> config:
+         return self._config
+
       def save_loss(self, loss: float) -> None:
           pass
 
