@@ -181,4 +181,4 @@ class DDQN(Agent):
 
       def __del__(self) -> None:
           self._session.close()
-          self._q_update_session.close()
+          self._session_q_update.close()
