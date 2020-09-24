@@ -109,7 +109,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           n_samples = min(self._batch_size, len(self._buffer))
           sampling_probabilities = self._sampling_probabilities()
           self._sampling_ids = choices(range(len(self._buffer)), weights=sampling_probabilities, k=n_samples)
-          samples = np.array(self._buffer)[self._sampling_ids]
+          samples = np.array(self._buffer, dtype=np.object)[self._sampling_ids]
           importance_sampling_weights = self._importance_sampling_weights(sampling_probabilities[self._sampling_ids])
           return samples, np.expand_dims(importance_sampling_weights, axis=1)
 
