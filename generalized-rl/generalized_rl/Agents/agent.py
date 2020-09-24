@@ -32,25 +32,26 @@ class Agent(metaclass=ABCMeta):
           env.make()
           env.reset()
           state = self.state(env.render())
-          yield env, progress, reward_manager, state
+          yield state
           progress.bump_episode()
           env.close()
           reward_manager.rollout()
           self.save()
 
       def _episode_suite_dqn(self) -> None:
-          with self._episode_context(self._env, self._progress, self._reward_manager) as env, progress, reward_manager, s_t:
-               while not env.ended:
+          with self._episode_context(self._env, self._progress, self._reward_manager) as s_t:
+               while not self.env.ended:
                      a_t = self.action(s_t)
-                     x_t1, r_t, done, _ = env.step(a_t)
+                     x_t1, r_t, done, _ = self.env.step(a_t)
+                     self._reward_manager.update(r_t)
                      s_t1 = self.state(x_t1, s_t)
                      self.replay.add((s_t, a_t, r_t, s_t1, done,))
                      s_t = s_t1
-                     if progress.explore_clock and progress.explore_clock%self.training_interval == 0:
+                     if self.progress.explore_clock and self.progress.explore_clock%self.training_interval == 0:
                         self.train()
-                     if progress.explore_clock and progress.explore_clock%self.target_frequency == 0:
+                     if self.progress.explore_clock and self.progress.explore_clock%self.target_frequency == 0:
                         self.update_target()
-                     progress.bump()
+                     self.progress.bump()
 
       def _load_artifacts(self) -> None:
           path = self.workspace()

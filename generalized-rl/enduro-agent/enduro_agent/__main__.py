@@ -21,6 +21,7 @@ class Enduro(Environment):
 
       def __init__(self) -> None:
           self._env = None
+          self._ended = False
 
       @property
       def name(self) -> str:
