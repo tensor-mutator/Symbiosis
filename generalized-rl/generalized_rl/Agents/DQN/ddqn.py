@@ -42,7 +42,7 @@ class DDQN(Agent):
           self._lr_scheduler_scheme = hyperparams.get('lr_scheduler_scheme', 'linear')
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._explore, self._progress)
           self._session = self._build_network_graph(network, hyperparams)
-          self._q_update_session = self._build_td_update_graph()
+          self._session_q_update = self._build_td_update_graph()
           self._memory_path = self.workspace()
 
       def _define_alias(self, network: str, hyperparams: Dict) -> str:
