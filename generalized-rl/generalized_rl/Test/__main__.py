@@ -1,5 +1,5 @@
-from environment import Environment, State, Action
-from .Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
+from generalized_rl import Environment, State, Action
+from generalized_rl.Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
 from typing import Tuple, Sequence
 import numpy as np
 import gym
