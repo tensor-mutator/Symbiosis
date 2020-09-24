@@ -68,7 +68,11 @@ class RewardManager:
              return f'{file}.reward.*'
           return '%(file)s.reward.%(index)d' %{'file': file, 'index': idx}
 
-      def _create_tensorflow_event_file(self, path: str, agent: str, graph: tf.Graph) -> None:
+      def _generate_tensorboard_event(self, path: str, agent: str, graph: tf.Graph) -> None:
+          def _remove_old_event() -> None:
+              if glob(os.path.join(path, "events.out.tfevents.*")):
+                 [os.remove(x) for x in glob(os.path.join(path, "events.out.tfevents.*"))]
+          _remove_old_event()
           summary_writer = tf.summary.FileWriter(path, graph)
           for idx, episode in enumerate(self._episode_buffer):
               total, max, min, median, mean, cumulative_mean, steps = [tf.Summary() for _ in range(7)]
@@ -102,7 +106,7 @@ class RewardManager:
                        dill.dump(deque(itertools.islice(obj, x, x+step)), f_obj, protocol=dill.HIGHEST_PROTOCOL)
           _save(self._episode_buffer, self._episodic_reward)
           _save(self._buffer, self._reward)
-          self._create_tensorflow_event_file(path, file, session.graph)
+          self._generate_tensorboard_event(path, file, session.graph)
 
       def load(self, path: str, file: str) -> None:
           def _load(obj: deque, func: Callable, raise_: bool = True):
