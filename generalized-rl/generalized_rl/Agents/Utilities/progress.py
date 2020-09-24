@@ -1,3 +1,5 @@
+import numpy as np
+
 __all__ = ["Progress"]
 
 class Progress:
@@ -49,8 +51,7 @@ class Progress:
       def bump(self) -> None:
           self._clock += 1
           self._episodic_clock += 1
-          if self._clock > self._observe:
-             self._explore_clock += 1
+          self._explore_clock = np.clip(self._clock-self._observe, 0, self._explore)
 
       def bump_episode(self) -> None:
           self._episode += 1
