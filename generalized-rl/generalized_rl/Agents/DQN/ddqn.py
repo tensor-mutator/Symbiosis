@@ -123,7 +123,7 @@ class DDQN(Agent):
           if np.random.rand() <= self._greedy_epsilon.epsilon:
              action = np.random.choice(self._env.action.size, 1)[0]
           else:
-             q_values = self._session.run(self._local_model.q_predicted, feed_dict={self._local_model.state: state})
+             q_values = self._session.run(self._local_network.q_predicted, feed_dict={self._local_network.state: state})
              action = np.argmax(q_values)
           self._greedy_epsilon.decay()
           return action
