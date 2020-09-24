@@ -1,5 +1,7 @@
+with warnings.catch_warnings():  
+     warnings.filterwarnings("ignore", category=FutureWarning)
+     import tensorflow.compat.v1 as tf
 from typing import Tuple
-import tensorflow.compat.v1 as tf
 from ..network_base import NetworkBaseDQN
 from ..Utilities import NetBlocks
 
