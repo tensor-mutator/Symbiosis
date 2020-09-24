@@ -2,52 +2,50 @@ from environment import Environment, State, Action
 from .Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
 from typing import Tuple, Sequence
 import numpy as np
+import gym
+import cv2
 
-class DemoState(State):
+class EnduroState(State):
 
       @property
       def shape(self) -> Tuple[int, int]:
-          return (128, 128)
+          return (64, 64,)
 
-class DemoAction(Action):
+class EnduroAction(Action):
 
       @property
       def size(self) -> int:
-          return 4
+          return 9
 
-class DemoEnvironment(Environment):
+class Enduro(Environment):
 
       def __init__(self) -> None:
-          self._t = 0
-          self._ended = False
+          self._env = None
 
       @property
       def name(self) -> str:
-          return "DemoEnv"
+          return "Enduro-v0"
 
       def make(self) -> None:
-          pass
+          self._env = gym.make("Enduro-v0")
 
       def reset(self) -> np.ndarray:
-          return np.ones(dtype=np.float32, shape=[128, 128, 3])
+          state = self._env.reset()
+          self._state_shape = (state.shape[0], state.shape[1],)
+          return state
 
       def step(self, action: Any) -> Sequence[np.ndarray, float, bool, Dict]:
-          self._t += 1
-          self._ended = False
-          if self._t > 40:
-             self._t = 0
-             self._ended = True
-          self._reward = -1
-          return np.ones(dtype=np.float32, shape=[128, 128, 3]), self._reward, self._ended, None
+          state, self._reward, self._ended, info = self._env.step(action)
+          return cv2.resize(state, (64, 64,)), self._reward, self._ended, info
 
       def render(self) -> np.ndarray:
-          return np.ones(dtype=np.float32, shape=[128, 128, 3])
+          return cv2.resize(self._env.render(mode="rgb_array"), (64, 64,))
 
       def state(self) -> State:
-          return DemoState()
+          return EnduroState()
 
       def action(self) -> Action:
-          return DemoAction()
+          return EnduroAction()
 
       @property
       def ended(self) -> bool:
@@ -58,4 +56,8 @@ class DemoEnvironment(Environment):
           return self._reward
 
       def close(self) -> bool:
-          return True
+          self._env.close()
+
+if __name__ == "__main__":
+   agent = DDQN(Enduro(), DQNNet)
+   agent.run()
