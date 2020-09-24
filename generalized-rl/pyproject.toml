@@ -9,7 +9,6 @@ python = "^3.6"
 enduro-agent = { path = "enduro-agent/" }
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
 tensorflow = "1.15.3"
 opencv-python = "^4.4.0.42"
 
