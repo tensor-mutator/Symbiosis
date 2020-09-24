@@ -1,4 +1,4 @@
-__all__ = ["MissingReplayError"]
+__all__ = ["MissingReplayError", "MissingRewardArtifactError", "MissingSuiteError"]
 
 class MissingReplayError(Exception):
 

@@ -5,6 +5,8 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 import itertools
 import dill
+import sys
+import os
 from ...environment import Environment
 from .exceptions import *
 
@@ -107,7 +109,7 @@ class RewardManager:
               files = glob(os.path.join(path, func()))
               if len(files) == 0:
                  if raise_:
-                    raise MissingRewardArtifactError('Reward Artifact not found')
+                    raise MissingRewardArtifactError("Reward Artifact not found")
               for file_ in files:
                   with open(file_, 'rb') as f_obj:
                        obj.extend(dill.load(f_obj))

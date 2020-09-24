@@ -123,9 +123,10 @@ class Agent(metaclass=ABCMeta):
           return Progress(self._observe, self._explore)
 
       def load(self) -> None:
+          path = self.workspace()
           with self._graph.as_default():
                saver = tf.train.Saver(max_to_keep=5)
-          ckpt = tf.train.get_checkpoint_state(self.workspace())
+          ckpt = tf.train.get_checkpoint_state(path)
           saver.restore(self.session, ckpt.model_checkpoint_path)
           self._reward_manager.load(path, self.alias)
 

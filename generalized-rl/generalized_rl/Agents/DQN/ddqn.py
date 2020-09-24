@@ -130,7 +130,7 @@ class DDQN(Agent):
 
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
           x_t1 = cv2.cvtColor(x_t1, cv2.COLOR_BGR2GRAY)
-          if not s_t:
+          if np.all(s_t is None):
              return np.expand_dims(np.stack([x_t1]*self._trace, axis=2), axis=0)
           if self._trace > 1:
              return np.append(np.expand_dims(np.expand_dims(x_t1, axis=0), axis=3), s_t[:, :, :, :self._trace - 1], axis=3)
