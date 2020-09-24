@@ -20,7 +20,7 @@ class GreedyEpsilon:
           return self._epsilon
 
       def _linear(self) -> None:
-          explore_time = max(0, self._progress.clock-self._progress.observe)
+          explore_time = self._progress.explore_clock
           if self._epsilon > self._min_epsilon:
              self._epsilon = self._max_epsilon - self._linear_rate*explore_time
               
