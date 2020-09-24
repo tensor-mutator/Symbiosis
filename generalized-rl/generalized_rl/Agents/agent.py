@@ -61,7 +61,8 @@ class Agent(metaclass=ABCMeta):
 
       def _load_artifacts(self) -> None:
           path = self.workspace()
-          if glob(os.path.join(path, "{}.ckpt.*".format(self._alias))):
+          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(path,
+                                                                       "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
              with self.session.graph.as_default():
@@ -69,8 +70,7 @@ class Agent(metaclass=ABCMeta):
 
       def run(self, suite: Callable) -> None:
           self._reward_manager = RewardManager(self._env, self.config)
-          if self.config & config.LOAD_WEIGHTS:
-             self._load_artifacts()
+          self._load_artifacts()
           while True:
                 suite()
 
