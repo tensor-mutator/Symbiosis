@@ -22,7 +22,7 @@ class NetworkBaseDQN(metaclass=NetworkMeta):
 
       @property
       def q_predicted(self) -> tf.Tensor:
-          return self._predicted
+          return self._q_predicted
 
       @property
       def q_target(self) -> tf.Tensor:
