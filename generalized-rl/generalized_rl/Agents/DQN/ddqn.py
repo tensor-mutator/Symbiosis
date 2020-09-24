@@ -91,9 +91,9 @@ class DDQN(Agent):
           session = tf.Session(graph=self._graph, config=config)
           with self._graph.as_default():
                optional_network_params = self._get_optional_network_params(hyperparams)
-               self._local_network = network(self._env.state.shape, self._env.action.size,
+               self._local_network = network(self._env.state.shape, self._trace, self._env.action.size,
                                              **optional_network_params, scope="local")
-               self._target_network = network(self._env.state.shape, self._env.action.size,
+               self._target_network = network(self._env.state.shape, self._trace, self._env.action.size,
                                               **optional_network_params, scope="target")
                self._update_ops = self._initiate_update_ops("local", "target")
           return session

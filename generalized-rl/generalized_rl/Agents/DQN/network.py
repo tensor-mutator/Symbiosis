@@ -7,10 +7,10 @@ class DQNNet(NetworkBaseDQN):
 
       type: str = "DQN"
 
-      def __init__(self, state_shape: Tuple[int, int], action_size: int,
+      def __init__(self, state_shape: Tuple[int, int], trace: int, action_size: int,
                    scope: str, clip_norm: float = None) -> None:
           with tf.variable_scope(scope):
-               self._state = NetBlocks.placeholder(state_shape)
+               self._state = NetBlocks.placeholder(state_shape + (trace,))
                nature_out = NetBlocks.Conv2DNature()(self._state)
                self._q_predicted = NetBlocks.Dense(units=action_size, activation="linear")(nature_out)
                if scope == "local":
@@ -18,7 +18,7 @@ class DQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[])
+          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
           mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)
@@ -38,10 +38,10 @@ class DRQNNet(NetworkBaseDQN):
 
       type: str = "DRQN"
 
-      def __init__(self, state_shape: Tuple[int, int], action_size: int,
+      def __init__(self, state_shape: Tuple[int, int], trace: int, action_size: int,
                    scope: str, clip_norm: float = None) -> None:
           with tf.variable_scope(scope):
-               self._state = NetBlocks.placeholder(state_shape)
+               self._state = NetBlocks.placeholder((trace,) + state_shape + (3,))
                nature_out = NetBlocks.Conv2DNature(time_distributed=True)(self._state)
                lstm_out = NetBLocks.LSTM(units=512)(nature_out)
                self._q_predicted = NetBlocks.Dense(units=action_size, activation="linear")(lstm_out)
@@ -50,7 +50,7 @@ class DRQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[])
+          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
           mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)
@@ -70,10 +70,10 @@ class DuelingDQNNet(NetworkBaseDQN):
 
       type: str = "DuelingDQN"
 
-      def __init__(self, state_shape: Tuple[int, int], action_size: int,
+      def __init__(self, state_shape: Tuple[int, int], trace: int, action_size: int,
                    scope: str, clip_norm: float = None) -> None:
           with tf.variable_scope(scope):
-               self._state = NetBlocks.placeholder(state_shape)
+               self._state = NetBlocks.placeholder(state_shape + (trace,))
                nature_out_adv, nature_out_val = NetBlocks.Conv2DNatureDueling()(self._state)
                self._q_predicted = self._fuse_adv_val(nature_out_adv, nature_out_val, action_size)
                if scope == "local":
@@ -87,7 +87,7 @@ class DuelingDQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[])
+          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
           mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)

@@ -69,7 +69,7 @@ class NetBlocks:
                                        batch_norm=batch_norm, time_distributed=time_distributed)(conv1)
               conv3 = NetBlocks.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
                                        time_distributed=time_distributed)(conv2)
-              flattened = layers.TimeDistributed(layers.Flatten())(conv3) if timedistributed else layers.Flatten()(conv3)
+              flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
               return NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
           return _op
 
@@ -82,7 +82,7 @@ class NetBlocks:
                                        batch_norm=batch_norm, time_distributed=time_distributed)(conv1)
               conv3 = NetBlocks.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
                                        time_distributed=time_distributed)(conv2)
-              flattened = layers.TimeDistributed(layers.Flatten())(conv3) if timedistributed else layers.Flatten()(conv3)
+              flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
               return [NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
                       NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
                       ]
@@ -99,7 +99,8 @@ class NetBlocks:
                  gradients[i] = (tf.clip_by_norm(grad, clip_norm), var)
 
       @staticmethod
-      def placeholder(shape: Any, name: str = None) -> tf.Tensor:
+      def placeholder(shape: Any, dtype: tf.DType = None, name: str = None) -> tf.Tensor:
+          dtype = tf.float32 if not dtype else dtype
           if type(shape).__name__ == "str":
-             return tf.placeholder(dtype=tf.float32, shape=[], name=name)
-          return tf.placeholder(dtype=tf.float32, shape=[None] + list(shape), name=name)
+             return tf.placeholder(dtype=dtype, shape=[], name=name)
+          return tf.placeholder(dtype=dtype, shape=[None] + list(shape), name=name)
