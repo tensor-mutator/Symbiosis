@@ -1,4 +1,3 @@
-import tensorflow as tf_2
 import tensorflow.compat.v1 as tf
 import tensorflow.compat.v1.keras.layers as layers
 from typing import Callable, Tuple, Any
@@ -90,7 +89,7 @@ class NetBlocks:
 
       @staticmethod
       def huber_loss(errors: tf.Tensor) -> tf.Tensor:
-          return tf_2.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
+          return tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
 
       @staticmethod
       def clip_grads_by_norm(gradients: tf.Tensor, clip_norm: float) -> None:
