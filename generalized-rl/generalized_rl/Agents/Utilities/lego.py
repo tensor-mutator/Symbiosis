@@ -1,6 +1,5 @@
-import tensorflow as tf
-import tensorflow.keras.layers as layers
-import tensorflow.compat.v1.keras.layers as layers_compat
+import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1.keras.layers as layers
 from typing import Callable, Tuple, Any
 
 class NetBlocks:
@@ -56,7 +55,7 @@ class NetBlocks:
       def LSTM(units: int) -> Callable:
           def _op(tensor: tf.Tensor) -> tf.Tensor:
               if tf.test.is_gpu_available():
-                 return layers_compat.CuDNNLSTM(units=units)
+                 return layers.CuDNNLSTM(units=units)
               return layers.LSTM(units=units)
           return _op
 
