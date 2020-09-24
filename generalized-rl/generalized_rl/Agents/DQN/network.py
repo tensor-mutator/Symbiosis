@@ -18,10 +18,10 @@ class DQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
+          self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
-          mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)
+          mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error = tf.subtract(q_predicted, q_target)
@@ -50,10 +50,10 @@ class DRQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
+          self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
-          mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)
+          mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error = tf.subtract(q_predicted, q_target)
@@ -87,10 +87,10 @@ class DuelingDQNNet(NetworkBaseDQN):
 
       def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
-          self._actions = NetBlocks.placeholder(shape=[], dtype=tf.int32)
+          self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
-          mask_tensor = tf.one_hot(indices=self._actions, depth=action_size)
+          mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error = tf.subtract(q_predicted, q_target)
