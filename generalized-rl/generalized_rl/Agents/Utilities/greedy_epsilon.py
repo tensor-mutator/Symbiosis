@@ -21,12 +21,11 @@ class GreedyEpsilon:
 
       def _linear(self) -> None:
           explore_time = self._progress.explore_clock
-          if self._epsilon > self._min_epsilon:
-             self._epsilon = self._max_epsilon - self._linear_rate*explore_time
+          self._epsilon = self._max_epsilon - self._linear_rate*explore_time
               
       def _exponential(self) -> None:
           const = 10/self._progress.explore
-          explore_time = max(0, self._progress.clock-self._progress.observe)
+          explore_time = self._progress.explore_clock
           self._epsilon = self._min_epsilon + ((self._max_epsilon - self._min_epsilon)*np.exp(-const*explore_time))
 
       def decay(self) -> None:
