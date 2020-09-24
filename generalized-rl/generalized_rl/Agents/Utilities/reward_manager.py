@@ -58,12 +58,12 @@ class RewardManager:
                 mem_size += sys.getsizeof(x)
           return mem_size
 
-      def _episodic_reward(self, file: str = None, idx: int = None) -> str:
+      def _episodic_reward(self, file: str, idx: int = None) -> str:
           if idx is None:
              return f'{file}.episode.reward.*'
           return '%(file)s.episode.reward.%(index)d' %{'file': file, 'index': idx}
 
-      def _reward(self, file: str = None, idx: int = None) -> str:
+      def _reward(self, file: str, idx: int = None) -> str:
           if idx is None:
              return f'{file}.reward.*'
           return '%(file)s.reward.%(index)d' %{'file': file, 'index': idx}
@@ -110,7 +110,7 @@ class RewardManager:
 
       def load(self, path: str, file: str) -> None:
           def _load(obj: deque, func: Callable, raise_: bool = True):
-              files = glob(os.path.join(path, func()))
+              files = glob(os.path.join(path, func(file)))
               if len(files) == 0:
                  if raise_:
                     raise MissingRewardArtifactError("Reward Artifact not found")
