@@ -8,17 +8,20 @@ import dill
 import sys
 import os
 from ...environment import Environment
+from ...config import config
 from .exceptions import *
 
 __all__ = ["RewardManager"]
 
 class RewardManager:
 
-      def __init__(self, env: Environment) -> None:
+      def __init__(self, env: Environment, config: config) -> None:
           self._env = env
           self._buffer = deque()
           self._episode_buffer = deque()
           self._n_steps = 0
+          self._generate_event = config & config.TENSOR_EVENT
+          self._console_summary = config & config.CONSOLE_SUMMARY
 
       def update(self, reward: float) -> None:
           self._buffer.append(reward)
@@ -106,7 +109,8 @@ class RewardManager:
                        dill.dump(deque(itertools.islice(obj, x, x+step)), f_obj, protocol=dill.HIGHEST_PROTOCOL)
           _save(self._episode_buffer, self._episodic_reward)
           _save(self._buffer, self._reward)
-          self._generate_tensorboard_event(path, file, session.graph)
+          if self._generate_event:
+             self._generate_tensorboard_event(path, file, session.graph)
 
       def load(self, path: str, file: str) -> None:
           def _load(obj: deque, func: Callable, raise_: bool = True):
