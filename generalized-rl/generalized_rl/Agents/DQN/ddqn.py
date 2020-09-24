@@ -12,11 +12,13 @@ from ..agent import Agent, register
 from ..network_base import NetworkBaseDQN
 from ..Utilities import LRScheduler, GreedyEpsilon, Progress
 from ...environment import Environment
+from ...config import config
 
 class DDQN(Agent):
 
-      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, **hyperparams) -> None:
+      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: config = 0b000, **hyperparams) -> None:
           self._env = env
+          self._config = config
           self._observe = hyperparams.get('observe', 5000)
           self._explore = hyperparams.get('explore', 10000)
           self._batch_size = hyperparams.get('batch_size', 32)
