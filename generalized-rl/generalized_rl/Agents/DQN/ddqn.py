@@ -16,7 +16,8 @@ from ...config import config
 
 class DDQN(Agent):
 
-      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: config.DEFAULT, **hyperparams) -> None:
+      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: config = config.DEFAULT,
+                   **hyperparams) -> None:
           self._env = env
           self._config = config
           self._observe = hyperparams.get('observe', 5000)
