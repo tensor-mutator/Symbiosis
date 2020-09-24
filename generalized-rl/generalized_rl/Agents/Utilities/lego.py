@@ -1,5 +1,7 @@
-import tensorflow.compat.v1 as tf
-import tensorflow.compat.v1.keras.layers as layers
+with warnings.catch_warnings():  
+     warnings.filterwarnings("ignore", category=FutureWarning)
+     import tensorflow.compat.v1 as tf
+     import tensorflow.compat.v1.keras.layers as layers
 from typing import Callable, Tuple, Any
 
 class NetBlocks:
