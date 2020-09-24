@@ -21,9 +21,10 @@ def register(suite: str) -> Callable:
 class Agent(metaclass=ABCMeta):
 
       def __getattr__(self, func: Callable) -> Callable:
+          base_idx = len(self.__class__.__mro__)-2
           agent = self.__class__.__name__
           if getattr(self, "_{}".format(func), None):
-             return lambda: self.__class__.__mro__[1].__dict__["_{}".format(func)](self)
+             return lambda: self.__class__.__mro__[base_idx].__dict__["_{}".format(func)](self)
           raise MissingSuiteError("Matching suite not found for class: {}".format(agent))
 
       @contextmanager
