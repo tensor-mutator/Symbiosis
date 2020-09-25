@@ -7,6 +7,8 @@ tf.logging.set_verbosity(tf.logging.WARN)
 tf.logging.set_verbosity(tf.logging.ERROR)
 from typing import Callable, Tuple, Any
 
+__all__ = ["NetBlocks"]
+
 class NetBlocks:
 
       graph = tf.get_default_graph()
