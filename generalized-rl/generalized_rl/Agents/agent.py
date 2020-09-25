@@ -162,10 +162,10 @@ class Agent(metaclass=ABCMeta):
       def total_steps(self) -> int:
           return self._total_steps
 
-     @property
-     def observe(self) -> int:
-         return getattr(self, "_observe", 0)
+      @property
+      def observe(self) -> int:
+          return getattr(self, "_observe", 0)
 
-     @property
-     def explore(self) -> float:
-         return getattr(self, "_explore", np.inf)
+      @property
+      def explore(self) -> float:
+          return getattr(self, "_explore", np.inf)
