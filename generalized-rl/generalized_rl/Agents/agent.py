@@ -46,7 +46,7 @@ class Agent(metaclass=ABCMeta):
           progress.bump_episode()
 
       def _episode_suite_dqn(self) -> None:
-          with self._episode_context(self._env, self._progress, self._reward_manager) as s_t:
+          with self._episode_context(self.env, self.progress, self._reward_manager) as s_t:
                while not self.env.ended:
                      a_t = self.action(s_t)
                      x_t1, r_t, done, _ = self.env.step(a_t)
@@ -72,7 +72,7 @@ class Agent(metaclass=ABCMeta):
       def run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
-          self._reward_manager = RewardManager(self._env, self.config)
+          self._reward_manager = RewardManager(self.env, self.config, self.progress)
           self._load_artifacts()
           while True:
                 suite()
@@ -131,7 +131,7 @@ class Agent(metaclass=ABCMeta):
                   self._saver = tf.train.Saver(max_to_keep=5)
           self._saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
           with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
-               dill.dump(self._progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
+               dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
           self._reward_manager.save(path, self.alias, self._session)
 
       def load_progress(self) -> Progress:
