@@ -20,7 +20,7 @@ class RewardManager:
           self._buffer = deque()
           self._episode_buffer = deque()
           self._n_steps = 0
-          self._generate_event = config_&config.TENSOR_EVENT
+          self._generate_event = config_&config.REWARD_EVENT
           self._console_summary = config_&config.CONSOLE_SUMMARY
 
       def update(self, reward: float) -> None:
