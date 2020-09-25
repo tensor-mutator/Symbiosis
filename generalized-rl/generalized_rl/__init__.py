@@ -4,7 +4,8 @@ from .environment import Environment, State, Action
 from .Agents.DQN.ddqn import DDQN
 from .Agents.DQN.network import DQNNet, DRQNNet, DuelingDQNNet
 from .Agents.network_base import NetworkBaseDQN
+from .Agents.Utilities.lego import NetBlocks
 from .config import config
 
 __all__ = ["Environment", "State", "Action", "DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet",
-           "config"]
+           "config", "NetBlocks"]
