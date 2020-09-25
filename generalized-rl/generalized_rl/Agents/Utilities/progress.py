@@ -4,7 +4,7 @@ __all__ = ["Progress"]
 
 class Progress:
 
-      def __init__(self, n_steps: int, observe: int = 0, explore: int = 0) -> None:
+      def __init__(self, n_steps: int, observe: int = 0, explore: float = np.inf) -> None:
           self._n_train_steps = n_steps-observe
           self._observe = observe
           self._explore = explore
