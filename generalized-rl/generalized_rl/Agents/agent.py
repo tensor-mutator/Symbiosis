@@ -27,9 +27,10 @@ class Agent(metaclass=ABCMeta):
       def __getattr__(self, func: Callable) -> Callable:
           base_idx = len(self.__class__.__mro__)-2
           agent = self.__class__.__name__
-          if getattr(self, "_{}".format(func), None):
-             return lambda: self.__class__.__mro__[base_idx].__dict__["_{}".format(func)](self)
-          raise MissingSuiteError("Matching suite not found for class: {}".format(agent))
+          func = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
+          if func:
+             return lambda: func(self)
+          return None
 
       @contextmanager
       def _episode_context(self, env: Environment, progress: Progress,
@@ -65,10 +66,12 @@ class Agent(metaclass=ABCMeta):
                                                                        "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
-             with self.session.graph.as_default():
+             with self.graph.as_default():
                   self.session.run(tf.global_variables_initializer())
 
       def run(self, suite: Callable) -> None:
+          if not suite:
+             raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           self._reward_manager = RewardManager(self._env, self.config)
           self._load_artifacts()
           while True:
@@ -124,7 +127,7 @@ class Agent(metaclass=ABCMeta):
       def save(self) -> None:
           path = self.workspace()
           if not getattr(self, "_saver", None):
-             with self._graph.as_default():
+             with self.graph.as_default():
                   self._saver = tf.train.Saver(max_to_keep=5)
           self._saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
           with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
@@ -141,7 +144,7 @@ class Agent(metaclass=ABCMeta):
 
       def load(self) -> None:
           path = self.workspace()
-          with self._graph.as_default():
+          with self.graph.as_default():
                self._saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(path)
           self._saver.restore(self.session, ckpt.model_checkpoint_path)
