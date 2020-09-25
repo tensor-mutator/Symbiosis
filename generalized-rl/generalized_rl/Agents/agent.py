@@ -41,7 +41,7 @@ class Agent(metaclass=ABCMeta):
           progress.bump_episode()
           env.close()
           reward_manager.rollout()
-          if self.config & config.SAVE_WEIGHTS:
+          if self.config&config.SAVE_WEIGHTS:
              self.save()
 
       def _episode_suite_dqn(self) -> None:
@@ -61,7 +61,7 @@ class Agent(metaclass=ABCMeta):
 
       def _load_artifacts(self) -> None:
           path = self.workspace()
-          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(path,
+          if (self.config&config.LOAD_WEIGHTS) and glob(os.path.join(path,
                                                                        "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
@@ -128,7 +128,7 @@ class Agent(metaclass=ABCMeta):
 
       def load_progress(self) -> Progress:
           path = self.workspace()
-          if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
+          if (self.config&config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
                                                                                  "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
