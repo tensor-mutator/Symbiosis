@@ -16,7 +16,7 @@ class config(IntEnum):
       LOAD_WEIGHTS: bin = 0b01000000000
       NOHUP: bin = 0b10000000000
 
-       @staticmethod
+      @staticmethod
       def show() -> None:
           print("config.DEFAULT")
           print("config.VERBOSE_LITE")
