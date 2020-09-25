@@ -33,7 +33,7 @@ class DQNNet(NetworkBaseDQN):
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBLocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
 
@@ -65,7 +65,7 @@ class DRQNNet(NetworkBaseDQN):
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBLocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
 
@@ -102,6 +102,6 @@ class DuelingDQNNet(NetworkBaseDQN):
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBLocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
