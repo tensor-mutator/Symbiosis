@@ -9,16 +9,19 @@ import sys
 import os
 from ...environment import Environment
 from ...config import config
+from .progress import Progress
 from .exceptions import *
 
 __all__ = ["RewardManager"]
 
 class RewardManager:
 
-      def __init__(self, env: Environment, config_: config) -> None:
+      def __init__(self, env: Environment, config_: config, progress: Progress) -> None:
           self._env = env
+          self._progress = progress
           self._buffer = deque()
           self._episode_buffer = deque()
+          self._episode_indices = deque()
           self._n_steps = 0
           self._generate_event = config_&config.REWARD_EVENT
           self._console_summary = config_&(config.VERBOSE_LITE+config.VERBOSE_HEAVY)
@@ -47,6 +50,7 @@ class RewardManager:
           payload = dict(mean=mean_reward, median=median_reward, max=max_reward, min=min_reward,
                          total=total_rewards, cumulative_mean=cumulative_mean_reward, steps=self._n_steps)
           self._episode_buffer.append(payload)
+          self._episode_indices.append(self._progress.episode)
           self._buffer = deque()
           self._n_steps = 0
 
@@ -73,7 +77,7 @@ class RewardManager:
 
       def _generate_tensorboard_event(self, path: str, agent: str, graph: tf.Graph) -> None:
           summary_writer = tf.summary.FileWriter(os.path.join(path, "Events"), graph)
-          for idx, episode in enumerate(self._episode_buffer):
+          for idx, episode in zip(self._episode_indices, self._episode_buffer):
               total, max, min, median, mean, cumulative_mean, steps = [tf.Summary() for _ in range(7)]
               total.value.add(tag='Performance Benchmark on {}/Episodes - Total Rewards'.format(self._env.name),
                               simple_value=episode["total"])
@@ -91,6 +95,7 @@ class RewardManager:
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
           self._episode_buffer = deque()
+          self._episode_indices = deque()
 
       def save(self, path: str, file: str, session: tf.Session) -> None:
           def _save(obj: deque, func: Callable):
