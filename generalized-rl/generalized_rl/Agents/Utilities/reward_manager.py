@@ -72,11 +72,7 @@ class RewardManager:
           return '%(file)s.reward.%(index)d' %{'file': file, 'index': idx}
 
       def _generate_tensorboard_event(self, path: str, agent: str, graph: tf.Graph) -> None:
-          def _remove_old_event() -> None:
-              if glob(os.path.join(path, "events.out.tfevents.*")):
-                 [os.remove(x) for x in glob(os.path.join(path, "events.out.tfevents.*"))]
-          _remove_old_event()
-          summary_writer = tf.summary.FileWriter(path, graph)
+          summary_writer = tf.summary.FileWriter(os.path.join(path, "Events"), graph)
           for idx, episode in enumerate(self._episode_buffer):
               total, max, min, median, mean, cumulative_mean, steps = [tf.Summary() for _ in range(7)]
               total.value.add(tag='Performance Benchmark on {}/Episodes - Total Rewards'.format(self._env.name),
