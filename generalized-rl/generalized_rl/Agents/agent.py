@@ -114,6 +114,10 @@ class Agent(metaclass=ABCMeta):
       def config(self) -> config:
           return self._config
 
+      @config.setter
+      def config(self, config: config) -> None:
+          self._config = config
+
       def save_loss(self, loss: float) -> None:
           pass
 
