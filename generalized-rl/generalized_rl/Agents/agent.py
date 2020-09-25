@@ -53,9 +53,9 @@ class Agent(metaclass=ABCMeta):
                      s_t1 = self.state(x_t1, s_t)
                      self.replay.add((s_t, a_t, r_t, s_t1, done,))
                      s_t = s_t1
-                     if self.progress.explore_clock and self.progress.explore_clock%self.training_interval == 0:
+                     if self.progress.explore_clock and self.progress.training_clock%self.training_interval == 0:
                         self.train()
-                     if self.progress.explore_clock and self.progress.explore_clock%self.target_frequency == 0:
+                     if self.progress.explore_clock and self.progress.training_clock%self.target_frequency == 0:
                         self.update_target()
                      self.progress.bump()
 
@@ -131,7 +131,7 @@ class Agent(metaclass=ABCMeta):
           if os.path.exists(os.path.join(path, "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
-          return Progress(self._observe, self._explore)
+          return Progress(self.total_steps, self.observe, self.explore)
 
       def load(self) -> None:
           path = self.workspace()
@@ -157,3 +157,15 @@ class Agent(metaclass=ABCMeta):
       @property
       def target_frequency(self) -> int:
           return self._target_frequency
+
+      @property
+      def total_steps(self) -> int:
+          return self._total_steps
+
+     @property
+     def observe(self) -> int:
+         return getattr(self, "_observe", 0)
+
+     @property
+     def explore(self) -> float:
+         return getattr(self, "_explore", np.inf)
