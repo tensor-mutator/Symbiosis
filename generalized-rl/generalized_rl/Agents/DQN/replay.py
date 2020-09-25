@@ -20,8 +20,9 @@ class ExperienceReplay:
           self._buffer = deque(maxlen=limit)
 
       def sample(self) -> np.ndarray:
-          samples = sample(self._buffer, min(self._batch_size, len(self._buffer)))
-          return np.array(samples), np.ones((samples, 1), dtype=np.float32)
+          n_samples = min(self._batch_size, len(self._buffer))
+          samples = sample(self._buffer, n_samples)
+          return np.array(samples, dtype=np.object), np.ones(shape=(n_samples, 1), dtype=np.float32)
 
       def update(self, errors: np.ndarray) -> None:
           ...
