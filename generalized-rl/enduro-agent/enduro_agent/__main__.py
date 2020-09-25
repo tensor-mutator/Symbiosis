@@ -61,5 +61,5 @@ class Enduro(Environment):
           self._env.close()
 
 if __name__ == "__main__":
-   agent = DDQN(Enduro(), DQNNet, config=config.CONSOLE_SUMMARY)
+   agent = DDQN(Enduro(), DQNNet, config=config.VERBOSE_LITE)
    agent.run()
