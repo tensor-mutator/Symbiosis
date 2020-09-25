@@ -45,5 +45,4 @@ class LRScheduler:
 
       @property
       def lr(self) -> float:
-          lr = self._scheme(self._progress.training_clock/self._n_steps)
-          return lr
+          return self._lr*self._scheme(self._progress.training_clock/self._n_steps)
