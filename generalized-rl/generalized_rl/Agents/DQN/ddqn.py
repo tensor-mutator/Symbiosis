@@ -47,7 +47,7 @@ class DDQN(Agent):
                                                                                                                                self._progress)
           self._lr = hyperparams.get("learning_rate", 0.0001)
           self._lr_scheduler_scheme = hyperparams.get("lr_scheduler_scheme", "linear")
-          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._training_steps, self._progress)
+          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._training_steps-self._observe, self._progress)
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
           self._memory_path = self.workspace()
