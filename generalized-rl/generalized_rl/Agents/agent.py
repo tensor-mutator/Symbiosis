@@ -128,7 +128,8 @@ class Agent(metaclass=ABCMeta):
 
       def load_progress(self) -> Progress:
           path = self.workspace()
-          if os.path.exists(os.path.join(path, "{}.progress".format(self.alias))):
+          if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
+                                                                                 "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
           return Progress(self.total_steps, self.observe, self.explore)
