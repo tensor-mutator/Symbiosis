@@ -39,11 +39,11 @@ class Agent(metaclass=ABCMeta):
           env.reset()
           state = self.state(env.render())
           yield state
-          progress.bump_episode()
           env.close()
           reward_manager.rollout()
           if self.config&config.SAVE_WEIGHTS:
              self.save()
+          progress.bump_episode()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self._env, self._progress, self._reward_manager) as s_t:
