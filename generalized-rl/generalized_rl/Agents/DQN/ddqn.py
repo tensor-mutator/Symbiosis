@@ -167,11 +167,8 @@ class DDQN(Agent):
           return loss
 
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
-          optional_network_params = ["clip_norm"]
           params_dict = dict()
-          for param in optional_network_params:
-              if hyperparams.get(param, None):
-                 params_dict[param] = hyperparams[param]
+          params_dict.update(dict(clip_norm=hyperparams.get("clip_norm", 10)))
           return params_dict
 
       def save(self) -> None:
