@@ -90,6 +90,7 @@ class RewardManager:
               steps.value.add(tag='Performance Benchmark on {}/Episodes - Steps'.format(self._env.name),
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
+          self._episode_buffer = deque()
 
       def save(self, path: str, file: str, session: tf.Session) -> None:
           def _save(obj: deque, func: Callable):
