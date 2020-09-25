@@ -1,6 +1,6 @@
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
-from generalized_rl import Environment, State, Action
+from generalized_rl import Environment, State, Action, config
 from generalized_rl.Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
 from typing import Tuple, Sequence, Any
 import numpy as np
@@ -61,5 +61,5 @@ class Enduro(Environment):
           self._env.close()
 
 if __name__ == "__main__":
-   agent = DDQN(Enduro(), DQNNet)
+   agent = DDQN(Enduro(), DQNNet, config=config.CONSOLE_SUMMARY)
    agent.run()
