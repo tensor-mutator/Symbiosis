@@ -39,7 +39,7 @@ class DDQN(Agent):
           self._progress = self.load_progress()
           self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
           self._replay = ExperienceReplay(self._replay_limit,
-                                          self._batch_size) if self._replay_type == 'regular' else PrioritizedExperienceReplay(self._alpha,
+                                          self._batch_size) if self._replay_type == "regular" else PrioritizedExperienceReplay(self._alpha,
                                                                                                                                self._beta,
                                                                                                                                self._offset,
                                                                                                                                self._replay_limit,
