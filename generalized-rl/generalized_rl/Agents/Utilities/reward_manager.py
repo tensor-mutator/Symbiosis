@@ -21,7 +21,7 @@ class RewardManager:
           self._episode_buffer = deque()
           self._n_steps = 0
           self._generate_event = config_&config.REWARD_EVENT
-          self._console_summary = config_&config.CONSOLE_SUMMARY
+          self._console_summary = config_&(config.VERBOSE_LITE+config.VERBOSE_HEAVY)
 
       def update(self, reward: float) -> None:
           self._buffer.append(reward)
