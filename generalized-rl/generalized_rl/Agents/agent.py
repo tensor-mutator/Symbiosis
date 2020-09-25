@@ -123,9 +123,10 @@ class Agent(metaclass=ABCMeta):
 
       def save(self) -> None:
           path = self.workspace()
-          with self._graph.as_default():
-               saver = tf.train.Saver(max_to_keep=5)
-          saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
+          if not getattr(self, "_saver", None):
+             with self._graph.as_default():
+                  self._saver = tf.train.Saver(max_to_keep=5)
+          self._saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
           with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self._progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
           self._reward_manager.save(path, self.alias, self._session)
@@ -141,9 +142,9 @@ class Agent(metaclass=ABCMeta):
       def load(self) -> None:
           path = self.workspace()
           with self._graph.as_default():
-               saver = tf.train.Saver(max_to_keep=5)
+               self._saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(path)
-          saver.restore(self.session, ckpt.model_checkpoint_path)
+          self._saver.restore(self.session, ckpt.model_checkpoint_path)
           self._reward_manager.load(path, self.alias)
 
       def workspace(self) -> str:
