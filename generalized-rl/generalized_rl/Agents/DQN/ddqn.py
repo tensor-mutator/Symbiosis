@@ -22,7 +22,7 @@ class DDQN(Agent):
           self._config = config
           self._observe = hyperparams.get("observe", 5000)
           self._explore = hyperparams.get("explore", 50000)
-          self._training_steps = hyperparams.get("training_steps", 10000000)
+          self._total_steps = hyperparams.get("total_steps", 10000000)
           self._batch_size = hyperparams.get("batch_size", 32)
           self._trace = hyperparams.get("trace", 4)
           self._replay_limit = hyperparams.get("replay_limit", 10000)
@@ -47,7 +47,7 @@ class DDQN(Agent):
                                                                                                                                self._progress)
           self._lr = hyperparams.get("learning_rate", 0.0001)
           self._lr_scheduler_scheme = hyperparams.get("lr_scheduler_scheme", "linear")
-          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._training_steps-self._observe, self._progress)
+          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._total_steps-self._observe, self._progress)
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
           self._memory_path = self.workspace()
