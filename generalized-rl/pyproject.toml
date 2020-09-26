@@ -2,10 +2,10 @@
 name = "generalized-rl"
 version = "0.1.0"
 description = "Generalized RL"
-authors = ["Debajyoti Raychaudhuri"]
+authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6"
+python = "3.6"
 enduro-agent = { path = "enduro-agent/" }
 
 [tool.poetry.dev-dependencies]
