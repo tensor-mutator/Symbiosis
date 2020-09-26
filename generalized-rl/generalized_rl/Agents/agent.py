@@ -39,13 +39,13 @@ class Agent(metaclass=ABCMeta):
           yield state
           env.close()
           reward_manager.rollout()
-          if self.config&config.SAVE_WEIGHTS:
+          if self.config & config.SAVE_WEIGHTS:
              self.save()
           progress.bump_episode()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self.env, self.progress, self._reward_manager) as s_t:
-               while not self.env.ended:
+               while not self.env.ended and self.progress.clock < self.total_steps:
                      a_t = self.action(s_t)
                      x_t1, r_t, done, _ = self.env.step(a_t)
                      self._reward_manager.update(r_t)
@@ -60,7 +60,7 @@ class Agent(metaclass=ABCMeta):
 
       def _load_artifacts(self) -> None:
           path = self.workspace()
-          if (self.config&config.LOAD_WEIGHTS) and glob(os.path.join(path,
+          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(path,
                                                                      "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
@@ -72,7 +72,7 @@ class Agent(metaclass=ABCMeta):
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
           self._load_artifacts()
-          while True:
+          while self.progress.clock < self.total_steps:
                 suite()
 
       @abstractmethod
@@ -134,7 +134,7 @@ class Agent(metaclass=ABCMeta):
 
       def load_progress(self) -> Progress:
           path = self.workspace()
-          if (self.config&config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
+          if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
                                                                                "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
