@@ -1,7 +1,7 @@
 import os
 os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
 from generalized_rl import Environment, State, Action, config
-from generalized_rl.Agents import DDQN, DQNNet, DuelingDQNNet, DRQNNet
+from generalized_rl.Agents import DDQN, DQNNet
 from typing import Tuple, Sequence, Any
 import numpy as np
 import gym
