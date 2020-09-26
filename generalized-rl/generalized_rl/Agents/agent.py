@@ -70,7 +70,7 @@ class Agent(metaclass=ABCMeta):
       def run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
-          self._reward_manager = RewardManager(self.env, self.config, self.progress)
+          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
           self._load_artifacts()
           while True:
                 suite()
