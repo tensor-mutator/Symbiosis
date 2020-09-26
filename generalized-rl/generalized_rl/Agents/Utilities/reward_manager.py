@@ -96,7 +96,7 @@ class RewardManager:
               mean.value.add(tag='{} Performance Benchmark on {}/Episodes - Mean Rewards'.format(self._agent, 
                                                                                                  self._env.name),
                               simple_value=episode["mean"])
-              cumulative_mean.value.add(tag='Performance Benchmark on {}/Episodes - Cumulative Mean Rewards'.format(self._agent, 
+              cumulative_mean.value.add(tag='{} Performance Benchmark on {}/Episodes - Cumulative Mean Rewards'.format(self._agent, 
                                                                                                                     self._env.name),
                               simple_value=episode["cumulative_mean"])
               steps.value.add(tag='{} Performance Benchmark on {}/Episodes - Steps'.format(self._agent, 
