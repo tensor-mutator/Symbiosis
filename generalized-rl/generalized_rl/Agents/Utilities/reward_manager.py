@@ -16,8 +16,10 @@ __all__ = ["RewardManager"]
 
 class RewardManager:
 
-      def __init__(self, env: Environment, config_: config, progress: Progress) -> None:
+      def __init__(self, env: Environment, agent: str,
+                   config_: config, progress: Progress) -> None:
           self._env = env
+          self._agent = agent
           self._progress = progress
           self._buffer = deque()
           self._episode_buffer = deque()
@@ -76,22 +78,29 @@ class RewardManager:
           return '%(file)s.reward.%(index)d' %{'file': file, 'index': idx}
 
       def _generate_tensorboard_event(self, path: str, agent: str, graph: tf.Graph) -> None:
-          summary_writer = tf.summary.FileWriter(os.path.join(path, "Events"), graph)
+          summary_writer = tf.summary.FileWriter(os.path.join(path, f"{self._agent} Events"), graph)
           for idx, episode in zip(self._episode_indices, self._episode_buffer):
               total, max, min, median, mean, cumulative_mean, steps = [tf.Summary() for _ in range(7)]
-              total.value.add(tag='Performance Benchmark on {}/Episodes - Total Rewards'.format(self._env.name),
+              total.value.add(tag='{} Performance Benchmark on {}/Episodes - Total Rewards'.format(self._agent, 
+                                                                                                   self._env.name),
                               simple_value=episode["total"])
-              max.value.add(tag='Performance Benchmark on {}/Episodes - Max Rewards'.format(self._env.name),
+              max.value.add(tag='{} Performance Benchmark on {}/Episodes - Max Rewards'.format(self._agent, 
+                                                                                               self._env.name),
                               simple_value=episode["max"])
-              min.value.add(tag='Performance Benchmark on {}/Episodes - Min Rewards'.format(self._env.name),
+              min.value.add(tag='{} Performance Benchmark on {}/Episodes - Min Rewards'.format(self._agent, 
+                                                                                               self._env.name),
                               simple_value=episode["min"])
-              median.value.add(tag='Performance Benchmark on {}/Episodes - Median Rewards'.format(self._env.name),
+              median.value.add(tag='{} Performance Benchmark on {}/Episodes - Median Rewards'.format(self._agent, 
+                                                                                                     self._env.name),
                               simple_value=episode["median"])
-              mean.value.add(tag='Performance Benchmark on {}/Episodes - Mean Rewards'.format(self._env.name),
+              mean.value.add(tag='{} Performance Benchmark on {}/Episodes - Mean Rewards'.format(self._agent, 
+                                                                                                 self._env.name),
                               simple_value=episode["mean"])
-              cumulative_mean.value.add(tag='Performance Benchmark on {}/Episodes - Cumulative Mean Rewards'.format(self._env.name),
+              cumulative_mean.value.add(tag='Performance Benchmark on {}/Episodes - Cumulative Mean Rewards'.format(self._agent, 
+                                                                                                                    self._env.name),
                               simple_value=episode["cumulative_mean"])
-              steps.value.add(tag='Performance Benchmark on {}/Episodes - Steps'.format(self._env.name),
+              steps.value.add(tag='{} Performance Benchmark on {}/Episodes - Steps'.format(self._agent, 
+                                                                                           self._env.name),
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
           self._episode_buffer = deque()
