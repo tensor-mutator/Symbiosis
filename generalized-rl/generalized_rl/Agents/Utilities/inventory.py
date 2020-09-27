@@ -15,10 +15,14 @@ class Inventory:
           self._inventory_path = self._make_path()
 
       def _make_path(self) -> str:
-          path = os.path.join(self._env.name, self._agent, self._name)
-          if not os.path.exists(path):
-             os.makedirs(path)
-          return path
+          self._inventory_path = os.path.join(self._env.name, self._agent, self._name)
+          if not os.path.exists(self._inventory_path):
+             os.makedirs(self._inventory_path)
+          return self._inventory_path
+
+      @property
+      def inventory_path(self) -> str:
+          return self._inventory_path
 
       @property
       def path(self) -> str:
