@@ -80,7 +80,7 @@ class Agent(metaclass=ABCMeta):
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
           if self.config & config.SAVE_FRAMES:
-             self._inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.progress)
+             self._inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
           self._load_artifacts()
           while self.progress.clock < self.total_steps:
                 suite()
