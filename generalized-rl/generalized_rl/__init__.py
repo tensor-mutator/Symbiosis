@@ -10,4 +10,4 @@ from .Agents.Utilities.flow import LucasKanadeFlow
 from .config import config
 
 __all__ = ["Environment", "State", "Action", "DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet",
-           "config", "NetBlocks", "LucasKanadeFlow"]
+           "config", "NetBlocks", "Flow", "LucasKanadeFlow"]
