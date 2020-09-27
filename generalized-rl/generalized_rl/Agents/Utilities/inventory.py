@@ -16,7 +16,7 @@ class Inventory:
 
       def _make_path(self) -> str:
           path = os.path.join(self._env.name, self._agent, self._name)
-          os.mkdirs(path)
+          os.makedirs(path)
           return path
 
       @property
