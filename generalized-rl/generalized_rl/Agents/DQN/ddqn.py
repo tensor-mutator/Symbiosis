@@ -8,7 +8,7 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
-from ..agent import Agent, register
+from ..agent import Agent, register, record
 from ..network_base import NetworkBaseDQN
 from ..Utilities import LRScheduler, GreedyEpsilon, Progress
 from ...environment import Environment
@@ -135,6 +135,7 @@ class DDQN(Agent):
           self._greedy_epsilon.decay()
           return action
 
+      @record
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
           x_t1 = cv2.cvtColor(x_t1, cv2.COLOR_BGR2GRAY)
           if np.all(s_t is None):
