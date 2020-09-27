@@ -16,7 +16,8 @@ class Inventory:
 
       def _make_path(self) -> str:
           path = os.path.join(self._env.name, self._agent, self._name)
-          os.makedirs(path)
+          if not os.path.exists(path):
+             os.makedirs(path)
           return path
 
       @property
