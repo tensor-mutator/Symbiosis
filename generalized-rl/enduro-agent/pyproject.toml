@@ -6,7 +6,11 @@ authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.6.8"
+<<<<<<< HEAD
 gym = "0.15.7"
+=======
+gym = "^0.15.7"
+>>>>>>> 1ed53966da217c3a87e8c9ed1819a74b6cc271ac
 atari-py = "^0.2.6"
 
 [tool.poetry.dev-dependencies]
