@@ -9,18 +9,26 @@ with warnings.catch_warnings():
 import numpy as np
 import os
 import dill
+import cv2
 from .DQN.replay import ExperienceReplay
-from .Utilities import Progress, RewardManager
+from .Utilities import Progress, RewardManager, Inventory
 from .Utilities.exceptions import *
 from ..environment import Environment
 from ..config import config
 
 def register(suite: str) -> Callable:
     def wrapper(func) -> Callable:
-        def run(self) -> None:
-            super(self.__class__, self).run(getattr(self, suite))
+        def run(inst) -> None:
+            super(inst.__class__, inst).run(getattr(inst, suite))
         return run
     return wrapper
+
+def record(func) -> Callable
+    def inner(inst, frame, *args, **kwargs) -> np.ndarray
+        if inst.config & config.SAVE_FRAMES:
+           cv2.imwrite(inst._inventory.path, frame)
+        return func(inst, frame, *args, **kwargs)
+    return inner
 
 class Agent(metaclass=ABCMeta):
 
@@ -71,6 +79,8 @@ class Agent(metaclass=ABCMeta):
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
+          if self.config & config.SAVE_FRAMES:
+             self._inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.progress)
           self._load_artifacts()
           while self.progress.clock < self.total_steps:
                 suite()
