@@ -18,7 +18,7 @@ class FlappyBirdAction(Action):
 
       @property
       def size(self) -> int:
-          return 9
+          return 2
 
 class FlappyBird(Environment):
 
