@@ -1,6 +1,8 @@
 from abc import ABCMeta, abstractmethod
 import numpy as np
 
+__all__ = ["Flow"]
+
 class Flow:
 
       @abstractmethod
