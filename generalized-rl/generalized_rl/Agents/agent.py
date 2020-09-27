@@ -99,7 +99,8 @@ class Agent(metaclass=ABCMeta):
 
       def _save_flow(self, x_t: np.ndarray, x_t1: np.ndarray, r_t: float) -> None:
           if self.config & config.SAVE_FLOW:
-             cv2.imwrite(self._flow_inventory.path, self.flow.flow_map(x_t, x_t1))
+             if self._flow:
+                cv2.imwrite(self._flow_inventory.path, self.flow.flow_map(x_t, x_t1))
              flow_rewards = dict()
              if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "rewards.meta")):
                 with open(os.path.join(self._flow_inventory.inventory_path, "rewards.meta"), "r") as f_obj:
