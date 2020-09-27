@@ -23,7 +23,7 @@ def register(suite: str) -> Callable:
         return run
     return wrapper
 
-def record(func) -> Callable
+def record(func) -> Callable:
     def inner(inst, frame, *args, **kwargs) -> np.ndarray
         if inst.config & config.SAVE_FRAMES:
            cv2.imwrite(inst._inventory.path, frame)
