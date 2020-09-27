@@ -15,7 +15,7 @@ class config(IntEnum):
       SAVE_WEIGHTS: bin = 0b0000100000000
       LOAD_WEIGHTS: bin = 0b0001000000000
       SAVE_FRAMES: bin = 0b0010000000000
-      GET_FLOW: bin = 0b0100000000000
+      SAVE_FLOW: bin = 0b0100000000000
       NOHUP: bin = 0b1000000000000
 
       @staticmethod
@@ -32,5 +32,5 @@ class config(IntEnum):
           print("config.SAVE_WEIGHTS")
           print("config.LOAD_WEIGHTS")
           print("config.SAVE_FRAMES")
-          print("config.GET_FLOW")
+          print("config.SAVE_FLOW")
           print("config.NOHUP")
