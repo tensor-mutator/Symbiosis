@@ -217,6 +217,6 @@ class Agent(metaclass=ABCMeta):
       def explore(self) -> float:
           return getattr(self, "_explore", np.inf)
 
-     @property
-     def flow(self) -> Flow:
-         return self._flow
+      @property
+      def flow(self) -> Flow:
+          return self._flow
