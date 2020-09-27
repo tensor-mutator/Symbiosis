@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "enduro-agent"
+name = "flappy-bird-agent"
 version = "0.1.0"
 description = ""
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
@@ -7,6 +7,9 @@ authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 [tool.poetry.dependencies]
 python = "3.6.8"
 gym = "0.15.7"
+ple = { path = "PyGame-Learning-Environment/" }
+gym_ple = "^0.3"
+pygame = "^1.9.6"
 atari-py = "^0.2.6"
 
 [tool.poetry.dev-dependencies]
