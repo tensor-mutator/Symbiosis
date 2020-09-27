@@ -20,7 +20,7 @@ class Inventory:
           return path
 
       @property
-      def path(self) -> path:
+      def path(self) -> str:
           if not os.path.exists(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)))):
              os.mkdir(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10))))
           return os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)),
