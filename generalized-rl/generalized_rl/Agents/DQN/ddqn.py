@@ -9,17 +9,19 @@ import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
 from ..agent import Agent, register, record
+from ..flow_base import Flow
 from ..network_base import NetworkBaseDQN
-from ..Utilities import LRScheduler, GreedyEpsilon, Progress
+from ..Utilities import LRScheduler, GreedyEpsilon, Progress, LucasKanadeFlow
 from ...environment import Environment
 from ...config import config
 
 class DDQN(Agent):
 
       def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: config = config.DEFAULT,
-                   **hyperparams) -> None:
+                   flow: Flow = LucasKanadeFlow(), **hyperparams) -> None:
           self._env = env
           self._config = config
+          self._flow = flow
           self._observe = hyperparams.get("observe", 5000)
           self._explore = hyperparams.get("explore", 50000)
           self._total_steps = hyperparams.get("total_steps", 10000000)
