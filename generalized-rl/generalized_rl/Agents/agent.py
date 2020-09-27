@@ -36,7 +36,9 @@ class Agent(metaclass=ABCMeta):
           base_idx = len(self.__class__.__mro__)-2
           agent = self.__class__.__name__
           func = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
-          return lambda: func(self)  if func else None
+          if func:
+             return lambda: func(self)
+          return None
 
       @contextmanager
       def _episode_context(self, env: Environment, progress: Progress,
