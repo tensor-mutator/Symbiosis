@@ -5,7 +5,7 @@ description = "Generalized RL"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.6"
+python = "3.6.8"
 enduro-agent = { path = "enduro-agent/" }
 
 [tool.poetry.dev-dependencies]
