@@ -29,8 +29,7 @@ def record(func: Callable) -> Callable:
     def inner(inst, frame, *args, **kwargs) -> List:
         if inst.config & config.SAVE_FRAMES:
            cv2.imwrite(inst._frame_inventory.path, frame)
-        state = func(inst, frame, *args, **kwargs)
-        return state, inst._frame_inventory.path
+        return func(inst, frame, *args, **kwargs), inst._frame_inventory.path
     return inner
 
 class Agent(metaclass=ABCMeta):
