@@ -65,10 +65,11 @@ class Agent(metaclass=ABCMeta):
                      self._save_flow(x_t, x_t1, r_t, path_t, path_t1)
                      self.replay.add((s_t, a_t, r_t, s_t1, done,))
                      x_t, s_t, path_t = x_t1, s_t1, path_t1
-                     if self.progress.explore_clock and self.progress.training_clock%self.training_interval == 0:
-                        self.train()
-                     if self.progress.explore_clock and self.progress.training_clock%self.target_frequency == 0:
-                        self.update_target()
+                     if self.progress.explore_clock:
+                        if self.progress.training_clock%self.training_interval == 0:
+                           self.train()
+                        if self.progress.training_clock%self.target_frequency == 0:
+                           self.update_target()
                      self.progress.bump()
 
       def _load_artifacts(self) -> None:
