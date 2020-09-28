@@ -75,7 +75,7 @@ class Agent(metaclass=ABCMeta):
       def _load_artifacts(self) -> None:
           path = self.workspace()
           if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(path,
-                                                                     "{}.ckpt.*".format(self._alias))):
+                                                                       "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
              with self.graph.as_default():
@@ -173,7 +173,7 @@ class Agent(metaclass=ABCMeta):
       def load_progress(self) -> Progress:
           path = self.workspace()
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
-                                                                               "{}.progress".format(self.alias))):
+                                                                                 "{}.progress".format(self.alias))):
              with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
           return Progress(self.total_steps, self.observe, self.explore)
