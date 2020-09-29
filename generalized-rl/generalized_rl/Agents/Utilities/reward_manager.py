@@ -106,7 +106,7 @@ class RewardManager:
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
           self._event_buffer.clear()
-          self._episode_indice.clear()
+          self._episode_indices.clear()
 
       def save(self, path: str, file: str, session: tf.Session) -> None:
           def _save(obj: deque, func: Callable):
