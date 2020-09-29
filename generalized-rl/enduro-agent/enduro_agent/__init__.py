@@ -41,7 +41,7 @@ class Enduro(Environment):
 
       def render(self) -> np.ndarray:
           state = self._env.render(mode="rgb_array")
-          self._env.state._frame = state
+          self.state.frame = state
           return cv2.resize(state, (64, 64,))
 
       @property
