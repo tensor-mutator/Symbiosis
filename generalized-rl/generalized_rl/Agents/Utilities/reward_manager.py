@@ -55,7 +55,7 @@ class RewardManager:
           self._episode_buffer.append(payload)
           self._event_buffer.append(payload)
           self._episode_indices.append(self._progress.episode)
-          self._buffer = deque()
+          self._buffer.clear()
           self._n_steps = 0
 
       def mem_size(self, buffer: deque) -> int:
@@ -105,8 +105,8 @@ class RewardManager:
                                                                                            self._env.name),
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
-          self._event_buffer = deque()
-          self._episode_indices = deque()
+          self._event_buffer.clear()
+          self._episode_indice.clear()
 
       def save(self, path: str, file: str, session: tf.Session) -> None:
           def _save(obj: deque, func: Callable):
