@@ -28,7 +28,7 @@ def register(suite: str) -> Callable:
 def record(func: Callable) -> Callable:
     def inner(inst, frame, *args, **kwargs) -> List:
         if inst.config & config.SAVE_FRAMES:
-           cv2.imwrite(inst._frame_inventory.path, frame)
+           cv2.imwrite(inst._frame_inventory.path, inst.env.state.frame)
         return func(inst, frame, *args, **kwargs), inst._frame_inventory.path
     return inner
 
@@ -47,8 +47,9 @@ class Agent(metaclass=ABCMeta):
           env.make()
           env.reset()
           image = env.render()
+          image_original = env.state.frame
           state, path = self.state(image)
-          yield image, state, path
+          yield image, image_original, state, path
           env.close()
           reward_manager.rollout()
           if self.config & config.SAVE_WEIGHTS:
@@ -56,15 +57,16 @@ class Agent(metaclass=ABCMeta):
           progress.bump_episode()
 
       def _episode_suite_dqn(self) -> None:
-          with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, s_t, path_t]:
+          with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, frame_t, s_t, path_t]:
                while not self.env.ended and self.progress.clock < self.total_steps:
                      a_t = self.action(s_t)
                      x_t1, r_t, done, _ = self.env.step(a_t)
                      self._reward_manager.update(r_t)
                      s_t1, path_t1 = self.state(x_t1, s_t)
-                     self._save_flow(x_t, x_t1, r_t, path_t, path_t1)
+                     frame_t1 = self.env.state.frame
+                     self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
                      self.replay.add((s_t, a_t, r_t, s_t1, done,))
-                     x_t, s_t, path_t = x_t1, s_t1, path_t1
+                     x_t, frame_t, s_t, path_t = x_t1, frame_t1, s_t1, path_t1
                      if self.progress.explore_clock:
                         if self.progress.training_clock%self.training_interval == 0:
                            self.train()
