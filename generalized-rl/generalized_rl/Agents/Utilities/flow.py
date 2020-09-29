@@ -7,7 +7,7 @@ __all__ = ["GunnerFarnebackFlow", "LucasKanadeFlow"]
 class GunnerFarnebackFlow(Flow):
 
       def flow_map(self, x_t: np.ndarray, x_t1: np.ndarray) -> np.ndarray:
-          flow_map = np.zeros_like(frame1)
+          flow_map = np.zeros_like(x_t)
           flow_map[...,1] = 255
           x_t_gray = cv2.cvtColor(x_t,cv2.COLOR_BGR2GRAY)
           x_t1_gray = cv2.cvtColor(x_t1,cv2.COLOR_BGR2GRAY)
