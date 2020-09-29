@@ -11,6 +11,10 @@ class State(metaclass=ABCMeta):
       def shape(self) -> Tuple:
           ...
 
+      @property
+      def frame(self) -> np.ndarray:
+          return self._frame
+
 class Action(metaclass=ABCMeta):
 
       @property
