@@ -11,6 +11,7 @@ import os
 import dill
 import cv2
 import json
+import deque
 from .flow_base import Flow
 from .DQN.replay import ExperienceReplay
 from .Utilities import Progress, RewardManager, Inventory
@@ -58,7 +59,17 @@ class Agent(metaclass=ABCMeta):
           reward_manager.rollout()
           if self.config & config.SAVE_WEIGHTS:
              self.save()
+          self._flow_buffer.clear()
           progress.bump_episode()
+
+      @contextmanager
+      def _run_context(self) -> Generator:
+          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
+          self._initiate_inventories()
+          self._load_artifacts()
+          yield
+          if self.config & config.SAVE_WEIGHTS:
+             self.save()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, frame_t, s_t, path_t]:
@@ -90,20 +101,23 @@ class Agent(metaclass=ABCMeta):
       def run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
-          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
-          self._initiate_inventories()
-          self._load_artifacts()
-          while self.progress.clock < self.total_steps:
-                suite()
+          with self._run_context():
+               while self.progress.clock < self.total_steps:
+                     suite()
 
       def _initiate_inventories(self) -> None:
           if self.config & config.SAVE_FRAMES:
              self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
           if self.config & config.SAVE_FLOW:
              self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
+             self._flow_buffer = getattr(self, "flow_buffer", 1)
+             self._flow_buffer = deque(maxlen=self._flow_buffer)
 
       def _save_flow(self, x_t: np.ndarray, x_t1: np.ndarray, r_t: float, path_t: str, path_t1: str) -> None:
           if self.config & config.SAVE_FLOW:
+             self._flow_buffer.append({"img": x_t, "path": path_t})
+             x_t = self._flow_buffer[0]["img"]
+             path_t = self._flow_buffer[0]["path"]
              if self.flow:
                 cv2.imwrite(self._flow_inventory.path, self.flow.flow_map(x_t, x_t1))
              flow_rewards = list()
