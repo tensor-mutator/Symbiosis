@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from ..flow_base import Flow
 
-__all__ = ["GunnerFarnebackFlow"]
+__all__ = ["GunnerFarnebackFlow", "LucasKanadeFlow"]
 
 class GunnerFarnebackFlow(Flow):
 
@@ -16,3 +16,8 @@ class GunnerFarnebackFlow(Flow):
           flow_map[...,0] = ang*180/np.pi/2
           flow_map[...,2] = cv2.normalize(mag,None,0,255,cv2.NORM_MINMAX)
           return cv2.cvtColor(flow_map,cv2.COLOR_HSV2BGR)
+
+class LucasKanadeFlow(Flow):
+
+      def flow_map(self, x_t: np.ndarray, x_t1: np.ndarray) -> np.ndarray:
+          pass
