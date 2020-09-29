@@ -26,14 +26,14 @@ def register(suite: str) -> Callable:
     return wrapper
 
 def record(func: Callable) -> Callable:
-    def inner(inst, frame, *args, **kwargs) -> List:
+    def inner(inst, frame: np.ndarray, state: Any = None) -> List:
         if inst.config & config.SAVE_FRAMES:
-           if kwargs.get("init", None):
+           if state is None:
               path = inst._frame_inventory.init_path
            else:
               path = inst._frame_inventory.path
            cv2.imwrite(path, inst.env.state.frame)
-        return func(inst, frame, *args, **kwargs), path
+        return func(inst, frame, state), path
     return inner
 
 class Agent(metaclass=ABCMeta):
@@ -52,7 +52,7 @@ class Agent(metaclass=ABCMeta):
           env.reset()
           image = env.render()
           image_original = env.state.frame
-          state, path = self.state(image, init="INIT")
+          state, path = self.state(image)
           yield image, image_original, state, path
           env.close()
           reward_manager.rollout()
