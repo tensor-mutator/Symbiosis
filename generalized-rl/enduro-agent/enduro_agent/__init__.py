@@ -31,12 +31,12 @@ class Enduro(Environment):
 
       def reset(self) -> np.ndarray:
           state = self._env.reset()
-          self._env.state._frame = state
+          self.state.frame = state
           return state
 
       def step(self, action: Any) -> Sequence:
           state, self._reward, self._ended, info = self._env.step(action)
-          self._env.state._frame = state
+          self.state.frame = state
           return cv2.resize(state, (64, 64,)), self._reward, self._ended, info
 
       def render(self) -> np.ndarray:
