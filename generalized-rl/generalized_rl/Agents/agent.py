@@ -11,7 +11,7 @@ import os
 import dill
 import cv2
 import json
-import deque
+from collections import deque
 from .flow_base import Flow
 from .DQN.replay import ExperienceReplay
 from .Utilities import Progress, RewardManager, Inventory
