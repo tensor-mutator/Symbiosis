@@ -25,8 +25,12 @@ class Inventory:
           return self._inventory_path
 
       @property
-      def path(self) -> str:
+      def path(self. init: False) -> str:
           if not os.path.exists(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)))):
              os.mkdir(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10))))
+          if init:
+             extension = "{}.{}.{}".format(self._file_name, str(self._progress.epi_clock).zfill(10), self._extension)
+          else:
+             extension = "{}.{}.{}".format(self._file_name, "INIT", self._extension)
           return os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)),
-                              "{}.{}.{}".format(self._file_name, str(self._progress.epi_clock).zfill(10), self._extension))
+                              extension)
