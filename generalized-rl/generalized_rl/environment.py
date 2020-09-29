@@ -22,6 +22,10 @@ class State(metaclass=ABCMeta):
       def frame(self) -> np.ndarray:
           return self._frame
 
+      @frame.setter
+      def frame(self, frame) -> None:
+          self._frame = frame
+
 class Action(metaclass=ABCMeta):
 
       _singleton = None
