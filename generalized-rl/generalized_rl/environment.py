@@ -9,7 +9,7 @@ class State(metaclass=ABCMeta):
       _singleton = None
 
       def __new__(cls, *args, **kwargs) -> "<State inst>":
-          if State.singleton is None:
+          if State._singleton is None:
              State._singleton = super(State, cls).__new__(cls, *args, **kwargs)
           return State._singleton
 
@@ -27,7 +27,7 @@ class Action(metaclass=ABCMeta):
       _singleton = None
 
       def __new__(cls, *args, **kwargs) -> "<State inst>":
-          if Action.singleton is None:
+          if Action._singleton is None:
              Action._singleton = super(Action, cls).__new__(cls, *args, **kwargs)
           return Action._singleton
 
