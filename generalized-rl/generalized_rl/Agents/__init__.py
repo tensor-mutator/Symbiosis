@@ -4,6 +4,7 @@ from .agent import Agent
 from .flow_base import Flow
 from .network_base import NetworkBaseDQN
 from .Utilities.lego import NetBlocks
-from .Utilities.flow_lucas_kanade import LucasKanadeFlow
+from .Utilities.flow import GunnerFarnebackFlow, LucasKanadeFlow
 
-__all__ = ["DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet", "NetBlocks", "Flow", "LucasKanadeFlow"]
+__all__ = ["DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet", "NetBlocks", "Flow", "LucasKanadeFlow",
+           "GunnerFarnebackFlow"]
