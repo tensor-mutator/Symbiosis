@@ -32,15 +32,19 @@ class FlappyBird(Environment):
 
       def reset(self) -> np.ndarray:
           state = self._env.reset()
+          self.state.frame = state
           self._state_shape = (state.shape[0], state.shape[1],)
           return state
 
       def step(self, action: Any) -> Sequence:
           state, self._reward, self._ended, info = self._env.step(action)
+          self.state.frame = state
           return cv2.resize(state, (128, 128,)), self._reward, self._ended, info
 
       def render(self) -> np.ndarray:
-          return cv2.resize(self._env.render(mode="rgb_array"), (128, 128,))
+          state = self._env.render(mode="rgb_array")
+          self.state.frame = state
+          return cv2.resize(state, (128, 128,))
 
       @property
       def state(self) -> State:
