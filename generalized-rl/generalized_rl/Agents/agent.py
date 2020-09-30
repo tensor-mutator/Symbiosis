@@ -110,7 +110,8 @@ class Agent(metaclass=ABCMeta):
              self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
           if self.config & config.SAVE_FLOW:
              self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
-             self._buffer_len = max(1, getattr(self, "flow_skip", 1))
+             self._buffer_len = self.flow_skip if hasattr(self, "flow_skip") else 1
+             self._buffer_len = max(1, self._buffer_len)
              self._flow_buffer = deque(maxlen=self._buffer_len)
 
       def _save_flow(self, x_t: np.ndarray, x_t1: np.ndarray, r_t: float, path_t: str, path_t1: str) -> None:
