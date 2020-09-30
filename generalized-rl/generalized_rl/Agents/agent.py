@@ -40,7 +40,7 @@ def record(func: Callable) -> Callable:
 
 def register_handler(unix_signals: List) -> Callable:
     def outer(handler: Callable) -> Callable:
-        def inner(inst: "<Agent inst>", signal_id: int, frame: Any) -> None:
+        def inner(inst: "<Agent inst>") -> None:
             for sig in unix_signals:
                 signal.signal(sig, lambda x, y: handler(inst))
         return inner
@@ -113,7 +113,7 @@ class Agent(metaclass=ABCMeta):
                   self.session.run(tf.global_variables_initializer())
 
       @register_handler(UNIX_SIGNALS)
-      def _create_handler(self, signal_id: int, frame: Any):
+      def _create_handler(self):
           raise AgentInterrupt("Agent interrupted")
 
       def run(self, suite: Callable) -> None:
