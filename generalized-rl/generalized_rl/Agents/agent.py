@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 from typing import Dict, Any, Generator, Callable, List
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from glob import glob
 import warnings
 with warnings.catch_warnings():  
@@ -122,8 +122,9 @@ class Agent(metaclass=ABCMeta):
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           self._create_handler()
           with self._run_context():
-               while self.progress.clock < self.total_steps:
-                     suite()
+               with suppress(Exception):
+                    while self.progress.clock < self.total_steps:
+                          suite()
 
       def _initiate_inventories(self) -> None:
           if self.config & config.SAVE_FRAMES:
