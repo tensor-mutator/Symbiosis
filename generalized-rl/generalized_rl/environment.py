@@ -6,12 +6,12 @@ __all__ = ["Environment", "State", "Action"]
 
 class Singleton:
 
-      _singleton = None
+      _singleton: Dict = dict()
 
       def __new__(cls, *args, **kwargs) -> "<Singleton inst>":
-          if Singleton._singleton is None:
-             Singleton._singleton = super(Singleton, cls).__new__(cls, *args, **kwargs)
-          return Singleton._singleton
+          if Singleton._singleton.get(cls, None) is None:
+             Singleton._singleton[cls] = super(Singleton, cls).__new__(cls, *args, **kwargs)
+          return Singleton._singleton[cls]
 
 class State(Singleton, metaclass=ABCMeta):
 
