@@ -40,7 +40,7 @@ def record(func: Callable) -> Callable:
 
 def register_handler(unix_signals: List) -> Callable:
     def outer(handler: Callable) -> Callable:
-        def inner(inst: "<Agent inst>", signal_id: int, frame: Any) -> None:
+        def inner(inst: "<Agent inst>", signal_id: int = None, frame: Any = None) -> None:
             for sig in unix_signals:
                 signal.signal(sig, lambda x, y: handler(inst, x, y))
         return inner
