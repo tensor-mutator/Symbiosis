@@ -4,14 +4,16 @@ import numpy as np
 
 __all__ = ["Environment", "State", "Action"]
 
-class State(metaclass=ABCMeta):
+class Singleton:
 
       _singleton = None
 
-      def __new__(cls, *args, **kwargs) -> "<State inst>":
-          if State._singleton is None:
-             State._singleton = super(State, cls).__new__(cls, *args, **kwargs)
-          return State._singleton
+      def __new__(cls, *args, **kwargs) -> "<Singleton inst>":
+          if Singleton._singleton is None:
+             Singleton._singleton = super(Singleton, cls).__new__(cls, *args, **kwargs)
+          return Singleton._singleton
+
+class State(Singleton, metaclass=ABCMeta):
 
       @property
       @abstractmethod
@@ -26,14 +28,7 @@ class State(metaclass=ABCMeta):
       def frame(self, frame) -> None:
           self._frame = frame
 
-class Action(metaclass=ABCMeta):
-
-      _singleton = None
-
-      def __new__(cls, *args, **kwargs) -> "<State inst>":
-          if Action._singleton is None:
-             Action._singleton = super(Action, cls).__new__(cls, *args, **kwargs)
-          return Action._singleton
+class Action(Singleton, metaclass=ABCMeta):
 
       @property
       @abstractmethod
