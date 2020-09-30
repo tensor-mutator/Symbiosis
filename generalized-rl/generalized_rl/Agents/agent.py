@@ -11,6 +11,7 @@ import os
 import dill
 import cv2
 import json
+import signal
 from collections import deque
 from .flow_base import Flow
 from .DQN.replay import ExperienceReplay
@@ -21,13 +22,13 @@ from ..config import config
 
 def register(suite: str) -> Callable:
     def wrapper(func: Callable) -> Callable:
-        def run(inst) -> None:
+        def run(inst: "<Agent inst>") -> None:
             super(inst.__class__, inst).run(getattr(inst, suite))
         return run
     return wrapper
 
 def record(func: Callable) -> Callable:
-    def inner(inst, frame: np.ndarray, state: Any = None) -> List:
+    def inner(inst: "<Agent inst>", frame: np.ndarray, state: Any = None) -> List:
         if inst.config & config.SAVE_FRAMES:
            if state is None:
               path = inst._frame_inventory.init_path
@@ -36,6 +37,19 @@ def record(func: Callable) -> Callable:
            cv2.imwrite(path, inst.env.state.frame)
         return func(inst, frame, state), path
     return inner
+
+def register_handler(unix_signals: List) -> Callable:
+    def outer(handler: Callable) -> Callable:
+        def inner(inst: "<Agent inst>", signal_id: int, frame: Any) -> None:
+            for sig in unix_signals:
+                signal.signal(sig, lambda x, y: handler(inst))
+        return inner
+    return outer
+
+UNIX_SIGNALS = ["SIGABRT", "SIGALRM", "SIGBUS", "SIGCHLD", "SIGCLD", "SIGCONT", "SIGFPE", "SIGHUP", "SIGILL", "SIGINT",
+                "SIGIO", "SIGIOT", "SIGKILL", "SIGPIPE", "SIGPOLL", "SIGPROF", "SIGPWR", "SIGQUIT", "SIGRTMAX", "SIGRTMIN",
+                "SIGSEGV", "SIGSTOP", "SIGSYS", "SIGTERM", "SIGTRAP", "SIGTSTP", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGUSR1",
+                "SIGUSR2", "SIGVTALRM", "SIGWINCH", "SIGXCPU", "SIGXFSZ"]
 
 class Agent(metaclass=ABCMeta):
 
@@ -98,9 +112,14 @@ class Agent(metaclass=ABCMeta):
              with self.graph.as_default():
                   self.session.run(tf.global_variables_initializer())
 
+      @register_handler(UNIX_SIGNALS)
+      def _create_handler(self, signal_id: int, frame: Any):
+          raise AgentInterrupt("Agent interrupted")
+
       def run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
+          self._create_handler()
           with self._run_context():
                while self.progress.clock < self.total_steps:
                      suite()
