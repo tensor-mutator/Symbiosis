@@ -17,4 +17,4 @@ class GunnerFarnebackFlow(Flow):
 class LucasKanadeFlow(Flow):
 
       def flow_map(self, x_t: np.ndarray, x_t1: np.ndarray) -> np.ndarray:
-          pass
+          raise NotImplementedError("Not implemented yet !!")
