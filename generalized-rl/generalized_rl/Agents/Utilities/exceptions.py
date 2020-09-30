@@ -14,3 +14,8 @@ class MissingSuiteError(Exception):
 
       def __init__(self, msg: str) -> None:
           super(MissingSuiteError, self).__init__(msg)
+
+class AgentInterrupt(Exception):
+
+      def __init__(self, msg: str) -> None:
+          super(AgentInterrupt, self).__init__(msg)
