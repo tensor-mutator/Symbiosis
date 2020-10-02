@@ -105,6 +105,7 @@ class RewardManager:
                                                                                            self._env.name),
                               simple_value=episode["steps"])
               [summary_writer.add_summary(x, idx+1) for x in [total, max, min, median, mean, cumulative_mean, steps]]
+          summary_writer.close()
           self._event_buffer.clear()
           self._episode_indices.clear()
 
