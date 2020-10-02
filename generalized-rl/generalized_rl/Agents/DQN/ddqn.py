@@ -17,7 +17,7 @@ from ...config import config
 
 class DDQN(Agent):
 
-      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: config = config.DEFAULT,
+      def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: bin = config.DEFAULT,
                    flow: Flow = None, **hyperparams) -> None:
           self._env = env
           self._config = config
