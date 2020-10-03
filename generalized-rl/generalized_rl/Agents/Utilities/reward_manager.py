@@ -29,7 +29,7 @@ class RewardManager:
           self._event_buffer = deque()
           self._episode_indices = deque()
           self._n_steps = 0
-          self._generate_event = config_ & config.REWARD_EVENT
+          self._reward_event = config_ & config.REWARD_EVENT
           self._writer = writer
           self._console_summary = config_ & (config.VERBOSE_LITE+config.VERBOSE_HEAVY)
 
@@ -83,7 +83,7 @@ class RewardManager:
              return f'{file}.reward.*'
           return '%(file)s.reward.%(index)d' %{'file': file, 'index': idx}
 
-      def _generate_tensorboard_event(self, path: str, agent: str, graph: tf.Graph) -> None:
+      def _generate_reward_event(self, path: str, agent: str, graph: tf.Graph) -> None:
           for idx, episode in zip(self._episode_indices, self._event_buffer):
               summary = tf.Summary()
               summary.value.add(tag='{} Performance Benchmark on {}/Episodes - Total Rewards'.format(self._agent, 
@@ -125,8 +125,8 @@ class RewardManager:
                        dill.dump(deque(itertools.islice(obj, x, x+step)), f_obj, protocol=dill.HIGHEST_PROTOCOL)
           _save(self._episode_buffer, self._episodic_reward)
           _save(self._buffer, self._reward)
-          if self._generate_event:
-             self._generate_tensorboard_event(path, file, session.graph)
+          if self._reward_event:
+             self._generate_reward_event(path, file, session.graph)
 
       def load(self, path: str, file: str) -> None:
           def _load(obj: deque, func: Callable, raise_: bool = True):
