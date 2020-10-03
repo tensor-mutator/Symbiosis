@@ -2,7 +2,10 @@ from typing import List, Callable
 from collections import deque
 from glob import glob
 import numpy as np
-import tensorflow.compat.v1 as tf
+import warnings
+with warnings.catch_warnings():  
+     warnings.filterwarnings("ignore", category=FutureWarning)
+     import tensorflow.compat.v1 as tf
 import itertools
 import dill
 import sys
