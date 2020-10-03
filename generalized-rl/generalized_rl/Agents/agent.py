@@ -132,7 +132,7 @@ class Agent(metaclass=ABCMeta):
       def _summary_writer(self) -> tf.summary.FileWriter:
           if self.config & config.REWARD_EVENT+config.LOSS_EVENT+config.EPSILON_EVENT+config.BETA_EVENT+config.LR_EVENT:
              return tf.summary.FileWriter(os.path.join(self.workspace(), "{} EVENTS".format(self.alias)), self.graph)
-          retur None
+          return None
 
       def _initiate_inventories(self) -> None:
           if self.config & config.SAVE_FRAMES:
