@@ -1,3 +1,17 @@
+"""
+@author: Debajyoti Raychaudhuri
+
+A precise implementation of a DQN agent with the following components:
+
+1. Deep
+2. Double
+3. Dueling
+4. PER (Prioritized Experience Replay)
+5. N-Step
+6. Distributional (C51)
+7. Noisy
+"""
+
 import warnings
 with warnings.catch_warnings():  
      warnings.filterwarnings("ignore", category=FutureWarning)
