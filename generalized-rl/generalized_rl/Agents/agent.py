@@ -98,7 +98,7 @@ class Agent(metaclass=ABCMeta):
                      s_t1, path_t1 = self.state(x_t1, s_t)
                      frame_t1 = self.env.state.frame
                      self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
-                     self.replay.add((s_t, a_t, r_t, s_t1, done,))
+                     self.replay.update((s_t, a_t, r_t, s_t1, done,))
                      x_t, frame_t, s_t, path_t = x_t1, frame_t1, s_t1, path_t1
                      if self.progress.explore_clock:
                         if self.progress.training_clock%self.training_interval == 0:
