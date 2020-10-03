@@ -3,7 +3,7 @@ import numpy as np
 
 __all__ = ["Flow"]
 
-class Flow(ABCMeta):
+class Flow(metaclass=ABCMeta):
 
       UNKNOWN_FLOW_THRESHOLD = 1e7
 
