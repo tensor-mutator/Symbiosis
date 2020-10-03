@@ -29,7 +29,8 @@ def register(suite: str) -> Callable:
 
 def record(func: Callable) -> Callable:
     def inner(inst: "<Agent inst>", frame: np.ndarray, state: Any = None) -> List:
-        if inst.config & config.SAVE_FRAMES:
+        path = None
+        if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
            if state is None:
               path = inst._frame_inventory.init_path
            else:
