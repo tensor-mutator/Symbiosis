@@ -27,7 +27,7 @@ class ExperienceReplay:
       def update(self, errors: np.ndarray) -> None:
           ...
 
-      def add(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
+      def append(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
           self._buffer.append(transition)
 
       def mem_size(self, buffer: deque) -> int:
@@ -114,7 +114,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           importance_sampling_weights = self._importance_sampling_weights(sampling_probabilities[self._sampling_ids])
           return samples, np.expand_dims(importance_sampling_weights, axis=1)
 
-      def add(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
+      def append(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
           self._base.add(transition)
           self._priorities.append(max(self._priorities, default=1))
           
