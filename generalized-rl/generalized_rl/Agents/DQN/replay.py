@@ -115,7 +115,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           return samples, np.expand_dims(importance_sampling_weights, axis=1)
 
       def append(self, transition: Tuple[np.ndarray, int, float, np.ndarray, bool]) -> None:
-          self._base.add(transition)
+          self._base.append(transition)
           self._priorities.append(max(self._priorities, default=1))
           
       def update(self, errors: np.ndarray) -> None:
