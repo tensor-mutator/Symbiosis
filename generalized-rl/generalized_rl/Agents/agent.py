@@ -79,6 +79,7 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _run_context(self) -> Generator:
+          self._create_handler()
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
@@ -123,7 +124,6 @@ class Agent(metaclass=ABCMeta):
       def run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
-          self._create_handler()
           with self._run_context():
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
