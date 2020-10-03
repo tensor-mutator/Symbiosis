@@ -79,12 +79,15 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _run_context(self) -> Generator:
-          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress)
+          self._writer = self._summary_writer()
+          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
           self._load_artifacts()
           yield
           if self.config & config.SAVE_WEIGHTS:
              self.save()
+          if self._writer:
+             self._writer.close()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, frame_t, s_t, path_t]:
@@ -125,6 +128,11 @@ class Agent(metaclass=ABCMeta):
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
                           suite()
+
+      def _summary_writer(self) -> tf.summary.FileWriter:
+          if self.config & config.REWARD_EVENT+config.LOSS_EVENT+config.EPSILON_EVENT+config.BETA_EVENT+config.LR_EVENT:
+             return tf.summary.FileWriter(os.path.join(self.workspace(), "{} EVENTS".format(self.alias)), self.graph)
+          retur None
 
       def _initiate_inventories(self) -> None:
           if self.config & config.SAVE_FRAMES:
