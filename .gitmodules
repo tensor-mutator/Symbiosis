@@ -1,3 +1,6 @@
 [submodule "generalized-rl/flappy-bird-with-gunner-farneback-agent/Flow-Classification-Pipeline"]
 	path = generalized-rl/flappy-bird-with-gunner-farneback-agent/Flow-Classification-Pipeline
 	url = https://github.com/tensor-mutator/Flow-Classification-Pipeline.git
+[submodule "generalized-rl/flappy-bird-agent/PyGame-Learning-Environment"]
+	path = generalized-rl/flappy-bird-agent/PyGame-Learning-Environment
+	url = https://github.com/ntasfi/PyGame-Learning-Environment.git
