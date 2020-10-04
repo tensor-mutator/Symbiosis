@@ -8,6 +8,8 @@ import gym
 import gym_ple
 import cv2
 
+MODEL = os.path.join(os.path.split(__file__)[0], "GunnerFarnebackRewardModel")
+
 class FlappyBirdState(State):
 
       @property
