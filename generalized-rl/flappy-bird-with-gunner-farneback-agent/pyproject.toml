@@ -2,7 +2,7 @@
 name = "flappy-bird-with-gunner-farneback-agent"
 version = "0.1.0"
 description = ""
-authors = ["7000015346 <Debajyoti.Raychaudhuri@ap.sony.com>"]
+authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6.8"
