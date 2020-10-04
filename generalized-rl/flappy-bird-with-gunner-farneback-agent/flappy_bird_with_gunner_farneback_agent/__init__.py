@@ -33,7 +33,7 @@ class FlappyBird(Environment):
       class RewardModelNotFoundError(Exception):
 
             def __init__(self, msg: str) -> None:
-                super(FlappyBird.RewardModelNotFoundError).__init__(msg)
+                super(FlappyBird.RewardModelNotFoundError, self).__init__(msg)
 
       def __init__(self, flow_skip: int = 1) -> None:
           self._session = self._load_graph()
