@@ -122,5 +122,5 @@ class FlappyBird(Environment):
           self._env.close()
 
 def main():
-    agent = DDQN(FlappyBird(), DQNNet, config=config.VERBOSE_LITE)
+    agent = DDQN(FlappyBird(), DQNNet, config=config.VERBOSE_LITE+config.REWARD_EVENT+config.LOAD_WEIGHTS+config.SAVE_WEIGHTS)
     agent.run()
