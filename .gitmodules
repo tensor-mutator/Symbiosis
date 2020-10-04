@@ -1,0 +1,3 @@
+[submodule "generalized-rl/flappy-bird-with-gunner-farneback-agent/Flow-Classification-Pipeline"]
+	path = generalized-rl/flappy-bird-with-gunner-farneback-agent/Flow-Classification-Pipeline
+	url = https://github.com/tensor-mutator/Flow-Classification-Pipeline.git

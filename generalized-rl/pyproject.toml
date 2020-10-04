@@ -8,6 +8,7 @@ authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 python = "3.6.8"
 enduro-agent = { path = "enduro-agent/" }
 flappy-bird-agent = { path = "flappy-bird-agent/" }
+flappy-bird-with-gunner-farneback-agent = { path = "flappy-bird-with-gunner-farneback-agent/" }
 
 [tool.poetry.dev-dependencies]
 tensorflow = "1.15.3"
