@@ -75,7 +75,8 @@ class Agent(metaclass=ABCMeta):
           reward_manager.rollout()
           if self.config & config.SAVE_WEIGHTS:
              self.save()
-          self._flow_buffer.clear()
+          if self.config & config.SAVE_FLOW:
+             self._flow_buffer.clear()
           progress.bump_episode()
 
       @contextmanager
