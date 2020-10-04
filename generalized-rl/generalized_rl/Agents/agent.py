@@ -47,11 +47,8 @@ def register_handler(unix_signals: List) -> Callable:
         return inner
     return outer
 
-UNIX_SIGNALS = [signal.SIGABRT, signal.SIGALRM, signal.SIGBUS, signal.SIGCHLD, signal.SIGCLD, signal.SIGCONT, signal.SIGFPE,
-                signal.SIGHUP, signal.SIGILL, signal.SIGINT, signal.SIGIO, signal.SIGIOT, signal.SIGPIPE, signal.SIGSEGV,
-                signal.SIGPOLL, signal.SIGPROF, signal.SIGPWR, signal.SIGQUIT, signal.SIGRTMAX, signal.SIGRTMIN, signal.SIGXFSZ,
-                signal.SIGSYS, signal.SIGTERM, signal.SIGTRAP, signal.SIGTSTP, signal.SIGTTIN, signal.SIGTTOU, signal.SIGXCPU,
-                signal.SIGURG, signal.SIGUSR1, signal.SIGUSR2, signal.SIGVTALRM, signal.SIGWINCH]
+UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, signal.SIGINT,
+                signal.SIGQUIT, signal.SIGTERM, signal.SIGTRAP, signal.SIGTSTP]
 
 class Agent(metaclass=ABCMeta):
 
