@@ -6,7 +6,7 @@ authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.6.8"
-pipeline = { path = "Flow-Classification-Pipeline/" }
+pipeline = { path = "Flow-Classification-Pipeline/pipeline/" }
 
 [tool.poetry.dev-dependencies]
 
