@@ -29,7 +29,9 @@ class DQNNet(NetworkBaseDQN):
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
-          optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
+          optimizer = optimizer if isinstance(params.get("optimizer"), tf.train.Optimizer.__class__) else getattr(tf.train,
+                                                                                                                  "{}Optimizer".format(optimizer))
+          optimizer = optimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
              NetBlocks.clip_grads_by_norm(gradients, params.get("gradient_clip_norm"))
@@ -60,7 +62,9 @@ class DRQNNet(NetworkBaseDQN):
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
-          optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
+          optimizer = optimizer if isinstance(params.get("optimizer"), tf.train.Optimizer.__class__) else getattr(tf.train,
+                                                                                                                  "{}Optimizer".format(optimizer))
+          optimizer = optimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
              NetBlocks.clip_grads_by_norm(gradients, params.get("gradient_clip_norm"))
@@ -96,7 +100,9 @@ class DuelingDQNNet(NetworkBaseDQN):
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
           self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
-          optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
+          optimizer = optimizer if isinstance(params.get("optimizer"), tf.train.Optimizer.__class__) else getattr(tf.train,
+                                                                                                                  "{}Optimizer".format(optimizer))
+          optimizer = optimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
              NetBlocks.clip_grads_by_norm(gradients, params.get("gradient_clip_norm"))
