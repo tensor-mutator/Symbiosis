@@ -22,7 +22,7 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
-from ..agent import Agent, register, record
+from ..agent import Agent, register, record, track
 from ..flow_base import Flow
 from ..network_base import NetworkBaseDQN
 from ..Utilities import LRScheduler, GreedyEpsilon, Progress
@@ -31,6 +31,7 @@ from ...config import config
 
 class DDQN(Agent):
 
+      @track(DQNNet)
       def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: bin = config.DEFAULT,
                    flow: Flow = None, **hyperparams) -> None:
           self._env = env
