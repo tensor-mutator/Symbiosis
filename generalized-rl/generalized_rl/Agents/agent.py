@@ -13,6 +13,7 @@ import cv2
 import json
 import signal
 from collections import deque
+from .colors import COLORS
 from .flow_base import Flow
 from .DQN.replay import ExperienceReplay
 from .Utilities import Progress, RewardManager, Inventory
@@ -78,6 +79,7 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _run_context(self) -> Generator:
+          self._check_hyperparams()
           self._create_handler()
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
@@ -85,6 +87,7 @@ class Agent(metaclass=ABCMeta):
           self._load_artifacts()
           yield
           if self.config & config.SAVE_WEIGHTS:
+             self._save_hyperparams()
              self.save()
           if self._writer:
              self._writer.close()
@@ -227,6 +230,29 @@ class Agent(metaclass=ABCMeta):
                   return dill.load(f_obj)
           return Progress(self.total_steps, self.observe, self.explore)
 
+      def _save_hyperparams(self) -> None:
+          path = self.workspace()
+          with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
+               json.dump(self.hyperparams, f_obj)
+
+      def _check_hyperparams(self) -> None:
+          if not self.config & config.LOAD_WEIGHTS:
+             return
+          path = self.workspace()
+          if glob.glob(os.path.join(path, "{}.*".format(self.alias))):
+             if not os.path.exists(os.path.join(path, "{}.hyperparams".format(self.alias))):
+                raise MissingHyperparamsError("{} file not found".format(os.path.join(path,
+                                                                                      "{}.hyperparams".format(self.alias))))
+             with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
+                  hyperparams = json.load(f_obj)
+             if hyperparams != self.hyperparams:
+                msg = f"\n{COLORS.RED}hyperparams are different from the ones used during the last run\n"
+                for param, value in self.hyperparams.items():
+                    old_value = hyperparams.get(param)
+                    if value != old_value:
+                       msg += f"{COLORS.MAGENTA}param = {COLORS.RED}value {COLORS.MAGENTA}!= old_value{colors.DEFAULT}\n"
+                raise HyperparamsMismatchError(msg)
+
       def load(self) -> None:
           path = self.workspace()
           with self.graph.as_default():
@@ -267,3 +293,7 @@ class Agent(metaclass=ABCMeta):
       @property
       def flow(self) -> Flow:
           return self._flow
+
+      @property
+      def hyperparams(self) -> Dict:
+          return self._hyperparams
