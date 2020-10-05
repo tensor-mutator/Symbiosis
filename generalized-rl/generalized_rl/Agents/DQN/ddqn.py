@@ -36,21 +36,7 @@ class DDQN(Agent):
           self._env = env
           self._config = config
           self._flow = flow
-          self._observe = hyperparams.get("observe", 5000)
-          self._explore = hyperparams.get("explore", 50000)
-          self._total_steps = hyperparams.get("total_steps", 10000000)
-          self._batch_size = hyperparams.get("batch_size", 32)
-          self._trace = hyperparams.get("trace", 4)
-          self._replay_limit = hyperparams.get("replay_limit", 10000)
-          self._epsilon_range = hyperparams.get("epsilon_range", (1, 0.0001))
-          self._training_interval = hyperparams.get("training_interval", 5)
-          self._target_frequency = hyperparams.get("target_frequency", 3000)
-          self._replay_type = hyperparams.get("replay", "prioritized")
-          self._decay_scheme = hyperparams.get("decay_scheme", "linear")
-          self._gamma = hyperparams.get("gamma", 0.9)
-          self._alpha = hyperparams.get("alpha", 0.7)
-          self._beta = hyperparams.get("beta", 0.5)
-          self._offset = hyperparams.get("offset", 1)
+          self._read_params(hyperparams)
           self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
           self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
@@ -67,6 +53,23 @@ class DDQN(Agent):
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
           self._memory_path = self.workspace()
+
+      def _read_params(self, hyperparams) -> None:
+          self._observe = hyperparams.get("observe", 5000)
+          self._explore = hyperparams.get("explore", 50000)
+          self._total_steps = hyperparams.get("total_steps", 10000000)
+          self._batch_size = hyperparams.get("batch_size", 32)
+          self._trace = hyperparams.get("trace", 4)
+          self._replay_limit = hyperparams.get("replay_limit", 10000)
+          self._epsilon_range = hyperparams.get("epsilon_range", (1, 0.0001))
+          self._training_interval = hyperparams.get("training_interval", 5)
+          self._target_frequency = hyperparams.get("target_frequency", 3000)
+          self._replay_type = hyperparams.get("replay", "prioritized")
+          self._decay_scheme = hyperparams.get("decay_scheme", "linear")
+          self._gamma = hyperparams.get("gamma", 0.9)
+          self._alpha = hyperparams.get("alpha", 0.7)
+          self._beta = hyperparams.get("beta", 0.5)
+          self._offset = hyperparams.get("offset", 1)
 
       def _define_alias(self, network: str, hyperparams: Dict) -> str:
           alias = self.__class__.__name__
@@ -185,7 +188,8 @@ class DDQN(Agent):
 
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
           params_dict = dict()
-          params_dict.update(dict(gradient_clip_norm=hyperparams.get("gradient_clip_norm", 10)))
+          params_dict.update(dict(gradient_clip_norm=hyperparams.get("gradient_clip_norm", 10)
+                                  loss=hyperparams.get("loss", "huber_loss")))
           return params_dict
 
       def save(self) -> None:
