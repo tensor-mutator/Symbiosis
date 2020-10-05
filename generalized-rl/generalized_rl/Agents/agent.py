@@ -15,6 +15,7 @@ import signal
 from collections import deque
 from .colors import COLORS
 from .flow_base import Flow
+from .network_base import NetworkMeta
 from .DQN.replay import ExperienceReplay
 from .Utilities import Progress, RewardManager, Inventory
 from .Utilities.exceptions import *
@@ -48,6 +49,15 @@ def register_handler(unix_signals: List) -> Callable:
         return inner
     return outer
 
+def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
+    def outer(func: Callable) -> Callable:
+        def inner(inst, env: Environment, network: NetworkMeta = network, config: bin = config,
+                  flow: Flow = flow, **hyperparams) -> None:
+            inst._params = dict(env=env, network=network, config=config, flow=flow)
+            func(inst, env, network, config, flow, **hyperparams)
+        return inner
+    def outer
+
 UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, signal.SIGINT,
                 signal.SIGQUIT, signal.SIGTERM, signal.SIGTRAP, signal.SIGTSTP]
 
@@ -59,6 +69,16 @@ class Agent(metaclass=ABCMeta):
           if func:
              return lambda: func(self)
           return None
+
+      def __call__(self, operation: str) -> "<Agent inst>":
+          if operation == "restore":
+             if self._hyperparams_file:
+                inst = self.__class__(**self._params.update(self._old_params))
+                return inst
+             return self
+          else:
+             self._continue = True
+             return self
 
       @contextmanager
       def _episode_context(self, env: Environment, progress: Progress,
@@ -79,7 +99,7 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _run_context(self) -> Generator:
-          self._check_hyperparams()
+          self._check_hyperparams(getattr(self, "_continue", False))
           self._create_handler()
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
@@ -235,16 +255,27 @@ class Agent(metaclass=ABCMeta):
           with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
                json.dump(self.hyperparams, f_obj)
 
-      def _check_hyperparams(self) -> None:
-          if not self.config & config.LOAD_WEIGHTS:
-             return
+      @property
+      def _old_params(self) -> Dict:
+          with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
+               return json.load(f_obj)
+
+      @property
+      def _hyperparams_file(self) -> bool:
           path = self.workspace()
+          exists = False
           if glob.glob(os.path.join(path, "{}.*".format(self.alias))):
              if not os.path.exists(os.path.join(path, "{}.hyperparams".format(self.alias))):
                 raise MissingHyperparamsError("{} file not found".format(os.path.join(path,
                                                                                       "{}.hyperparams".format(self.alias))))
-             with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
-                  hyperparams = json.load(f_obj)
+             exists = True
+          return exists
+
+      def _check_hyperparams(self, continue: bool) -> None:
+          if not self.config & config.LOAD_WEIGHTS or continue:
+             return
+          if self._hyperparams_file:
+             hyperparams = self._old_params
              if hyperparams != self.hyperparams:
                 msg = f"\n{COLORS.RED}hyperparams are different from the ones used during the last run\n"
                 for param, value in self.hyperparams.items():
