@@ -8,6 +8,7 @@ from .Agents.network_base import NetworkBaseDQN
 from .Agents.Utilities.lego import NetBlocks
 from .Agents.Utilities.flow import LucasKanadeFlow, GunnerFarnebackFlow
 from .config import config
+from .colors import COLORS
 
 __all__ = ["Environment", "State", "Action", "DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet",
            "config", "NetBlocks", "Flow", "LucasKanadeFlow", "GunnerFarnebackFlow"]
