@@ -55,7 +55,7 @@ class DDQN(Agent):
           self._session_q_update = self._build_td_update_graph()
           self._memory_path = self.workspace()
 
-      def _read_params(self, hyperparams) -> None:
+      def _read_params(self, hyperparams: Dict) -> None:
           self._observe = hyperparams.get("observe", 5000)
           self._explore = hyperparams.get("explore", 50000)
           self._total_steps = hyperparams.get("total_steps", 10000000)
