@@ -19,7 +19,7 @@ class DQNNet(NetworkBaseDQN):
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, clip_norm)
 
-      def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
+      def _build_training_ops(self, action_size: int, gradient_clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
           self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
@@ -31,9 +31,9 @@ class DQNNet(NetworkBaseDQN):
           huber_errors = NetBlocks.huber_loss(self._error)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*huber_errors)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
-          if clip_norm is not None:
+          if gradient_clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, gradient_clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
 
@@ -51,7 +51,7 @@ class DRQNNet(NetworkBaseDQN):
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, clip_norm)
 
-      def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
+      def _build_training_ops(self, action_size: int, gradient_clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
           self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
@@ -63,9 +63,9 @@ class DRQNNet(NetworkBaseDQN):
           huber_errors = NetBlocks.huber_loss(self._error)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*huber_errors)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
-          if clip_norm is not None:
+          if gradient_clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, gradient_clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
 
@@ -88,7 +88,7 @@ class DuelingDQNNet(NetworkBaseDQN):
           action_advantage = action_advantage-tf.reduce_mean(action_advantage, axis=1, keep_dims=True)
           return tf.add(state_value, action_advantage)
 
-      def _build_training_ops(self, action_size: int, clip_norm: float) -> tf.Tensor:
+      def _build_training_ops(self, action_size: int, gradient_clip_norm: float) -> tf.Tensor:
           self._q_target = NetBlocks.placeholder(shape=[action_size])
           self._action = NetBlocks.placeholder(shape=[], dtype=tf.int32)
           self._importance_sampling_weights = NetBlocks.placeholder(shape=[1])
@@ -100,8 +100,8 @@ class DuelingDQNNet(NetworkBaseDQN):
           huber_errors = NetBlocks.huber_loss(self._error)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*huber_errors)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
-          if clip_norm is not None:
+          if gradient_clip_norm is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
-             NetBlocks.clip_grads_by_norm(gradients, clip_norm)
+             NetBlocks.clip_grads_by_norm(gradients, gradient_clip_norm)
              return optimizer.apply_gradients(gradients)
           return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, "local"))
