@@ -36,6 +36,7 @@ class DDQN(Agent):
           self._env = env
           self._config = config
           self._flow = flow
+          self._hyperparams = hyperparams
           self._read_params(hyperparams)
           self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
