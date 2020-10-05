@@ -95,10 +95,6 @@ class NetBlocks:
           return _op
 
       @staticmethod
-      def huber_loss(errors: tf.Tensor) -> tf.Tensor:
-          return tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
-
-      @staticmethod
       def clip_grads_by_norm(gradients: tf.Tensor, clip_norm: float) -> None:
           for i, (grad, var) in enumerate(gradients):
               if grad is not None:
@@ -110,3 +106,15 @@ class NetBlocks:
           if type(shape).__name__ == "str":
              return tf.placeholder(dtype=dtype, shape=[], name=name)
           return tf.placeholder(dtype=dtype, shape=[None] + list(shape), name=name)
+
+      class Loss:
+
+            @staticmethod
+            def huber(predicted: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
+                errors = tf.subtract(predicted, lablels)
+                return errors, tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
+
+            @staticmethod
+            def mse(predicted: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
+                errors = tf.subtract(predicted, lablels)
+                return errors, tf.square(errors)
