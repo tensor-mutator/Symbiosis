@@ -24,3 +24,8 @@ class HyperparamsMismatchError(Exception):
 
       def __init__(self, msg: str) -> None:
           super(HyperparamsMismatchError, self).__init__(msg)
+
+class MissingHyperparamsError(Exception):
+
+      def __init__(self, msg: str) -> None:
+          super(MissingHyperparamsError, self).__init__(msg)
