@@ -27,7 +27,7 @@ class DQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBLocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
@@ -58,7 +58,7 @@ class DRQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBLocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
@@ -94,7 +94,7 @@ class DuelingDQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBLocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
