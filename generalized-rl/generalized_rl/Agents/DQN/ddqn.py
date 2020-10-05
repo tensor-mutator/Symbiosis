@@ -189,7 +189,7 @@ class DDQN(Agent):
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
           params_dict = dict()
           params_dict.update(dict(gradient_clip_norm=hyperparams.get("gradient_clip_norm", 10)
-                                  loss=hyperparams.get("loss", "huber_loss")))
+                                  loss=hyperparams.get("loss", "huber")))
           return params_dict
 
       def save(self) -> None:
