@@ -15,6 +15,10 @@ class Progress:
           self._episode = 0
 
       @property
+      def training_steps(self) -> int:
+          return self._n_train_steps
+
+      @property
       def clock(self) -> int:
           return self._clock
 
