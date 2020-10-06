@@ -199,7 +199,7 @@ class DDQN(Agent):
           loss=hyperparams.get("loss", "huber")
           optimizer=hyperparams.get("optimizer", "Adam")
           optional_params = dict(gradient_clip_norm=gradient_clip_norm, loss=loss, optimizer=optimizer)
-          self.hyperparams.update(optional_params)
+          self._hyperparams.update(optional_params)
           return optional_params
 
       def save(self) -> None:
