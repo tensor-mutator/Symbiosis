@@ -1,4 +1,4 @@
-from typing import Callable, List
+from typing import Callable, List, Any
 from .network_base import NetworkMeta
 from .flow_base import Flow
 from ..config import config
