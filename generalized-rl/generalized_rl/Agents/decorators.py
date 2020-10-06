@@ -1,5 +1,6 @@
 from typing import Callable, List
 from .network_base import NetworkMeta
+from .flow_base import Flow
 from ..config import config
 
 __all__ = ["register", "record", "register_handler", "track"]
