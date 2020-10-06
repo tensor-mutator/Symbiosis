@@ -63,7 +63,12 @@ UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, sig
 
 class Agent(metaclass=ABCMeta):
 
-      def __getattr__(self, func: Callable) -> Callable:
+      @abstractmethod
+      @track(...)
+      def __init__(self, *args, **kwargs) -> None:
+          ...
+
+      def __getattr__(self, func: str) -> Callable:
           base_idx = len(self.__class__.__mro__)-2
           func = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
           if func:
@@ -193,6 +198,11 @@ class Agent(metaclass=ABCMeta):
       @property
       def training_interval(self) -> int:
           return self._training_interval
+
+      @abstractmethod
+      @record
+      def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
+          ...
 
       @abstractmethod
       def action(self, state: np.ndarray) -> Any:
