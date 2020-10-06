@@ -271,8 +271,8 @@ class Agent(metaclass=ABCMeta):
              exists = True
           return exists
 
-      def _check_hyperparams(self, continue: bool) -> None:
-          if not self.config & config.LOAD_WEIGHTS or continue:
+      def _check_hyperparams(self, continue_: bool) -> None:
+          if not self.config & config.LOAD_WEIGHTS or continue_:
              return
           if self._hyperparams_file:
              hyperparams = self._old_params
