@@ -100,6 +100,8 @@ class Agent(metaclass=ABCMeta):
       @contextmanager
       def _run_context(self) -> Generator:
           self._check_hyperparams(getattr(self, "_continue", False))
+          if self.config & config.SAVE_WEIGHTS:
+             self._save_hyperparams()
           self._create_handler()
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
@@ -107,7 +109,6 @@ class Agent(metaclass=ABCMeta):
           self._load_artifacts()
           yield
           if self.config & config.SAVE_WEIGHTS:
-             self._save_hyperparams()
              self.save()
           if self._writer:
              self._writer.close()
