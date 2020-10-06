@@ -229,7 +229,7 @@ class Agent(metaclass=ABCMeta):
       def _save_hyperparams(self) -> None:
           path = self.workspace()
           with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
-               json.dump(self.hyperparams, f_obj)
+               json.dump(self.hyperparams, f_obj, indent=2)
 
       @property
       def _old_params(self) -> Dict:
