@@ -22,7 +22,7 @@ import json
 import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
-from ..agent import Agent, register, record, track
+from ..agent import Agent
 from ..decorators import track, record, register
 from ..flow_base import Flow
 from ..network_base import NetworkBaseDQN
