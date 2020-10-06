@@ -75,7 +75,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           self._offset = offset
           self._priorities = deque(maxlen=limit)
           self._progress = progress
-          self._annealing_rate = (1 - beta)/progress.explore
+          self._annealing_rate = (1 - beta)/progress.training_steps
           self._base = super(PrioritizedExperienceReplay, self)
           self._base.__init__(limit, batch_size)
 
@@ -85,7 +85,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           return self._beta
 
       def _anneal_beta(self) -> float:
-          explore_time = min(0, self._progress.clock - self._progress.observe)
+          explore_time = max(0, self._progress.clock - self._progress.observe)
           if self._beta < 1:
              self._beta = self._min_beta + self._annealing_rate*explore_time
           return self._beta
