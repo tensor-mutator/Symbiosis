@@ -1,5 +1,6 @@
 from typing import Callable, List, Any
 import numpy as np
+import signal
 from .network_base import NetworkMeta
 from .flow_base import Flow
 from ..config import config
