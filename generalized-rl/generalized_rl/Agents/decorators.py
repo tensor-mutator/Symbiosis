@@ -1,6 +1,6 @@
 from typing import Callable, List
 from .network_base import NetworkMeta
-from ..config import
+from ..config import config
 
 __all__ = ["register", "record", "register_handler", "track"]
 
