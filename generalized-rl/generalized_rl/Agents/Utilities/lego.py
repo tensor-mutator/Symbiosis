@@ -111,10 +111,10 @@ class NetBlocks:
 
             @staticmethod
             def huber(predicted: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
-                errors = tf.subtract(predicted, lablels)
+                errors = tf.subtract(predicted, labels)
                 return errors, tf.where(tf.abs(errors) < 1.0, tf.square(errors) * 0.5, 1.0 * (tf.abs(errors) - 0.5 * 1.0))
 
             @staticmethod
             def mse(predicted: tf.Tensor, labels: tf.Tensor) -> tf.Tensor:
-                errors = tf.subtract(predicted, lablels)
+                errors = tf.subtract(predicted, labels)
                 return errors, tf.square(errors)
