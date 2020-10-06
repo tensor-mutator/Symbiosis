@@ -1,4 +1,5 @@
 from typing import Callable, List, Any
+import numpy as np
 from .network_base import NetworkMeta
 from .flow_base import Flow
 from ..config import config
