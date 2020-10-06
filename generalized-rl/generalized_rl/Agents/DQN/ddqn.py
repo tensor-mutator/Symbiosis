@@ -38,7 +38,6 @@ class DDQN(Agent):
           self._env = env
           self._config = config
           self._flow = flow
-          self._hyperparams = hyperparams
           self._read_params(hyperparams)
           self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
@@ -73,6 +72,12 @@ class DDQN(Agent):
           self._alpha = hyperparams.get("alpha", 0.7)
           self._beta = hyperparams.get("beta", 0.5)
           self._offset = hyperparams.get("offset", 1)
+          self._hyperparams = dict(observe=self._observe, explore=self._explore, total_steps=self._total_steps,
+                                   batch_size=self._batch_size, trace=self._trace, replay_limit=self._replay_limit,
+                                   epsilon_range=self._epsilon_range, training_interval=self._training_interval,
+                                   target_frequency=self._target_frequency, replay=self._replay_type,
+                                   decay_scheme=self._decay_scheme, gamma=self._gamma, alpha=self._alpha,
+                                   beta=self._beta, offset=self._offset)
 
       def _define_alias(self, network: str, hyperparams: Dict) -> str:
           alias = self.__class__.__name__
@@ -190,11 +195,12 @@ class DDQN(Agent):
           return loss
 
       def _get_optional_network_params(self, hyperparams: Dict) -> Dict:
-          params_dict = dict()
-          params_dict.update(dict(gradient_clip_norm=hyperparams.get("gradient_clip_norm", None),
-                                  loss=hyperparams.get("loss", "huber"),
-                                  optimizer=hyperparams.get("optimizer", "Adam")))
-          return params_dict
+          gradient_clip_norm=hyperparams.get("gradient_clip_norm", None)
+          loss=hyperparams.get("loss", "huber")
+          optimizer=hyperparams.get("optimizer", "Adam")
+          optional_params = dict(gradient_clip_norm=gradient_clip_norm, loss=loss, optimizer=optimizer)
+          self.hyperparams.update(optional_params)
+          return optional_params
 
       def save(self) -> None:
           super(self.__class__, self).save()
