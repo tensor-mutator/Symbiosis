@@ -56,7 +56,7 @@ def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None)
             inst._params = dict(env=env, network=network, config=config, flow=flow)
             func(inst, env, network, config, flow, **hyperparams)
         return inner
-    def outer
+    return outer
 
 UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, signal.SIGINT,
                 signal.SIGQUIT, signal.SIGTERM, signal.SIGTRAP, signal.SIGTSTP]
