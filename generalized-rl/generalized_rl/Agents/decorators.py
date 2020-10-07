@@ -17,7 +17,7 @@ def register(suite: str) -> Callable:
     return wrapper
 
 def record(func: Callable) -> Callable:
-    def inner(inst: "<Agent inst>", frame: np.ndarray, state: Any = None) -> List:
+    def inner(inst: "<Agent inst>", img: np.ndarray, state: Any = None) -> List:
         path = None
         if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
            if state is None:
@@ -27,10 +27,10 @@ def record(func: Callable) -> Callable:
            frame = inst.env.state.frame
            inst._frame_buffer.append(dict(path=path, frame=frame))
            if len(inst._frame_buffer) == inst.frame_buffer_size:
-              for frame_ in inst._frame_buffer:
-                  cv2.imwrite(frame_["path"], frame_["frame"])
+              for frame in inst._frame_buffer:
+                  cv2.imwrite(frame["path"], frame["frame"])
               inst._frame_buffer.clear()
-        return func(inst, frame, state), path
+        return func(inst, img, state), path
     return inner
 
 def register_handler(unix_signals: List) -> Callable:
