@@ -8,7 +8,7 @@ from typing import Tuple
 from glob import glob
 from collections import deque
 from ..Utilities.exceptions import *
-from ..Utilities import Progress
+from ..Utilities import Progress, BetaScheduler
 
 __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 
@@ -69,13 +69,13 @@ class ExperienceReplay:
 class PrioritizedExperienceReplay(ExperienceReplay):
 
       def __init__(self, alpha: float, beta: float, offset: float,
-                   limit: int, batch_size: int, progress: Progress) -> None:
+                   limit: int, scheme: "str", batch_size: int, progress: Progress) -> None:
           self._alpha = alpha
           self._min_beta = self._beta = beta
           self._offset = offset
           self._priorities = deque(maxlen=limit)
           self._progress = progress
-          self._annealing_rate = (1 - beta)/progress.training_steps
+          self._beta_scheduler = BetaScheduler(scheme, beta, progress)
           self._base = super(PrioritizedExperienceReplay, self)
           self._base.__init__(limit, batch_size)
 
@@ -85,9 +85,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           return self._beta
 
       def _anneal_beta(self) -> float:
-          explore_time = max(0, self._progress.clock - self._progress.observe)
-          if self._beta < 1:
-             self._beta = self._min_beta + self._annealing_rate*explore_time
+          self._beta = self._beta_scheduler.beta
           return self._beta
 
       def _sampling_probabilities(self) -> np.ndarray:
