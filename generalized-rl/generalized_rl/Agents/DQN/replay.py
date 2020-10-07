@@ -4,7 +4,7 @@ import sys
 import os
 import numpy as np
 from random import choices, sample
-from typing import Tuple
+from typing import Tuple, List
 from glob import glob
 from collections import deque
 from ..Utilities.exceptions import *
