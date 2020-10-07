@@ -143,18 +143,19 @@ class Agent(metaclass=ABCMeta):
                 if len(self._frame_buffer_flow) == self.frame_buffer_size:
                    for frame in self._frame_buffer_flow:
                        cv2.imwrite(frame["path"], frame["frame"])
-             flow_rewards = list()
-             if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "rewards.meta")):
-                with open(os.path.join(self._flow_inventory.inventory_path, "rewards.meta"), "r") as f_obj:
-                     flow_rewards = json.load(f_obj)
-             flow_rewards.append({"flow": self._flow_inventory.path,
-                                  "src_image": path_t,
-                                  "dest_image": path_t1,
-                                  "reward": r_t}) if self.flow else flow_rewards.append({"src_image": path_t,
-                                                                                         "dest_image": path_t1,
-                                                                                         "reward": r_t})
-             with open(os.path.join(self._flow_inventory.inventory_path, "rewards.meta"), "w") as f_obj:
-                  json.dump(flow_rewards, f_obj)
+                   self._frame_buffer_flow.clear()
+             flow_meta = list()
+             if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "flow.meta")):
+                with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "r") as f_obj:
+                     flow_meta = json.load(f_obj)
+             flow_meta.append({"flow": self._flow_inventory.path,
+                               "src_image": path_t,
+                               "dest_image": path_t1,
+                               "reward": r_t}) if self.flow else flow_meta.append({"src_image": path_t,
+                                                                                   "dest_image": path_t1,
+                                                                                   "reward": r_t})
+             with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
+                  json.dump(flow_meta, f_obj)
 
       def _save_all_frames(self) -> None:
           if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
