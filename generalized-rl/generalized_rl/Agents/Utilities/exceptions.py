@@ -1,4 +1,5 @@
-__all__ = ["MissingReplayError", "MissingRewardArtifactError", "MissingSuiteError", "AgentInterrupt", "HyperparamsMismatchError"]
+__all__ = ["MissingReplayError", "MissingRewardArtifactError", "MissingSuiteError", "AgentInterrupt", "HyperparamsMismatchError",
+           "UnregisteredSchemeError"]
 
 class MissingReplayError(Exception):
 
@@ -29,3 +30,8 @@ class MissingHyperparamsError(Exception):
 
       def __init__(self, msg: str) -> None:
           super(MissingHyperparamsError, self).__init__(msg)
+
+class UnregisteredSchemeError(Exception):
+
+      def __init__(self, msg: str) -> None:
+          super(UnregisteredSchemeError, self).__init__(msg)
