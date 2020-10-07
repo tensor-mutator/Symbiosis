@@ -6,9 +6,9 @@ authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "3.6.8"
-enduro-agent = { path = "enduro-agent/" }
-flappy-bird-agent = { path = "flappy-bird-agent/" }
-flappy-bird-with-gunner-farneback-agent = { path = "flappy-bird-with-gunner-farneback-agent/" }
+enduro-bot = { path = "enduro-bot/" }
+flappy-bird-bot = { path = "flappy-bird-bot/" }
+flappy-bird-with-gunner-farneback-bot = { path = "flappy-bird-with-gunner-farneback-bot/" }
 
 [tool.poetry.dev-dependencies]
 tensorflow-gpu = "1.15.3"
