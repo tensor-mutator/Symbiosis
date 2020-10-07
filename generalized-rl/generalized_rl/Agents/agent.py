@@ -47,7 +47,8 @@ class Agent(metaclass=ABCMeta):
       def __call__(self, operation: str) -> "<Agent inst>":
           if operation == "restore":
              if self._hyperparams_file:
-                inst = self.__class__(**self._params.update(self._old_params))
+                self._params.update(self._old_params)
+                inst = self.__class__(**self._params)
                 return inst
              return self
           else:
