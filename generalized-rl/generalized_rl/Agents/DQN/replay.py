@@ -22,7 +22,7 @@ class ExperienceReplay:
       def __len__(self) -> int:
           return len(self._buffer)
 
-      def __getitem__(self, idx: int) -> np.ndarray:
+      def __getitem__(self, idx: int) -> Tuple[np.ndarray, int, float, np.ndarray, bool]:
           return self._buffer[idx]
 
       def sample(self) -> np.ndarray:
