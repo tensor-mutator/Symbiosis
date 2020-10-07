@@ -19,6 +19,12 @@ class ExperienceReplay:
           self._batch_size = batch_size
           self._buffer = deque(maxlen=limit)
 
+      def __len__(self) -> int:
+          return len(self._buffer)
+
+      def __getitem__(self, idx: int) -> np.ndarray:
+          return self._buffer[idx]
+
       def sample(self) -> np.ndarray:
           n_samples = min(self._batch_size, len(self._buffer))
           samples = sample(self._buffer, n_samples)
@@ -77,6 +83,9 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           self._beta_scheduler = BetaScheduler(scheme, beta, progress)
           self._base = super(PrioritizedExperienceReplay, self)
           self._base.__init__(limit, batch_size)
+
+      def __getitem__(self, idx: int) -> List:
+          return self._base[idx], self._priorities[idx]
 
       @property
       def beta(self) -> float:
