@@ -81,8 +81,7 @@ class Agent(metaclass=ABCMeta):
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
           self._load()
-          if not getattr(self, "checkpoint_interval"):
-             self.checkpoint_interval = 1
+          self._set_checkpoint_interval()
           yield
           self._save()
           self._save_all_frames()
@@ -123,6 +122,10 @@ class Agent(metaclass=ABCMeta):
           if self.config & config.REWARD_EVENT+config.LOSS_EVENT+config.EPSILON_EVENT+config.BETA_EVENT+config.LR_EVENT:
              return tf.summary.FileWriter(os.path.join(self.workspace, "{} EVENTS".format(self.alias)), self.graph)
           return None
+
+      def _set_checkpoint_interval(self) -> None:
+          if not getattr(self, "checkpoint_interval"):
+             self.checkpoint_interval = 1
 
       def _initiate_inventories(self) -> None:
           if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
