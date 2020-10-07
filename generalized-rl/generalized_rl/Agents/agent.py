@@ -51,8 +51,8 @@ class Agent(metaclass=ABCMeta):
                 inst = self.__class__(**self._params)
                 return inst
              return self
-          else:
-             self._continue = True
+          if operation == "override":
+             self._override = True
              return self
 
       @contextmanager
@@ -74,7 +74,7 @@ class Agent(metaclass=ABCMeta):
 
       @contextmanager
       def _run_context(self) -> Generator:
-          self._check_hyperparams(getattr(self, "_continue", False))
+          self._check_hyperparams()
           self._save_hyperparams()
           self._create_handler()
           self._writer = self._summary_writer()
@@ -266,8 +266,8 @@ class Agent(metaclass=ABCMeta):
              exists = True
           return exists
 
-      def _check_hyperparams(self, continue_: bool) -> None:
-          if not self.config & config.LOAD_WEIGHTS or continue_:
+      def _check_hyperparams(self) -> None:
+          if not self.config & config.LOAD_WEIGHTS or getattr(self, "_override", False):
              return
           if self._hyperparams_file:
              hyperparams = self._old_params
