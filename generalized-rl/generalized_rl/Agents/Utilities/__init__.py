@@ -1,4 +1,4 @@
-from .lr_scheduler import LRScheduler
+from .scheduler import LRScheduler, BetaScheduler
 from .progress import Progress
 from .greedy_epsilon import GreedyEpsilon
 from .exceptions import *
@@ -8,4 +8,4 @@ from .lego import NetBlocks
 from .flow import LucasKanadeFlow, GunnerFarnebackFlow
 
 __all__ = ["LRScheduler", "Progress", "GreedyEpsilon", "Exceptions", "RewardManager", "NetBlocks", "Inventory", "LucasKanadeFlow",
-           "GunnerFarnebackFlow"]
+           "GunnerFarnebackFlow", "BetaScheduler"]
