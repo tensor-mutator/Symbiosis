@@ -48,9 +48,9 @@ class Scheduler:
 class LRScheduler(Scheduler):
 
       def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
+          self._registered_schemes = ["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"]
           super(LRScheduler, self).__init__(scheme, progress)
           self._lr = learning_rate
-          self._registered_schemes = ["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"]
 
       @property
       def lr(self) -> float:
@@ -59,9 +59,9 @@ class LRScheduler(Scheduler):
 class BetaScheduler(Scheduler):
 
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
+          self._registered_schemes = ["constant", "linear"]
           super(BetaScheduler, self).__init__(scheme, progress)
           self._beta = beta
-          self._registered_schemes = ["constant", "linear"]
 
       @property
       def beta(self) -> float:
