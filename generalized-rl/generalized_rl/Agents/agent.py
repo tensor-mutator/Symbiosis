@@ -333,3 +333,9 @@ class Agent(metaclass=ABCMeta):
       @property
       def hyperparams(self) -> Dict:
           return self._hyperparams
+
+      @property
+      def ConfigProto(self) -> tf.ConfigProto:
+          config = tf.ConfigProto()
+          config.gpu_options.allow_growth = True
+          return config
