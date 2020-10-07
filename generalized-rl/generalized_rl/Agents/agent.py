@@ -41,7 +41,7 @@ class Agent(metaclass=ABCMeta):
           return None
 
       def __getattribute__(self, func: str) -> Callable:
-          obj = self.__class__.__bases__[0]
+          obj = self.__class__.__mro__[-1]
           if func == "save":
              return obj.__getattribute__(self, "_save")
           if func == "load":
@@ -225,12 +225,13 @@ class Agent(metaclass=ABCMeta):
       def save_loss(self, loss: float) -> None:
           pass
 
+      @abstractmethod
+      def save(self) -> None:
+          ...
+
       def _save(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
              return
-          self.save()
-
-      def save(self) -> None:
           if not getattr(self, "_saver", None):
              with self.graph.as_default():
                   self._saver = tf.train.Saver(max_to_keep=5)
@@ -238,6 +239,8 @@ class Agent(metaclass=ABCMeta):
           with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
           self._reward_manager.save(self.workspace, self.alias, self._session)
+          obj = self.__class__.__mro__[-1]
+          return obj.__getattribute__(self, "save")
 
       def load_progress(self) -> Progress:
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
@@ -280,20 +283,23 @@ class Agent(metaclass=ABCMeta):
                        msg += f"{COLORS.MAGENTA}{param} = {COLORS.RED}{value} {COLORS.MAGENTA}!= {old_value}{COLORS.DEFAULT}\n"
                 raise HyperparamsMismatchError(msg)
 
+      @abstractmethod
+      def load(self) -> None:
+          ...
+
       def _load(self) -> None:
           if not (self.config & config.LOAD_WEIGHTS) or not glob(os.path.join(self.workspace,
                                                                               "{}.ckpt.*".format(self.alias))):
              with self.graph.as_default():
                   self.session.run(tf.global_variables_initializer())
              return
-          self.load()
-
-      def load(self) -> None:
           with self.graph.as_default():
                self._saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(self.workspace)
           self._saver.restore(self.session, ckpt.model_checkpoint_path)
           self._reward_manager.load(self.workspace, self.alias)
+          obj = self.__class__.__mro__[-1]
+          return obj.__getattribute__(self, "load")
 
       @property
       def workspace(self) -> str:
