@@ -71,7 +71,7 @@ class PrioritizedExperienceReplay(ExperienceReplay):
       def __init__(self, alpha: float, beta: float, offset: float,
                    limit: int, scheme: "str", batch_size: int, progress: Progress) -> None:
           self._alpha = alpha
-          self._min_beta = self._beta = beta
+          self._beta = beta
           self._offset = offset
           self._priorities = deque(maxlen=limit)
           self._progress = progress
