@@ -24,10 +24,11 @@ def record(func: Callable) -> Callable:
               path = inst._frame_inventory.init_path
            else:
               path = inst._frame_inventory.path
-           inst._frame_buffer.append(dict(path=path, frame=inst.env.state.frame))
+           frame = inst.env.state.frame
+           inst._frame_buffer.append(dict(path=path, frame=frame))
            if len(inst._frame_buffer) == inst.frame_buffer_size:
-              for frame in inst._frame_buffer:
-                  cv2.imwrite(frame["path"], frame["frame"])
+              for frame_ in inst._frame_buffer:
+                  cv2.imwrite(frame_["path"], frame_["frame"])
               inst._frame_buffer.clear()
         return func(inst, frame, state), path
     return inner
