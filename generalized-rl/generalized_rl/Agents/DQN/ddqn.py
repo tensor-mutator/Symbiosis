@@ -202,11 +202,9 @@ class DDQN(Agent):
           return optional_params
 
       def save(self) -> None:
-          super(self.__class__, self).save()
           self._replay.save(self.workspace, self._alias)
 
       def load(self) -> None:
-          super(self.__class__, self).load()
           self._replay.load(self.workspace, self._alias)
 
       @register("episode_suite_dqn")
