@@ -64,25 +64,23 @@ class Agent(metaclass=ABCMeta):
           if self.config & config.SAVE_FLOW:
              self._flow_buffer.clear()
           progress.bump_episode()
-          if self.config & config.SAVE_WEIGHTS:
-             if self.progress.episode%self.checkpoint_interval==0:
-                self.save()
+          if self.progress.episode%self.checkpoint_interval==0:
+             self.save()
 
       @contextmanager
       def _run_context(self) -> Generator:
           self._check_hyperparams(getattr(self, "_continue", False))
-          if self.config & config.SAVE_WEIGHTS:
-             self._save_hyperparams()
+          self._save_hyperparams()
           self._create_handler()
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
-          self._load_artifacts()
+          self.load()
           if not getattr(self, "checkpoint_interval"):
              self.checkpoint_interval = 1
           yield
-          if self.config & config.SAVE_WEIGHTS:
-             self.save()
+          self.save()
+          self._save_all_frames()
           if self._writer:
              self._writer.close()
 
@@ -103,14 +101,6 @@ class Agent(metaclass=ABCMeta):
                         if self.progress.training_clock%self.target_frequency == 0:
                            self.update_target()
                      self.progress.bump()
-
-      def _load_artifacts(self) -> None:
-          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(self.workspace,
-                                                                       "{}.ckpt.*".format(self._alias))):
-             self.load()
-          else:
-             with self.graph.as_default():
-                  self.session.run(tf.global_variables_initializer())
 
       @register_handler(UNIX_SIGNALS)
       def _create_handler(self, signal_id: int = None, frame: Any = None):
@@ -166,6 +156,14 @@ class Agent(metaclass=ABCMeta):
              with open(os.path.join(self._flow_inventory.inventory_path, "rewards.meta"), "w") as f_obj:
                   json.dump(flow_rewards, f_obj)
 
+      def _save_all_frames(self) -> None:
+          if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
+             for frame in self._frame_buffer:
+                 cv2.imwrite(frame["path"], frame["frame"])
+             if self.config & config.SAVE_FLOW and self.flow:
+                for frame in self._frame_buffer_flow:
+                    cv2.imwrite(frame["path"], frame["frame"])
+
       @abstractmethod
       def train(self) -> float:
           ...
@@ -219,6 +217,8 @@ class Agent(metaclass=ABCMeta):
           pass
 
       def save(self) -> None:
+          if not self.config & config.SAVE_WEIGHTS:
+             return
           if not getattr(self, "_saver", None):
              with self.graph.as_default():
                   self._saver = tf.train.Saver(max_to_keep=5)
@@ -235,6 +235,8 @@ class Agent(metaclass=ABCMeta):
           return Progress(self.total_steps, self.observe, self.explore)
 
       def _save_hyperparams(self) -> None:
+          if not self.config & config.SAVE_WEIGHTS:
+             return
           with open(os.path.join(self.workspace, "{}.hyperparams".format(self.alias)), "w") as f_obj:
                json.dump(self.hyperparams, f_obj, indent=2)
 
@@ -267,6 +269,11 @@ class Agent(metaclass=ABCMeta):
                 raise HyperparamsMismatchError(msg)
 
       def load(self) -> None:
+          if not (self.config & config.LOAD_WEIGHTS) or not glob(os.path.join(self.workspace,
+                                                                              "{}.ckpt.*".format(self.alias))):
+             with self.graph.as_default():
+                  self.session.run(tf.global_variables_initializer())
+             return
           with self.graph.as_default():
                self._saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(self.workspace)
