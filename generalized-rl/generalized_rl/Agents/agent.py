@@ -35,18 +35,14 @@ class Agent(metaclass=ABCMeta):
 
       def __getattr__(self, func: str) -> Callable:
           base_idx = len(self.__class__.__mro__)-2
+          if func == "_save":
+             return self.save_
+          if func == "_load":
+             return self.load_
           func = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
           if func:
              return lambda: func(self)
           return None
-
-      def __getattribute__(self, func: str) -> Callable:
-          obj = self.__class__.__mro__[-1]
-          if func == "save":
-             return obj.__getattribute__(self, "_save")
-          if func == "load":
-             return obj.__getattribute__(self, "_load")
-          return obj.__getattribute__(self, func)
 
       def __call__(self, operation: str) -> "<Agent inst>":
           if operation == "restore":
@@ -73,7 +69,7 @@ class Agent(metaclass=ABCMeta):
              self._flow_buffer.clear()
           progress.bump_episode()
           if self.progress.episode%self.checkpoint_interval==0:
-             self.save()
+             self._save()
 
       @contextmanager
       def _run_context(self) -> Generator:
@@ -83,11 +79,11 @@ class Agent(metaclass=ABCMeta):
           self._writer = self._summary_writer()
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
-          self.load()
+          self._load()
           if not getattr(self, "checkpoint_interval"):
              self.checkpoint_interval = 1
           yield
-          self.save()
+          self._save()
           self._save_all_frames()
           if self._writer:
              self._writer.close()
@@ -229,7 +225,7 @@ class Agent(metaclass=ABCMeta):
       def save(self) -> None:
           ...
 
-      def _save(self) -> None:
+      def save_(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
              return
           if not getattr(self, "_saver", None):
@@ -239,8 +235,7 @@ class Agent(metaclass=ABCMeta):
           with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
           self._reward_manager.save(self.workspace, self.alias, self._session)
-          obj = self.__class__.__mro__[-1]
-          return obj.__getattribute__(self, "save")
+          self.save()
 
       def load_progress(self) -> Progress:
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
@@ -287,7 +282,7 @@ class Agent(metaclass=ABCMeta):
       def load(self) -> None:
           ...
 
-      def _load(self) -> None:
+      def load_(self) -> None:
           if not (self.config & config.LOAD_WEIGHTS) or not glob(os.path.join(self.workspace,
                                                                               "{}.ckpt.*".format(self.alias))):
              with self.graph.as_default():
@@ -298,8 +293,7 @@ class Agent(metaclass=ABCMeta):
           ckpt = tf.train.get_checkpoint_state(self.workspace)
           self._saver.restore(self.session, ckpt.model_checkpoint_path)
           self._reward_manager.load(self.workspace, self.alias)
-          obj = self.__class__.__mro__[-1]
-          return obj.__getattribute__(self, "load")
+          self.load()
 
       @property
       def workspace(self) -> str:
