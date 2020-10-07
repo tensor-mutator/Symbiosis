@@ -73,7 +73,7 @@ class DDQN(Agent):
           self._offset = hyperparams.get("offset", 1)
           self._hyperparams = dict(observe=self._observe, explore=self._explore, total_steps=self._total_steps,
                                    batch_size=self._batch_size, trace=self._trace, replay_limit=self._replay_limit,
-                                   epsilon_range=self._epsilon_range, training_interval=self._training_interval,
+                                   epsilon_range=list(self._epsilon_range), training_interval=self._training_interval,
                                    target_frequency=self._target_frequency, replay=self._replay_type,
                                    decay_scheme=self._decay_scheme, gamma=self._gamma, alpha=self._alpha,
                                    beta=self._beta, offset=self._offset)
