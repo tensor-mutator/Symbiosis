@@ -11,4 +11,4 @@ from .config import config
 from .colors import COLORS
 
 __all__ = ["Environment", "State", "Action", "DDQN", "NetworkBaseDQN", "DQNNet", "DRQNNet", "DuelingDQNNet",
-           "config", "NetBlocks", "Flow", "LucasKanadeFlow", "GunnerFarnebackFlow"]
+           "config", "NetBlocks", "Flow", "LucasKanadeFlow", "GunnerFarnebackFlow", "COLORS"]
