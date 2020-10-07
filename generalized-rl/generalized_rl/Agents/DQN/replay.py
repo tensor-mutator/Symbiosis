@@ -71,7 +71,6 @@ class PrioritizedExperienceReplay(ExperienceReplay):
       def __init__(self, alpha: float, beta: float, offset: float,
                    limit: int, scheme: "str", batch_size: int, progress: Progress) -> None:
           self._alpha = alpha
-          self._beta = beta
           self._offset = offset
           self._priorities = deque(maxlen=limit)
           self._progress = progress
@@ -81,28 +80,27 @@ class PrioritizedExperienceReplay(ExperienceReplay):
 
       @property
       def beta(self) -> float:
-          self._anneal_beta()
-          return self._beta
+          beta = self._anneal_beta()
+          return beta
 
       def _anneal_beta(self) -> float:
-          self._beta = self._beta_scheduler.beta
-          return self._beta
+          beta = self._beta_scheduler.beta
+          return beta
 
       def _sampling_probabilities(self) -> np.ndarray:
           scaled_priorities = np.array(self._priorities)**self._alpha
           sampling_probabilities = scaled_priorities/np.sum(scaled_priorities)
           return sampling_probabilities
 
-      @property
-      def _scaling_factor(self) -> float:
+      def _scaling_factor(self, beta: float) -> float:
           scaled_priorities = np.array(self._priorities)**self._alpha
           min_probability = np.min(scaled_priorities)/np.sum(scaled_priorities)
-          return (min_probability*len(self._buffer))**-self._beta
+          return (min_probability*len(self._buffer))**-beta
 
       def _importance_sampling_weights(self, sample_probabilities: np.ndarray) -> np.ndarray:
-          self._anneal_beta()
-          importance_sampling_weights = (sample_probabilities*len(self._buffer))**-self._beta
-          return importance_sampling_weights/self._scaling_factor
+          beta = self._anneal_beta()
+          importance_sampling_weights = (sample_probabilities*len(self._buffer))**-beta
+          return importance_sampling_weights/self._scaling_factor(beta)
 
       def sample(self) -> np.ndarray:
           n_samples = min(self._batch_size, len(self._buffer))
