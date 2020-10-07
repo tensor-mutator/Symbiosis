@@ -40,6 +40,14 @@ class Agent(metaclass=ABCMeta):
              return lambda: func(self)
           return None
 
+      def __getattribute__(self, func: str) -> Callable:
+          obj = self.__class__.__bases__[0]
+          if func == "save":
+             return obj.__getattribute__(self, "_save")
+          if func == "load":
+             return obj.__getattribute__(self, "_load")
+          return obj.__getattribute__(self, func)
+
       def __call__(self, operation: str) -> "<Agent inst>":
           if operation == "restore":
              if self._hyperparams_file:
@@ -217,9 +225,12 @@ class Agent(metaclass=ABCMeta):
       def save_loss(self, loss: float) -> None:
           pass
 
-      def save(self) -> None:
+      def _save(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
              return
+          self.save()
+
+      def save(self) -> None:
           if not getattr(self, "_saver", None):
              with self.graph.as_default():
                   self._saver = tf.train.Saver(max_to_keep=5)
@@ -269,12 +280,15 @@ class Agent(metaclass=ABCMeta):
                        msg += f"{COLORS.MAGENTA}{param} = {COLORS.RED}{value} {COLORS.MAGENTA}!= {old_value}{COLORS.DEFAULT}\n"
                 raise HyperparamsMismatchError(msg)
 
-      def load(self) -> None:
+      def _load(self) -> None:
           if not (self.config & config.LOAD_WEIGHTS) or not glob(os.path.join(self.workspace,
                                                                               "{}.ckpt.*".format(self.alias))):
              with self.graph.as_default():
                   self.session.run(tf.global_variables_initializer())
              return
+          self.load()
+
+      def load(self) -> None:
           with self.graph.as_default():
                self._saver = tf.train.Saver(max_to_keep=5)
           ckpt = tf.train.get_checkpoint_state(self.workspace)
