@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "flappy-bird-agent"
+name = "flappy-bird-bot"
 version = "0.1.0"
 description = ""
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
