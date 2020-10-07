@@ -130,13 +130,18 @@ class Agent(metaclass=ABCMeta):
           return None
 
       def _initiate_inventories(self) -> None:
-          if self.config & config.SAVE_FRAMES:
+          if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
+             if not getattr(self, "frame_buffer_size"):
+                self.frame_buffer_size = 1
+             self._frame_buffer = deque()
              self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
-          if self.config & config.SAVE_FLOW:
-             self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
-             self._buffer_len = self.flow_skip if getattr(self, "flow_skip") else 1
-             self._buffer_len = max(1, self._buffer_len)
-             self._flow_buffer = deque(maxlen=self._buffer_len)
+             if self.config & config.SAVE_FLOW:
+                self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
+                self._buffer_len = self.flow_skip if getattr(self, "flow_skip") else 1
+                self._buffer_len = max(1, self._buffer_len)
+                self._flow_buffer = deque(maxlen=self._buffer_len)
+                if self.flow:
+                   self._frame_buffer_flow = deque()
 
       def _save_flow(self, x_t: np.ndarray, x_t1: np.ndarray, r_t: float, path_t: str, path_t1: str) -> None:
           if self.config & config.SAVE_FLOW:
@@ -144,7 +149,10 @@ class Agent(metaclass=ABCMeta):
              x_t = self._flow_buffer[0]["img"]
              path_t = self._flow_buffer[0]["path"]
              if self.flow:
-                cv2.imwrite(self._flow_inventory.path, self.flow.flow_map(x_t, x_t1))
+                self._frame_buffer_flow.append(dict(path=self._flow_inventory.path, frame=self.flow.flow_map(x_t, x_t1)))
+                if len(self._frame_buffer_flow) == self.frame_buffer_size:
+                   for frame in self._frame_buffer_flow:
+                       cv2.imwrite(frame["path"], frame["frame"])
              flow_rewards = list()
              if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "rewards.meta")):
                 with open(os.path.join(self._flow_inventory.inventory_path, "rewards.meta"), "r") as f_obj:
