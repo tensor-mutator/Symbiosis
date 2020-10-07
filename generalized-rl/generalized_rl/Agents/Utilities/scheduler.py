@@ -59,7 +59,7 @@ class LRScheduler(Scheduler):
 class BetaScheduler(Scheduler):
 
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
-          super(BetaScheduler, self).__init__(scheme, learning_rate, progress)
+          super(BetaScheduler, self).__init__(scheme, progress)
           self._beta = beta
           self._registered_schemes = ["constant", "linear"]
 
