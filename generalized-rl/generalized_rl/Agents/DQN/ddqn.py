@@ -54,7 +54,6 @@ class DDQN(Agent):
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._total_steps-self._observe, self._progress)
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
-          self._memory_path = self.workspace()
 
       def _read_params(self, hyperparams: Dict) -> None:
           self._observe = hyperparams.get("observe", 5000)
@@ -204,11 +203,11 @@ class DDQN(Agent):
 
       def save(self) -> None:
           super(self.__class__, self).save()
-          self._replay.save(self._memory_path, self._alias)
+          self._replay.save(self.workspace, self._alias)
 
       def load(self) -> None:
           super(self.__class__, self).load()
-          self._replay.load(self._memory_path, self._alias)
+          self._replay.load(self.workspace, self._alias)
 
       @register("episode_suite_dqn")
       def run(self) -> None:
