@@ -15,7 +15,6 @@ __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 class ExperienceReplay:
 
       def __init__(self, limit: int, batch_size: int) -> None:
-          self._limit = limit
           self._batch_size = batch_size
           self._buffer = deque(maxlen=limit)
 
