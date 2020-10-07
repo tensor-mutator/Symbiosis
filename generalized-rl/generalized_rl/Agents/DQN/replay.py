@@ -78,7 +78,6 @@ class PrioritizedExperienceReplay(ExperienceReplay):
           self._alpha = alpha
           self._offset = offset
           self._priorities = deque(maxlen=limit)
-          self._progress = progress
           self._beta_scheduler = BetaScheduler(scheme, beta, progress)
           self._base = super(PrioritizedExperienceReplay, self)
           self._base.__init__(limit, batch_size)
