@@ -65,4 +65,4 @@ class BetaScheduler(Scheduler):
 
       @property
       def beta(self) -> float:
-          return self._beta + (1-self._beta)*(1-self._scheme(self._progress.training_clock/self._progress.training_steps))
+          return min(1, self._beta + (1-self._beta)*(1-self._scheme(self._progress.training_clock/self._progress.training_steps)))
