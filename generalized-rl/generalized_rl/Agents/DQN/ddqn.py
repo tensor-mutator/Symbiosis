@@ -47,10 +47,9 @@ class DDQN(Agent):
                                                                                                                                self._beta,
                                                                                                                                self._offset,
                                                                                                                                self._replay_limit,
+                                                                                                                               self._beta_scheduler_scheme,
                                                                                                                                self._batch_size,
                                                                                                                                self._progress)
-          self._lr = hyperparams.get("learning_rate", 7e-4)
-          self._lr_scheduler_scheme = hyperparams.get("lr_scheduler_scheme", "constant")
           self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._progress)
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
@@ -67,16 +66,21 @@ class DDQN(Agent):
           self._target_frequency = hyperparams.get("target_frequency", 3000)
           self._replay_type = hyperparams.get("replay", "prioritized")
           self._decay_scheme = hyperparams.get("decay_scheme", "linear")
+          self._beta_scheduler_scheme = hyperparams.get("beta_scheduler_scheme", "constant")
           self._gamma = hyperparams.get("gamma", 0.9)
           self._alpha = hyperparams.get("alpha", 0.7)
           self._beta = hyperparams.get("beta", 0.5)
           self._offset = hyperparams.get("offset", 1)
+          self._lr = hyperparams.get("learning_rate", 7e-4)
+          self._lr_scheduler_scheme = hyperparams.get("lr_scheduler_scheme", "constant")
           self._hyperparams = dict(observe=self._observe, explore=self._explore, total_steps=self._total_steps,
                                    batch_size=self._batch_size, trace=self._trace, replay_limit=self._replay_limit,
                                    epsilon_range=list(self._epsilon_range), training_interval=self._training_interval,
                                    target_frequency=self._target_frequency, replay=self._replay_type,
                                    decay_scheme=self._decay_scheme, gamma=self._gamma, alpha=self._alpha,
-                                   beta=self._beta, offset=self._offset)
+                                   beta=self._beta, offset=self._offset, learning_rate=self._lr,
+                                   lr_scheduler_scheme=self._lr_scheduler_scheme,
+                                   beta_scheduler_scheme=self._beta_scheduler_scheme)
 
       def _define_alias(self, network: str, hyperparams: Dict) -> str:
           alias = self.__class__.__name__
