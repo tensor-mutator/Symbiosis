@@ -61,11 +61,12 @@ class Agent(metaclass=ABCMeta):
           yield image, image_original, state, path
           env.close()
           reward_manager.rollout()
-          if self.config & config.SAVE_WEIGHTS:
-             self.save()
           if self.config & config.SAVE_FLOW:
              self._flow_buffer.clear()
           progress.bump_episode()
+          if self.config & config.SAVE_WEIGHTS:
+             if self.progress.episode%self.checkpoint_interval==0:
+                self.save()
 
       @contextmanager
       def _run_context(self) -> Generator:
@@ -77,6 +78,8 @@ class Agent(metaclass=ABCMeta):
           self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
           self._initiate_inventories()
           self._load_artifacts()
+          if not getattr(self, "checkpoint_interval"):
+             self.checkpoint_interval = 1
           yield
           if self.config & config.SAVE_WEIGHTS:
              self.save()
