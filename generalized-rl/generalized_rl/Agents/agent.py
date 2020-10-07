@@ -248,11 +248,11 @@ class Agent(metaclass=ABCMeta):
           if self._hyperparams_file:
              hyperparams = self._old_params
              if hyperparams != self.hyperparams:
-                msg = f"\n{COLORS.RED}hyperparams are different from the ones used during the last run\n"
+                msg = f"\n{COLORS.RED}** hyperparameters are different from the ones that are used during the last run **\n"
                 for param, value in self.hyperparams.items():
                     old_value = hyperparams.get(param)
                     if value != old_value:
-                       msg += f"{COLORS.MAGENTA}param = {COLORS.RED}value {COLORS.MAGENTA}!= old_value{colors.DEFAULT}\n"
+                       msg += f"{COLORS.MAGENTA}param = {COLORS.RED}{value} {COLORS.MAGENTA}!= {old_value}{COLORS.DEFAULT}\n"
                 raise HyperparamsMismatchError(msg)
 
       def load(self) -> None:
