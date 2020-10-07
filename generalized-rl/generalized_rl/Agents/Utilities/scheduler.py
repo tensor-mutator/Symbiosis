@@ -6,16 +6,16 @@ __all__ = ["LRScheduler", "BetaScheduler"]
 
 class Scheduler:
 
-      def __init__(self, scheme: str, progress: Progress) -> None:
+      def __init__(self, scheme: str) -> None:
           self._scheme = getattr(self, scheme)
-          self._progress = progress
           self._registered_schemes = list()
 
       def __getattr__(self, func: str) -> Callable:
+          base_idx = len(self.__class__.__mro__)-2
           if func not in self._registered_schemes:
              raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(func,
                                                                                             self.__class__.__name__))
-          return lambda x: self.__class__.__dict__.get("_{}".format(func))(self, x)
+          return lambda x: self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func))(self, x)
       
       def _constant(self, p: float) -> float:
           return 1
@@ -49,8 +49,9 @@ class LRScheduler(Scheduler):
 
       def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
           self._registered_schemes = ["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"]
-          super(LRScheduler, self).__init__(scheme, progress)
+          super(LRScheduler, self).__init__(scheme)
           self._lr = learning_rate
+          self._progress = progress
 
       @property
       def lr(self) -> float:
@@ -60,8 +61,9 @@ class BetaScheduler(Scheduler):
 
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
           self._registered_schemes = ["constant", "linear"]
-          super(BetaScheduler, self).__init__(scheme, progress)
+          super(BetaScheduler, self).__init__(scheme)
           self._beta = beta
+          self._progress = progress
 
       @property
       def beta(self) -> float:
