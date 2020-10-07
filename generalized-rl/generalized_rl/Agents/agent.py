@@ -102,8 +102,7 @@ class Agent(metaclass=ABCMeta):
                      self.progress.bump()
 
       def _load_artifacts(self) -> None:
-          path = self.workspace()
-          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(path,
+          if (self.config & config.LOAD_WEIGHTS) and glob(os.path.join(self.workspace,
                                                                        "{}.ckpt.*".format(self._alias))):
              self.load()
           else:
@@ -209,40 +208,36 @@ class Agent(metaclass=ABCMeta):
           pass
 
       def save(self) -> None:
-          path = self.workspace()
           if not getattr(self, "_saver", None):
              with self.graph.as_default():
                   self._saver = tf.train.Saver(max_to_keep=5)
-          self._saver.save(self.session, os.path.join(path, "{}.ckpt".format(self.alias)))
-          with open(os.path.join(path, "{}.progress".format(self.alias)), "wb") as f_obj:
+          self._saver.save(self.session, os.path.join(self.workspace, "{}.ckpt".format(self.alias)))
+          with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "wb") as f_obj:
                dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
-          self._reward_manager.save(path, self.alias, self._session)
+          self._reward_manager.save(self.workspace, self.alias, self._session)
 
       def load_progress(self) -> Progress:
-          path = self.workspace()
-          if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(path,
+          if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
                                                                                  "{}.progress".format(self.alias))):
-             with open(os.path.join(path, "{}.progress".format(self.alias)), "rb") as f_obj:
+             with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
           return Progress(self.total_steps, self.observe, self.explore)
 
       def _save_hyperparams(self) -> None:
-          path = self.workspace()
-          with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
+          with open(os.path.join(self.workspace, "{}.hyperparams".format(self.alias)), "w") as f_obj:
                json.dump(self.hyperparams, f_obj, indent=2)
 
       @property
       def _old_params(self) -> Dict:
-          with open(os.path.join(path, "{}.hyperparams".format(self.alias)), "w") as f_obj:
+          with open(os.path.join(self.workspace, "{}.hyperparams".format(self.alias)), "w") as f_obj:
                return json.load(f_obj)
 
       @property
       def _hyperparams_file(self) -> bool:
-          path = self.workspace()
           exists = False
-          if glob.glob(os.path.join(path, "{}.*".format(self.alias))):
-             if not os.path.exists(os.path.join(path, "{}.hyperparams".format(self.alias))):
-                raise MissingHyperparamsError("{} file not found".format(os.path.join(path,
+          if glob(os.path.join(self.workspace, "{}.*".format(self.alias))):
+             if not os.path.exists(os.path.join(self.workspace, "{}.hyperparams".format(self.alias))):
+                raise MissingHyperparamsError("{} file not found".format(os.path.join(self.workspace,
                                                                                       "{}.hyperparams".format(self.alias))))
              exists = True
           return exists
@@ -261,13 +256,13 @@ class Agent(metaclass=ABCMeta):
                 raise HyperparamsMismatchError(msg)
 
       def load(self) -> None:
-          path = self.workspace()
           with self.graph.as_default():
                self._saver = tf.train.Saver(max_to_keep=5)
-          ckpt = tf.train.get_checkpoint_state(path)
+          ckpt = tf.train.get_checkpoint_state(self.workspace)
           self._saver.restore(self.session, ckpt.model_checkpoint_path)
-          self._reward_manager.load(path, self.alias)
+          self._reward_manager.load(self.workspace, self.alias)
 
+      @property
       def workspace(self) -> str:
           path = os.path.join(self.env.name, self.alias)
           if not os.path.exists(path):
