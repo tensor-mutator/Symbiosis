@@ -58,7 +58,6 @@ class Agent(metaclass=ABCMeta):
       @contextmanager
       def _episode_context(self, env: Environment, progress: Progress,
                            reward_manager: RewardManager) -> Generator:
-          env.make()
           env.reset()
           image = env.render()
           image_original = env.state.frame
@@ -82,6 +81,7 @@ class Agent(metaclass=ABCMeta):
           self._initiate_inventories()
           self._load()
           self._set_checkpoint_interval()
+          self.env.make()
           yield
           self._save()
           self._save_all_frames()
