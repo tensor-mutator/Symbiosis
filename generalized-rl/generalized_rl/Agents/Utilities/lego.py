@@ -90,8 +90,7 @@ class NetBlocks:
                                        time_distributed=time_distributed)(conv2)
               flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
               return [NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
-                      NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
-                      ]
+                      NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)]
           return _op
 
       @staticmethod
