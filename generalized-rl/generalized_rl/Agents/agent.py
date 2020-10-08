@@ -13,7 +13,7 @@ import cv2
 import json
 import signal
 from collections import deque
-from .decorators import record, register_handler, track
+from .decorators import record, register_handler, track, register
 from .flow_base import Flow
 from .network_base import NetworkMeta
 from .DQN.replay import ExperienceReplay
@@ -110,7 +110,7 @@ class Agent(metaclass=ABCMeta):
       def _create_handler(self, signal_id: int = None, frame: Any = None):
           raise AgentInterrupt("Agent interrupted")
 
-      def run(self, suite: Callable) -> None:
+      def _run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
           with self._run_context():
@@ -172,6 +172,11 @@ class Agent(metaclass=ABCMeta):
              if self.config & config.SAVE_FLOW and self.flow:
                 for frame in self._frame_buffer_flow:
                     cv2.imwrite(frame["path"], frame["frame"])
+
+      @abstractmethod
+      @register(...)
+      def run(self) -> None:
+          ...
 
       @abstractmethod
       def train(self) -> float:
