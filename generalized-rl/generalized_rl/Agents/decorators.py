@@ -12,7 +12,7 @@ __all__ = ["register", "record", "register_handler", "track"]
 def register(suite: str) -> Callable:
     def wrapper(func: Callable) -> Callable:
         def run(inst: "<Agent inst>") -> None:
-            super(inst.__class__, inst).run(getattr(inst, suite))
+            super(inst.__class__, inst)._run(getattr(inst, suite))
         return run
     return wrapper
 
