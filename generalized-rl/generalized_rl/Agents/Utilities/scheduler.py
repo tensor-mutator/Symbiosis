@@ -12,7 +12,7 @@ class Scheduler(metaclass=ABCMeta):
       def __init__(self, scheme: str, _, progress: Progress) -> None:
           ...
 
-      @classmethod
+      @staticmethod
       def register(schemes) -> Callable:
           def outer(func) -> Callable:
               def inner(inst: Scheduler, scheme: str, _, progress: Progress) -> None:
