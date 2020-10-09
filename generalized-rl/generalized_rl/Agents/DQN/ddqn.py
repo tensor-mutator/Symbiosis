@@ -12,10 +12,7 @@ A precise implementation of a DQN agent with the following components:
 7. Noisy
 """
 
-import warnings
-with warnings.catch_warnings():  
-     warnings.filterwarnings("ignore", category=FutureWarning)
-     import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 from typing import Dict, Any
 import json
