@@ -20,7 +20,6 @@ import cv2
 from .replay import ExperienceReplay, PrioritizedExperienceReplay
 from .network import *
 from ..agent import Agent
-from ..decorators import track, record, register
 from ..flow_base import Flow
 from ..network_base import NetworkBaseDQN
 from ..Utilities import LRScheduler, GreedyEpsilon, Progress
@@ -29,7 +28,7 @@ from ...config import config
 
 class DDQN(Agent):
 
-      @track(DQNNet)
+      @Agent.track(DQNNet)
       def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: bin = config.DEFAULT,
                    flow: Flow = None, **hyperparams) -> None:
           self._env = env
@@ -160,7 +159,7 @@ class DDQN(Agent):
           self._greedy_epsilon.decay()
           return action
 
-      @record
+      @Agent.record
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
           x_t1 = cv2.cvtColor(x_t1, cv2.COLOR_BGR2GRAY)
           if np.all(s_t is None):
@@ -206,7 +205,7 @@ class DDQN(Agent):
       def load(self) -> None:
           self._replay.load(self.workspace, self._alias)
 
-      @register("episode_suite_dqn")
+      @Agent.register("episode_suite_dqn")
       def run(self) -> None:
           ...
 
