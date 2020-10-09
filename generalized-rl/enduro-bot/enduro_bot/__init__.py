@@ -32,6 +32,7 @@ class Enduro(Environment):
       def reset(self) -> np.ndarray:
           state = self._env.reset()
           self.state.frame = state
+          self._ended = False
           return state
 
       def step(self, action: Any) -> Sequence:
