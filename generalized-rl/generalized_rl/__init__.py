@@ -7,6 +7,8 @@ with warnings.catch_warnings():
 tf.logging.set_verbosity(tf.logging.WARN)
 tf.logging.set_verbosity(tf.logging.ERROR)
 tf.disable_eager_execution()
+import os
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
 from .environment import Environment, State, Action
 from .Agents.flow_base import Flow
 from .Agents.DQN.ddqn import DDQN
