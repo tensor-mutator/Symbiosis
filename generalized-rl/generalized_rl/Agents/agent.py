@@ -63,7 +63,6 @@ class Agent(metaclass=ABCMeta):
           image_original = env.state.frame
           state, path = self.state(image)
           yield image, image_original, state, path
-          env.close()
           reward_manager.rollout()
           if self.config & config.SAVE_FLOW:
              self._flow_buffer.clear()
@@ -83,6 +82,7 @@ class Agent(metaclass=ABCMeta):
           self._set_checkpoint_interval()
           self.env.make()
           yield
+          self.env.close()
           self._save()
           self._save_all_frames()
           if self._writer:
