@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Any, Generator, Callable
+from typing import Dict, Any, Generator, Callable, List
 from contextlib import contextmanager, suppress
 from glob import glob
 import tensorflow.compat.v1 as tf
