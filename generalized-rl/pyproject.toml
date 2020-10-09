@@ -11,7 +11,7 @@ flappy-bird-bot = { path = "flappy-bird-bot/" }
 flappy-bird-with-gunner-farneback-bot = { path = "flappy-bird-with-gunner-farneback-bot/" }
 
 [tool.poetry.dev-dependencies]
-tensorflow-gpu = "1.15.3"
+tensorflow-gpu = "2.2.0"
 opencv-python = "^4.4.0.44"
 dill = "^0.3.2"
 loguru = "^0.4.1"
