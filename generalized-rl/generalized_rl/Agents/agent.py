@@ -137,33 +137,37 @@ class Agent(metaclass=ABCMeta):
                 self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
                 self._buffer_len = self.flow_skip if getattr(self, "flow_skip") else 1
                 self._buffer_len = max(1, self._buffer_len)
-                self._flow_buffer = deque(maxlen=self._buffer_len)
+                self._flow_skip_buffer = deque(maxlen=self._buffer_len)
+                self._flow_meta_buffer = deque()
                 if self.flow:
-                   self._frame_buffer_flow = deque()
+                   self._flow_buffer = deque()
 
       def _save_flow(self, x_t: np.ndarray, x_t1: np.ndarray, r_t: float, path_t: str, path_t1: str) -> None:
           if self.config & config.SAVE_FLOW:
-             self._flow_buffer.append({"img": x_t, "path": path_t})
-             x_t = self._flow_buffer[0]["img"]
-             path_t = self._flow_buffer[0]["path"]
+             self._flow_skip_buffer.append({"img": x_t, "path": path_t})
+             x_t = self._flow_skip_buffer[0]["img"]
+             path_t = self._flow_skip_buffer[0]["path"]
              if self.flow:
-                self._frame_buffer_flow.append(dict(path=self._flow_inventory.path, frame=self.flow.flow_map(x_t, x_t1)))
-                if len(self._frame_buffer_flow) == self.frame_buffer_size:
-                   for frame in self._frame_buffer_flow:
+                self._flow_buffer.append(dict(path=self._flow_inventory.path, frame=self.flow.flow_map(x_t, x_t1)))
+                if len(self._flow_buffer) == self.frame_buffer_size:
+                   for frame in self._flow_buffer:
                        cv2.imwrite(frame["path"], frame["frame"])
-                   self._frame_buffer_flow.clear()
-             flow_meta = list()
-             if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "flow.meta")):
-                with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "r") as f_obj:
-                     flow_meta = json.load(f_obj)
-             flow_meta.append({"flow": self._flow_inventory.path,
-                               "src_image": path_t,
-                               "dest_image": path_t1,
-                               "reward": r_t}) if self.flow else flow_meta.append({"src_image": path_t,
-                                                                                   "dest_image": path_t1,
-                                                                                   "reward": r_t})
-             with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
-                  json.dump(flow_meta, f_obj)
+                   self._flow_buffer.clear()
+             self._flow_meta_buffer.append({"flow": self._flow_inventory.path,
+                                            "src_image": path_t,
+                                            "dest_image": path_t1,
+                                            "reward": r_t}) if self.flow else self._flow_meta_buffer.append({"src_image": path_t,
+                                                                                                             "dest_image": path_t1,
+                                                                                                             "reward": r_t})
+             if len(self._flow_meta_buffer) == self.frame_buffer_size:
+                flow_meta = list()
+                if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "flow.meta")):
+                   with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "r") as f_obj:
+                        flow_meta = json.load(f_obj)
+                flow_meta.extend(list(self._flow_meta_buffer))
+                with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
+                     json.dump(flow_meta, f_obj)
+                self._flow_meta_buffer.close()
 
       def _save_all_frames(self) -> None:
           if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
