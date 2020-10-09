@@ -4,6 +4,8 @@ import warnings
 with warnings.catch_warnings():  
      warnings.filterwarnings("ignore", category=FutureWarning)
      import tensorflow.compat.v1 as tf
+tf.logging.set_verbosity(tf.logging.WARN)
+tf.logging.set_verbosity(tf.logging.ERROR)
 tf.disable_eager_execution()
 from .environment import Environment, State, Action
 from .Agents.flow_base import Flow
