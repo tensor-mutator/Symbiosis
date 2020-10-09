@@ -171,8 +171,15 @@ class Agent(metaclass=ABCMeta):
              for frame in self._frame_buffer:
                  cv2.imwrite(frame["path"], frame["frame"])
              if self.config & config.SAVE_FLOW and self.flow:
-                for frame in self._frame_buffer_flow:
+                for frame in self._flow_buffer:
                     cv2.imwrite(frame["path"], frame["frame"])
+                flow_meta = list()
+                if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "flow.meta")):
+                   with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "r") as f_obj:
+                        flow_meta = json.load(f_obj)
+                flow_meta.extend(list(self._flow_meta_buffer))
+                with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
+                     json.dump(flow_meta, f_obj)
 
       @abstractmethod
       @register(...)
