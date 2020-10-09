@@ -62,7 +62,7 @@ class Agent(metaclass=ABCMeta):
           yield image, image_original, state, path
           reward_manager.rollout()
           if self.config & config.SAVE_FLOW:
-             self._flow_buffer.clear()
+             self._flow_skip_buffer.clear()
           progress.bump_episode()
           if self.progress.episode%self.checkpoint_interval==0:
              self._save()
