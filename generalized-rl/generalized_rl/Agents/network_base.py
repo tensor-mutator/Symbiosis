@@ -1,8 +1,5 @@
 from typing import Dict, Tuple
-import warnings
-with warnings.catch_warnings():  
-     warnings.filterwarnings("ignore", category=FutureWarning)
-     import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1 as tf
 
 class NetworkMeta(type):
 
