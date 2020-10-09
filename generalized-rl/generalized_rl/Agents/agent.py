@@ -2,10 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Dict, Any, Generator, Callable
 from contextlib import contextmanager, suppress
 from glob import glob
-import warnings
-with warnings.catch_warnings():  
-     warnings.filterwarnings("ignore", category=FutureWarning)
-     import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1 as tf
 import numpy as np
 import os
 import dill
@@ -167,7 +164,7 @@ class Agent(metaclass=ABCMeta):
                 flow_meta.extend(list(self._flow_meta_buffer))
                 with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
                      json.dump(flow_meta, f_obj)
-                self._flow_meta_buffer.close()
+                self._flow_meta_buffer.clear()
 
       def _save_all_frames(self) -> None:
           if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
