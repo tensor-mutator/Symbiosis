@@ -1,9 +1,4 @@
-import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = '3'
-import warnings
-with warnings.catch_warnings():  
-     warnings.filterwarnings("ignore", category=FutureWarning)
-     import tensorflow.compat.v1 as tf
+import tensorflow.compat.v1 as tf
 from generalized_rl import Environment, State, Action, config
 from generalized_rl.Agents import DDQN, DQNNet
 from generalized_rl.Agents.Utilities import GunnerFarnebackFlow
