@@ -1,23 +1,43 @@
 from typing import Callable
+from abc import ABCMeta, abstractmethod
 from .progress import Progress
 from .exceptions import *
 
 __all__ = ["LRScheduler", "BetaScheduler"]
 
-class Scheduler:
+class Scheduler(metaclass=ABCMeta):
 
-      def __init__(self, scheme: str) -> None:
-          self._scheme = getattr(self, scheme)
+      @abstractmethod
+      @Scheduler.register(...)
+      def __init__(self, scheme: str, _, progress: Progress) -> None:
+          ...
+
+      @classmethod
+      def register(schemes) -> Callable:
+          def outer(func) -> Callable:
+              def inner(inst: Scheduler, scheme: str, _, progress: Progress) -> None:
+                  if scheme not in schemes:
+                     raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
+                                                                                                    self.__class__.__name__))
+                  inst._registered_schemes = schemes
+                  inst._scheme = getattr(inst, scheme)
+                  inst._progress = progress
+                  return func(inst, scheme)
+              return inner
+          return outer
 
       def __getattr__(self, func: str) -> Callable:
-          if func == "registered_schemes":
-             raise UnregisteredSchemeError("no schemes have been registered with {} class".format(func,
-                                                                                                  self.__class__.__name__))
+          if func == "_registered_schemes":
+             raise UnregisteredSchemeError("no scheme registration found with {} class".format(func,
+                                                                                               self.__class__.__name__))
           base_idx = len(self.__class__.__mro__)-2
-          if func not in self.registered_schemes:
+          if func not in self._registered_schemes:
              raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(func,
                                                                                             self.__class__.__name__))
-          return lambda x: self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func))(self, x)
+          scheme = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
+          if scheme is None:
+             raise UnregisteredSchemeError("invalid scheme registration : {}".format(func))
+          return lambda x: scheme(self, x)
       
       def _constant(self, p: float) -> float:
           return 1
@@ -47,26 +67,26 @@ class Scheduler:
              return eps1*0.1
           return 1-p
 
+      @property
+      def value(self) -> float:
+          return self._scheme(self._progress.training_clock/self._progress.training_steps)
+
 class LRScheduler(Scheduler):
 
+      @Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
       def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
-          self.registered_schemes = ["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"]
-          super(LRScheduler, self).__init__(scheme)
           self._lr = learning_rate
-          self._progress = progress
 
       @property
       def lr(self) -> float:
-          return self._lr*self._scheme(self._progress.training_clock/self._progress.training_steps)
+          return self._lr*self.value
 
 class BetaScheduler(Scheduler):
 
+      @Scheduler.register(["constant", "linear"]
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
-          self.registered_schemes = ["constant", "linear"]
-          super(BetaScheduler, self).__init__(scheme)
           self._beta = beta
-          self._progress = progress
 
       @property
       def beta(self) -> float:
-          return min(1, self._beta + (1-self._beta)*(1-self._scheme(self._progress.training_clock/self._progress.training_steps)))
+          return min(1, self._beta + (1-self._beta)*(1-self.value))
