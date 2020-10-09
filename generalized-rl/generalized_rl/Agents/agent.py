@@ -26,7 +26,7 @@ UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, sig
 class Agent(metaclass=ABCMeta):
 
       @abstractmethod
-      @track(...)
+      @Agent.track(...)
       def __init__(self, *args, **kwargs) -> None:
           ...
 
@@ -103,7 +103,7 @@ class Agent(metaclass=ABCMeta):
                            self.update_target()
                      self.progress.bump()
 
-      @register_handler(UNIX_SIGNALS)
+      @Agent.register_handler(UNIX_SIGNALS)
       def _create_handler(self, signal_id: int = None, frame: Any = None):
           raise AgentInterrupt("Agent interrupted")
 
@@ -182,7 +182,7 @@ class Agent(metaclass=ABCMeta):
                      json.dump(flow_meta, f_obj)
 
       @abstractmethod
-      @register(...)
+      @Agent.register(...)
       def run(self) -> None:
           ...
 
@@ -195,7 +195,7 @@ class Agent(metaclass=ABCMeta):
           return self._training_interval
 
       @abstractmethod
-      @record
+      @Agent.record
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
           ...
 
