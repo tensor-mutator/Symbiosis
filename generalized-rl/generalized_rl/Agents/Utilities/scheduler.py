@@ -9,7 +9,7 @@ class Scheduler(metaclass=ABCMeta):
 
       @abstractmethod
       @Scheduler.register(...)
-      def __init__(self, scheme: str, _, progress: Progress) -> None:
+      def __init__(self, scheme: str, value: float, progress: Progress) -> None:
           ...
 
       @staticmethod
