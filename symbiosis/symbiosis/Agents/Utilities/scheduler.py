@@ -5,12 +5,7 @@ from .exceptions import *
 
 __all__ = ["LRScheduler", "BetaScheduler"]
 
-class Scheduler(metaclass=ABCMeta):
-
-      @abstractmethod
-      @Scheduler.register(...)
-      def __init__(self, scheme: str, value: float, progress: Progress) -> None:
-          ...
+class RegisterSchemes:
 
       @staticmethod
       def register(schemes) -> Callable:
@@ -25,6 +20,13 @@ class Scheduler(metaclass=ABCMeta):
                   return func(inst, scheme)
               return inner
           return outer
+
+class Scheduler(RegisterSchemes, metaclass=ABCMeta):
+
+      @abstractmethod
+      @RegisterSchemes.register(...)
+      def __init__(self, scheme: str, value: float, progress: Progress) -> None:
+          ...
 
       def __getattr__(self, func: str) -> Callable:
           if func == "_registered_schemes":
