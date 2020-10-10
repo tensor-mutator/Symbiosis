@@ -10,14 +10,14 @@ class RegisterSchemes:
       @staticmethod
       def register(schemes) -> Callable:
           def outer(func) -> Callable:
-              def inner(inst: "<Scheduler inst>", scheme: str, _, progress: Progress) -> None:
+              def inner(inst: "<Scheduler inst>", scheme: str, value: float, progress: Progress) -> None:
                   if scheme not in schemes:
                      raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
                                                                                                     self.__class__.__name__))
                   inst._registered_schemes = schemes
                   inst._scheme = getattr(inst, scheme)
                   inst._progress = progress
-                  return func(inst, scheme)
+                  return func(inst, scheme, value, progress)
               return inner
           return outer
 
