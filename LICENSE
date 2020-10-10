@@ -632,7 +632,7 @@ the "copyright" line and a pointer to where the full notice is found.
     Symbiosis is a Reinforcement Learning Library desgined to leverage the power
     of RL in solving environments with restricted access by means of supporting
     custom techniques to build environments.
-    
+
     Copyright (C) 2020  Debajyoti Raychaudhuri
 
     This program is free software: you can redistribute it and/or modify
