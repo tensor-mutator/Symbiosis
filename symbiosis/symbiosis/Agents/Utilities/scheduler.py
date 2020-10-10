@@ -32,7 +32,7 @@ class Scheduler(RegisterSchemes, metaclass=ABCMeta):
           if func == "_registered_schemes":
              raise UnregisteredSchemeError("no scheme registration found with {} class".format(func,
                                                                                                self.__class__.__name__))
-          base_idx = len(self.__class__.__mro__)-2
+          base_idx = len(self.__class__.__mro__)-3
           if func not in self._registered_schemes:
              raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(func,
                                                                                             self.__class__.__name__))
