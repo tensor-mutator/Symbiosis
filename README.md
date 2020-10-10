@@ -1,5 +1,5 @@
-# GeneralizedRL
-A Generalized Reinforcement Learning library for general applications 
+# Symbiosis
+A Reinforcement Learning library for solving custom environments 
 
 ### Discrete Agents
 Flappy Bird             |  Enduro
