@@ -1,5 +1,5 @@
-from generalized_rl import Environment, State, Action, config
-from generalized_rl.Agents import DDQN, DQNNet
+from symbiosis import Environment, State, Action, config
+from symbiosis.Agents import DDQN, DQNNet
 from typing import Tuple, Sequence, Any
 import numpy as np
 import gym
