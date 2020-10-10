@@ -83,7 +83,7 @@ class LRScheduler(Scheduler):
 
 class BetaScheduler(Scheduler):
 
-      @Scheduler.register(["constant", "linear"]
+      @Scheduler.register(["constant", "linear"])
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
           self._beta = beta
 
