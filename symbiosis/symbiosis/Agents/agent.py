@@ -77,7 +77,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           ...
 
       def __getattr__(self, func: str) -> Callable:
-          base_idx = len(self.__class__.__mro__)-2
+          base_idx = len(self.__class__.__mro__)-3
           if func == "_save":
              return self.save_
           if func == "_load":
