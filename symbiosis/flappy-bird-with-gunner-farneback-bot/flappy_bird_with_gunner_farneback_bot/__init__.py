@@ -1,7 +1,7 @@
 import tensorflow.compat.v1 as tf
-from generalized_rl import Environment, State, Action, config
-from generalized_rl.Agents import DDQN, DQNNet
-from generalized_rl.Agents.Utilities import GunnerFarnebackFlow
+from symbiosis import Environment, State, Action, config
+from symbiosis.Agents import DDQN, DQNNet
+from symbiosis.Agents.Utilities import GunnerFarnebackFlow
 from typing import Tuple, Sequence, Any, List
 import numpy as np
 from collections import deque
