@@ -69,7 +69,7 @@ class AgentDecorators:
               return inner
           return outer
 
-class Agent(AgentDecotators, metaclass=ABCMeta):
+class Agent(AgentDecorators, metaclass=ABCMeta):
 
       @abstractmethod
       @AgentDecorators.track(...)
