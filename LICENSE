@@ -630,8 +630,8 @@ state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
     Symbiosis is a Reinforcement Learning Library desgined to leverage the power
-    of RL in solving environments with restricted access by means of incorporating
-    custom techniques to build custom environments.
+    of RL in solving environments with restricted access by means of supporting
+    custom techniques to build environments.
     
     Copyright (C) 2020  Debajyoti Raychaudhuri
 
