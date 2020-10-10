@@ -22,10 +22,57 @@ from ..config import config
 UNIX_SIGNALS = [signal.SIGABRT, signal.SIGBUS, signal.SIGHUP, signal.SIGILL, signal.SIGINT,
                 signal.SIGQUIT, signal.SIGTERM, signal.SIGTRAP, signal.SIGTSTP]
 
-class Agent(metaclass=ABCMeta):
+class AgentDecorators:
+
+      @staticmethod
+      def register(suite: str) -> Callable:
+          def wrapper(func: Callable) -> Callable:
+              def run(inst: "<Agent inst>") -> None:
+                  super(inst.__class__, inst)._run(getattr(inst, suite))
+              return run
+          return wrapper
+
+      @staticmethod
+      def record(func: Callable) -> Callable:
+          def inner(inst: "<Agent inst>", img: np.ndarray, state: Any = None) -> List:
+              path = None
+              if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
+                 if state is None:
+                    path = inst._frame_inventory.init_path
+                 else:
+                    path = inst._frame_inventory.path
+                 frame = inst.env.state.frame
+                 inst._frame_buffer.append(dict(path=path, frame=frame))
+                 if len(inst._frame_buffer) == inst.frame_buffer_size:
+                    for frame in inst._frame_buffer:
+                        cv2.imwrite(frame["path"], frame["frame"])
+                    inst._frame_buffer.clear()
+              return func(inst, img, state), path
+          return inner
+
+      @staticmethod
+      def register_handler(unix_signals: List) -> Callable:
+          def outer(handler: Callable) -> Callable:
+              def inner(inst: "<Agent inst>", signal_id: int = None, frame: Any = None) -> None:
+                  for sig in unix_signals:
+                      signal.signal(sig, lambda x, y: handler(inst, x, y))
+              return inner
+          return outer
+
+      @staticmethod
+      def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
+          def outer(func: Callable) -> Callable:
+              def inner(inst, env: Environment, network: NetworkMeta = network, config: bin = config,
+                        flow: Flow = flow, **hyperparams) -> None:
+                  inst._params = dict(env=env, network=network, config=config, flow=flow)
+                  func(inst, env, network, config, flow, **hyperparams)
+              return inner
+          return outer
+
+class Agent(AgentDecotators, metaclass=ABCMeta):
 
       @abstractmethod
-      @Agent.track(...)
+      @AgentDecorators.track(...)
       def __init__(self, *args, **kwargs) -> None:
           ...
 
@@ -102,7 +149,7 @@ class Agent(metaclass=ABCMeta):
                            self.update_target()
                      self.progress.bump()
 
-      @Agent.register_handler(UNIX_SIGNALS)
+      @AgentDecorators.register_handler(UNIX_SIGNALS)
       def _create_handler(self, signal_id: int = None, frame: Any = None):
           raise AgentInterrupt("Agent interrupted")
 
@@ -181,7 +228,7 @@ class Agent(metaclass=ABCMeta):
                      json.dump(flow_meta, f_obj)
 
       @abstractmethod
-      @Agent.register(...)
+      @AgentDecorators.register(...)
       def run(self) -> None:
           ...
 
@@ -194,7 +241,7 @@ class Agent(metaclass=ABCMeta):
           return self._training_interval
 
       @abstractmethod
-      @Agent.record
+      @AgentDecorators.record
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
           ...
 
@@ -354,48 +401,3 @@ class Agent(metaclass=ABCMeta):
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
           return config
-
-      @staticmethod
-      def register(suite: str) -> Callable:
-          def wrapper(func: Callable) -> Callable:
-              def run(inst: "<Agent inst>") -> None:
-                  super(inst.__class__, inst)._run(getattr(inst, suite))
-              return run
-          return wrapper
-
-      @staticmethod
-      def record(func: Callable) -> Callable:
-          def inner(inst: "<Agent inst>", img: np.ndarray, state: Any = None) -> List:
-              path = None
-              if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
-                 if state is None:
-                    path = inst._frame_inventory.init_path
-                 else:
-                    path = inst._frame_inventory.path
-                 frame = inst.env.state.frame
-                 inst._frame_buffer.append(dict(path=path, frame=frame))
-                 if len(inst._frame_buffer) == inst.frame_buffer_size:
-                    for frame in inst._frame_buffer:
-                        cv2.imwrite(frame["path"], frame["frame"])
-                    inst._frame_buffer.clear()
-              return func(inst, img, state), path
-          return inner
-
-      @staticmethod
-      def register_handler(unix_signals: List) -> Callable:
-          def outer(handler: Callable) -> Callable:
-              def inner(inst: "<Agent inst>", signal_id: int = None, frame: Any = None) -> None:
-                  for sig in unix_signals:
-                      signal.signal(sig, lambda x, y: handler(inst, x, y))
-              return inner
-          return outer
-
-      @staticmethod
-      def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
-          def outer(func: Callable) -> Callable:
-              def inner(inst, env: Environment, network: NetworkMeta = network, config: bin = config,
-                        flow: Flow = flow, **hyperparams) -> None:
-                  inst._params = dict(env=env, network=network, config=config, flow=flow)
-                  func(inst, env, network, config, flow, **hyperparams)
-              return inner
-          return outer
