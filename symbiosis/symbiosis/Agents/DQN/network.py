@@ -11,8 +11,8 @@ class DQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder(state_shape + (trace,))
-               nature_out = NetBlocks.Conv2DNature()(self._state)
-               self._q_predicted = NetBlocks.Dense(units=action_size, activation="linear")(nature_out)
+               nature_out = NetBlocks.layers.Conv2DNature()(self._state)
+               self._q_predicted = NetBlocks.layers.Dense(units=action_size, activation="linear")(nature_out)
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
 
@@ -24,7 +24,7 @@ class DQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.losses, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = params["optimizer"] if isinstance(params.get("optimizer"), 
                                                         tf.train.Optimizer.__class__) else getattr(tf.train,
@@ -44,9 +44,9 @@ class DRQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder((trace,) + state_shape + (3,))
-               nature_out = NetBlocks.Conv2DNature(time_distributed=True)(self._state)
+               nature_out = NetBlocks.layers.Conv2DNature(time_distributed=True)(self._state)
                lstm_out = NetBLocks.LSTM(units=512)(nature_out)
-               self._q_predicted = NetBlocks.Dense(units=action_size, activation="linear")(lstm_out)
+               self._q_predicted = NetBlocks.layers.Dense(units=action_size, activation="linear")(lstm_out)
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
 
@@ -58,7 +58,7 @@ class DRQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.losses, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = params["optimizer"] if isinstance(params.get("optimizer"),
                                                         tf.train.Optimizer.__class__) else getattr(tf.train,
@@ -78,14 +78,14 @@ class DuelingDQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder(state_shape + (trace,))
-               nature_out_adv, nature_out_val = NetBlocks.Conv2DNatureDueling()(self._state)
+               nature_out_adv, nature_out_val = NetBlocks.layers.Conv2DNatureDueling()(self._state)
                self._q_predicted = self._fuse_adv_val(nature_out_adv, nature_out_val, action_size)
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
 
       def _fuse_adv_val(advantage_tensor: tf.Tensor, value_tensor: tf.Tensor, action_size: int) -> tf.Tensor:
-          state_value = NetBlocks.Dense(units=1, activation="linear")(value_tensor)
-          action_advantage = NetBlocks.Dense(units=action_size, activation="linear")(advantage_tensor)
+          state_value = NetBlocks.layers.Dense(units=1, activation="linear")(value_tensor)
+          action_advantage = NetBlocks.layers.Dense(units=action_size, activation="linear")(advantage_tensor)
           action_advantage = action_advantage-tf.reduce_mean(action_advantage, axis=1, keep_dims=True)
           return tf.add(state_value, action_advantage)
 
@@ -97,7 +97,7 @@ class DuelingDQNNet(NetworkBaseDQN):
           mask_tensor = tf.one_hot(indices=self._action, depth=action_size)
           q_target = tf.reduce_sum(mask_tensor*self._q_target, axis=1)
           q_predicted = tf.reduce_sum(mask_tensor*self._q_predicted, axis=1)
-          self._error, error_terms = getattr(NetBlocks.Loss, params.get("loss"))(q_predicted, q_target)
+          self._error, error_terms = getattr(NetBlocks.losses, params.get("loss"))(q_predicted, q_target)
           self._loss = tf.reduce_mean(self._importance_sampling_weights*error_terms)
           optimizer = params["optimizer"] if isinstance(params.get("optimizer"),
                                                         tf.train.Optimizer.__class__) else getattr(tf.train,
