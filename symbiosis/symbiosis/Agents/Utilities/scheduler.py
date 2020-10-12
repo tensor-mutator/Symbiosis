@@ -90,6 +90,7 @@ class BetaScheduler(Scheduler):
       @Scheduler.register(["constant", "linear"])
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
           self._beta = beta
+          self._progress = progress
 
       @property
       def beta(self) -> float:
@@ -100,6 +101,7 @@ class EpsilonGreedyScheduler(Scheduler):
       @Scheduler.register(["constant", "linear", "exponential"])
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress) -> None:
           self._epsilon = epsilon_range[0]
+          self._progress = progress
           if scheme == "exponential":
              self._decay_factor = 1-epsilon_range[1]
 
