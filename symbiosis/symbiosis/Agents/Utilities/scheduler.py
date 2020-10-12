@@ -1,9 +1,9 @@
-from typing import Callable
+from typing import Callable, Tuple
 from abc import ABCMeta, abstractmethod
 from .progress import Progress
 from .exceptions import *
 
-__all__ = ["LRScheduler", "BetaScheduler"]
+__all__ = ["LRScheduler", "BetaScheduler", "EpsilonGreedyScheduler"]
 
 class RegisterSchemes:
 
@@ -16,7 +16,6 @@ class RegisterSchemes:
                                                                                                     self.__class__.__name__))
                   inst._registered_schemes = schemes
                   inst._scheme = getattr(inst, scheme)
-                  inst._progress = progress
                   return func(inst, scheme, value, progress)
               return inner
           return outer
@@ -39,13 +38,16 @@ class Scheduler(RegisterSchemes, metaclass=ABCMeta):
           scheme = self.__class__.__mro__[base_idx].__dict__.get("_{}".format(func), None)
           if scheme is None:
              raise UnregisteredSchemeError("invalid scheme registration : {}".format(func))
-          return lambda x: scheme(self, x)
+          return lambda *args, **kwargs: scheme(self, *args, **kwargs)
       
       def _constant(self, p: float) -> float:
           return 1
 
       def _linear(self, p: float) -> float:
           return 1-p
+
+      def _exponential(self, p: float, decay_factor: float) -> float:
+          return (1-decay_factor)**p
 
       def _middle_drop(self, p: float) -> float:
           eps = 0.75
@@ -69,19 +71,19 @@ class Scheduler(RegisterSchemes, metaclass=ABCMeta):
              return eps1*0.1
           return 1-p
 
-      @property
-      def value(self) -> float:
-          return self._scheme(self._progress.training_clock/self._progress.training_steps)
+      def value(self, p: float, *args, **kwargs) -> float:
+          return self._scheme(p, *args, **kwargs)
 
 class LRScheduler(Scheduler):
 
       @Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
       def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
           self._lr = learning_rate
+          self._progress = progress
 
       @property
       def lr(self) -> float:
-          return self._lr*self.value
+          return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
 
 class BetaScheduler(Scheduler):
 
@@ -91,4 +93,20 @@ class BetaScheduler(Scheduler):
 
       @property
       def beta(self) -> float:
-          return min(1, self._beta + (1-self._beta)*(1-self.value))
+          return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
+
+class EpsilonGreedyScheduler(Scheduler):
+
+      @Scheduler.register(["constant", "linear", "exponential"])
+      def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress) -> None:
+          self._epsilon = epsilon_range[0]
+          if scheme == "exponential":
+             self._decay_factor = 1-epsilon_range[1]
+
+      @property
+      def epsilon(self) -> float:
+          if scheme == "exponential":
+             multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
+          else:
+             multiplier = self.value(self._progress.explore_clock/self._progress.explore)
+          return self._epsilon*multiplier
