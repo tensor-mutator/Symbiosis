@@ -26,9 +26,9 @@ from ..Utilities import LRScheduler, EpsilonGreedyScheduler, Progress
 from ...environment import Environment
 from ...config import config
 
+@Agent.track(DQNNet)
 class DDQN(Agent):
 
-      @Agent.track(DQNNet)
       def __init__(self, env: Environment, network: NetworkBaseDQN = DQNNet, config: bin = config.DEFAULT,
                    flow: Flow = None, **hyperparams) -> None:
           self._env = env
