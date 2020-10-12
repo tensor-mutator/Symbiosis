@@ -1,4 +1,4 @@
-from typing import Callable, Tuple
+from typing import Callable, Tuple, List
 from .progress import Progress
 from .exceptions import *
 
@@ -7,8 +7,8 @@ __all__ = ["LRScheduler", "BetaScheduler", "EpsilonGreedyScheduler"]
 class RegisterSchemes:
 
       @staticmethod
-      def register(schemes) -> Callable:
-          def outer(cls) -> Callable:
+      def register(schemes: List) -> Callable:
+          def outer(cls: Callable) -> Callable:
               def inner(scheme: str, value: float, progress: Progress) -> None:
                   if scheme not in schemes:
                      raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
