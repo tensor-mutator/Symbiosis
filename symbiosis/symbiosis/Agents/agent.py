@@ -61,20 +61,16 @@ class AgentDecorators:
 
       @staticmethod
       def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
-          def outer(func: Callable) -> Callable:
-              def inner(inst, env: Environment, network: NetworkMeta = network, config: bin = config,
+          def outer(cls: Callable) -> Callable:
+              def inner(env: Environment, network: NetworkMeta = network, config: bin = config,
                         flow: Flow = flow, **hyperparams) -> None:
+                  inst = cls(inst, env, network, config, flow, **hyperparams)
                   inst._params = dict(env=env, network=network, config=config, flow=flow)
-                  func(inst, env, network, config, flow, **hyperparams)
+                  return inst
               return inner
           return outer
 
 class Agent(AgentDecorators, metaclass=ABCMeta):
-
-      @abstractmethod
-      @AgentDecorators.track(...)
-      def __init__(self, *args, **kwargs) -> None:
-          ...
 
       def __getattr__(self, func: str) -> Callable:
           base_idx = len(self.__class__.__mro__)-3
