@@ -1,5 +1,4 @@
 from typing import Callable, Tuple
-from abc import ABCMeta, abstractmethod
 from .progress import Progress
 from .exceptions import *
 
@@ -9,23 +8,19 @@ class RegisterSchemes:
 
       @staticmethod
       def register(schemes) -> Callable:
-          def outer(func) -> Callable:
-              def inner(inst: "<Scheduler inst>", scheme: str, value: float, progress: Progress) -> None:
+          def outer(cls) -> Callable:
+              def inner(scheme: str, value: float, progress: Progress) -> None:
                   if scheme not in schemes:
                      raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
-                                                                                                    self.__class__.__name__))
+                                                                                                    cls.__name__))
+                  inst = cls(scheme, value, progress)
                   inst._registered_schemes = schemes
                   inst._scheme = getattr(inst, scheme)
-                  return func(inst, scheme, value, progress)
+                  return inst
               return inner
           return outer
 
-class Scheduler(RegisterSchemes, metaclass=ABCMeta):
-
-      @abstractmethod
-      @RegisterSchemes.register(...)
-      def __init__(self, scheme: str, value: float, progress: Progress) -> None:
-          ...
+class Scheduler(RegisterSchemes):
 
       def __getattr__(self, func: str) -> Callable:
           if func == "_registered_schemes":
@@ -74,9 +69,9 @@ class Scheduler(RegisterSchemes, metaclass=ABCMeta):
       def value(self, p: float, *args, **kwargs) -> float:
           return self._scheme(p, *args, **kwargs)
 
+@Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
 class LRScheduler(Scheduler):
 
-      @Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
       def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
           self._lr = learning_rate
           self._progress = progress
@@ -85,9 +80,9 @@ class LRScheduler(Scheduler):
       def lr(self) -> float:
           return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
 
+@Scheduler.register(["constant", "linear"])
 class BetaScheduler(Scheduler):
 
-      @Scheduler.register(["constant", "linear"])
       def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
           self._beta = beta
           self._progress = progress
@@ -96,9 +91,9 @@ class BetaScheduler(Scheduler):
       def beta(self) -> float:
           return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
 
+@Scheduler.register(["constant", "linear", "exponential"])
 class EpsilonGreedyScheduler(Scheduler):
 
-      @Scheduler.register(["constant", "linear", "exponential"])
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress) -> None:
           self._epsilon = epsilon_range[0]
           self._progress = progress
