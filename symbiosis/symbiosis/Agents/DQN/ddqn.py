@@ -22,7 +22,7 @@ from .network import *
 from ..agent import Agent
 from ..flow_base import Flow
 from ..network_base import NetworkBaseDQN
-from ..Utilities import LRScheduler, GreedyEpsilon, Progress
+from ..Utilities import LRScheduler, EpsilonGreedyScheduler, Progress
 from ...environment import Environment
 from ...config import config
 
@@ -37,7 +37,7 @@ class DDQN(Agent):
           self._read_params(hyperparams)
           self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
-          self._greedy_epsilon = GreedyEpsilon(self._progress, self._epsilon_range, self._decay_scheme)
+          self._greedy_epsilon = EpsilonGreedyScheduler(self._epsilon_greedy_scheduler_scheme, self._epsilon_range, self._progress)
           self._replay = ExperienceReplay(self._replay_limit,
                                           self._batch_size) if self._replay_type == "regular" else PrioritizedExperienceReplay(self._alpha,
                                                                                                                                self._beta,
@@ -61,7 +61,7 @@ class DDQN(Agent):
           self._training_interval = hyperparams.get("training_interval", 5)
           self._target_frequency = hyperparams.get("target_frequency", 3000)
           self._replay_type = hyperparams.get("replay", "prioritized")
-          self._decay_scheme = hyperparams.get("decay_scheme", "linear")
+          self._epsilon_greedy_scheduler_scheme = hyperparams.get("epsilon_greedy_scheduler_scheme", "linear")
           self._beta_scheduler_scheme = hyperparams.get("beta_scheduler_scheme", "constant")
           self._gamma = hyperparams.get("gamma", 0.9)
           self._alpha = hyperparams.get("alpha", 0.7)
@@ -73,9 +73,9 @@ class DDQN(Agent):
                                    batch_size=self._batch_size, trace=self._trace, replay_limit=self._replay_limit,
                                    epsilon_range=list(self._epsilon_range), training_interval=self._training_interval,
                                    target_frequency=self._target_frequency, replay=self._replay_type,
-                                   decay_scheme=self._decay_scheme, gamma=self._gamma, alpha=self._alpha,
-                                   beta=self._beta, offset=self._offset, learning_rate=self._lr,
-                                   lr_scheduler_scheme=self._lr_scheduler_scheme,
+                                   epsilon_greedy_scheduler_scheme=self._epsilon_greedy_scheduler_scheme,
+                                   gamma=self._gamma, alpha=self._alpha, beta=self._beta, offset=self._offset,
+                                   learning_rate=self._lr, lr_scheduler_scheme=self._lr_scheduler_scheme,
                                    beta_scheduler_scheme=self._beta_scheduler_scheme)
 
       def _define_alias(self, network: str, hyperparams: Dict) -> str:
@@ -156,7 +156,6 @@ class DDQN(Agent):
           else:
              q_values = self._session.run(self._local_network.q_predicted, feed_dict={self._local_network.state: state})
              action = np.argmax(q_values)
-          self._greedy_epsilon.decay()
           return action
 
       @Agent.record
