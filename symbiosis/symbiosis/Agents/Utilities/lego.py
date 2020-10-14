@@ -79,28 +79,28 @@ class NetBlocks:
             @staticmethod
             def Conv2DNature(batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
-                    conv1 = NetBlocks.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
+                    conv1 = NetBlocks.layers.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
                                              batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
-                    conv2 = NetBlocks.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2),
+                    conv2 = NetBlocks.layers.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2),
                                              batch_norm=batch_norm, time_distributed=time_distributed)(conv1)
-                    conv3 = NetBlocks.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
+                    conv3 = NetBlocks.layers.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
                                              time_distributed=time_distributed)(conv2)
                     flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
-                    return NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
+                    return NetBlocks.layers.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)
                 return _op
 
             @staticmethod
             def Conv2DNatureDueling(batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
-                    conv1 = NetBlocks.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
+                    conv1 = NetBlocks.layers.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
                                              batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
-                    conv2 = NetBlocks.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2),
+                    conv2 = NetBlocks.layers.Conv2D(filters=64, kernel_size=(4, 4), strides=(2, 2),
                                              batch_norm=batch_norm, time_distributed=time_distributed)(conv1)
-                    conv3 = NetBlocks.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
+                    conv3 = NetBlocks.layers.Conv2D(filters=64, kernel_size=(3, 3), batch_norm=batch_norm,
                                              time_distributed=time_distributed)(conv2)
                     flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
-                    return [NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
-                            NetBlocks.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)]
+                    return [NetBlocks.layers.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
+                            NetBlocks.layers.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)]
                 return _op
 
       class losses:
