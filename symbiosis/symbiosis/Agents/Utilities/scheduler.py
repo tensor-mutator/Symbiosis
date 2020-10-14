@@ -97,12 +97,13 @@ class EpsilonGreedyScheduler(Scheduler):
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress) -> None:
           self._epsilon = epsilon_range[0]
           self._progress = progress
+          sel._scheme = scheme
           if scheme == "exponential":
              self._decay_factor = 1-epsilon_range[1]
 
       @property
       def epsilon(self) -> float:
-          if scheme == "exponential":
+          if self._scheme == "exponential":
              multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
           else:
              multiplier = self.value(self._progress.explore_clock/self._progress.explore)
