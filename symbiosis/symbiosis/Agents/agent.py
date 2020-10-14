@@ -64,7 +64,7 @@ class AgentDecorators:
           def outer(cls: Callable) -> Callable:
               def inner(env: Environment, network: NetworkMeta = network, config: bin = config,
                         flow: Flow = flow, **hyperparams) -> None:
-                  inst = cls(inst, env, network, config, flow, **hyperparams)
+                  inst = cls(env, network, config, flow, **hyperparams)
                   inst._params = dict(env=env, network=network, config=config, flow=flow)
                   return inst
               return inner
