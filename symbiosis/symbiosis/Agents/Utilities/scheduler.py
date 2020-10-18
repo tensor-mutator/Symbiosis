@@ -12,11 +12,12 @@ class RegisterSchemes:
       @staticmethod
       def register(schemes: List) -> Callable:
           def outer(cls: Callable) -> Callable:
-              def inner(scheme: str, value: float, progress: Progress) -> None:
+              def inner(scheme: str, value: float, progress: Progress, config_: config,
+                        writer: tf.summary.FileWriter) -> None:
                   if scheme not in schemes:
                      raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
                                                                                                     cls.__name__))
-                  inst = cls(scheme, value, progress)
+                  inst = cls(scheme, value, progress, config, writer)
                   inst._registered_schemes = schemes
                   inst._scheme = getattr(inst, scheme)
                   return inst
