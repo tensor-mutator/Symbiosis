@@ -17,7 +17,7 @@ class RegisterSchemes:
                   if scheme not in schemes:
                      raise UnregisteredSchemeError("scheme: {} not registered with {} class".format(scheme,
                                                                                                     cls.__name__))
-                  inst = cls(scheme, value, progress, config, writer)
+                  inst = cls(scheme, value, progress, config_, writer)
                   inst._registered_schemes = schemes
                   inst._scheme = getattr(inst, scheme)
                   return inst
