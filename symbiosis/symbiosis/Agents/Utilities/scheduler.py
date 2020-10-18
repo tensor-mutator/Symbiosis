@@ -89,7 +89,7 @@ class LRScheduler(EventWriter, Scheduler):
           return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
 
 @Scheduler.register(["constant", "linear"])
-class BetaScheduler(Scheduler):
+class BetaScheduler(EventWriter, Scheduler):
 
       def __init__(self, scheme: str, beta: float, progress: Progress, config_: config,
                    writer: tf.summary.FileWriter) -> None:
@@ -104,7 +104,7 @@ class BetaScheduler(Scheduler):
           return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
 
 @Scheduler.register(["constant", "linear", "exponential"])
-class EpsilonGreedyScheduler(Scheduler):
+class EpsilonGreedyScheduler(EventWriter, Scheduler):
 
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress, config_: config,
                    writer: tf.summary.FileWriter) -> None:
