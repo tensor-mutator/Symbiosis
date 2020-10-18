@@ -83,8 +83,8 @@ class LRScheduler(EventWriter, Scheduler):
           self._set_writer('Hyperparams Schedule/Epoch - Learning Rate', config_ & config.LR_EVENT,
                            writer, progress, "training_clock")
 
-      @EventWriter.registerwriter
       @property
+      @EventWriter.registerwriter
       def lr(self) -> float:
           return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
 
@@ -98,8 +98,8 @@ class BetaScheduler(EventWriter, Scheduler):
           self._set_writer('Hyperparams Schedule/Epoch - Beta', config_ & config.BETA_EVENT,
                            writer, progress, "training_clock")
 
-      @EventWriter.registerwriter
       @property
+      @EventWriter.registerwriter
       def beta(self) -> float:
           return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
 
@@ -116,8 +116,8 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
           self._set_writer('Hyperparams Schedule/Steps - Epsilon', config_ & config.EPSILON_EVENT,
                            writer, progress, "clock")
 
-      @EventWriter.registerwriter
       @property
+      @EventWriter.registerwriter
       def epsilon(self) -> float:
           if self._scheme == "exponential":
              multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
