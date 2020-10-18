@@ -4,8 +4,10 @@ __all__ = ["Progress"]
 
 class Progress:
 
-      def __init__(self, n_steps: int, observe: int = 0, explore: float = np.inf) -> None:
-          self._n_train_steps = n_steps-observe
+      def __init__(self, n_steps: int, train_interval: int, observe: int = 0, 
+                   explore: float = np.inf) -> None:
+          self._n_train_steps = (n_steps-observe)//train_interval
+          self._train_interval = train_interval
           self._observe = observe
           self._explore = explore
           self._clock = 0
@@ -62,7 +64,7 @@ class Progress:
           self._clock += 1
           self._episodic_clock += 1
           self._explore_clock = np.clip(self._clock-self._observe, 0, self._explore)
-          self._training_clock = np.clip(self._clock-self._observe, 0, self._n_train_steps)
+          self._training_clock = np.clip((self._clock-self._observe)//self._train_interval, 0, self._n_train_steps)
 
       def bump_episode(self) -> None:
           self._episode += 1
