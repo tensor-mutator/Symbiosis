@@ -10,7 +10,7 @@ from collections import deque
 import tensorflow.compat.v1 as tf
 from ..Utilities.exceptions import *
 from ..Utilities import Progress, BetaScheduler
-from ..config import config
+from ...config import config
 
 __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 
