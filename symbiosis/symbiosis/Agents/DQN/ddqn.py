@@ -37,7 +37,7 @@ class DDQN(Agent):
           self._read_params(hyperparams)
           self._alias = self._define_alias(network.type, hyperparams)
           self._progress = self.load_progress()
-          self._greedy_epsilon = EpsilonGreedyScheduler(self._epsilon_greedy_scheduler_scheme, self._epsilon_range, self._progress, config,
+          self._greedy_epsilon = EpsilonGreedyScheduler(self._epsilon_greedy_scheduler_scheme, self._epsilon_range, self._progress, self._config,
                                                         self.writer)
           self._replay = ExperienceReplay(self._replay_limit,
                                           self._batch_size) if self._replay_type == "regular" else PrioritizedExperienceReplay(self._alpha,
@@ -47,8 +47,9 @@ class DDQN(Agent):
                                                                                                                                self._beta_scheduler_scheme,
                                                                                                                                self._batch_size,
                                                                                                                                self._progress,
-                                                                                                                               config, self.writer)
-          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._progress, config, self.writer)
+                                                                                                                               self._config,
+                                                                                                                               self.writer)
+          self._lr_scheduler = LRScheduler(self._lr_scheduler_scheme, self._lr, self._progress, self._config, self.writer)
           self._session = self._build_network_graph(network, hyperparams)
           self._session_q_update = self._build_td_update_graph()
 
