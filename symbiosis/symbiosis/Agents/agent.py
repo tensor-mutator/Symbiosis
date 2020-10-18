@@ -301,7 +301,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                                                                                  "{}.progress".format(self.alias))):
              with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
-          return Progress(self.total_steps, self.observe, self.explore)
+          return Progress(self.total_steps, self.training_interval, self.observe, self.explore)
 
       def _save_hyperparams(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
