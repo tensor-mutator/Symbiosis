@@ -12,7 +12,7 @@ class GunnerFarnebackFlow(Flow):
           x_t_gray = cv2.cvtColor(x_t,cv2.COLOR_BGR2GRAY)
           x_t1_gray = cv2.cvtColor(x_t1,cv2.COLOR_BGR2GRAY)
           flow = cv2.calcOpticalFlowFarneback(x_t_gray, x_t1_gray, None, 0.5, 3, 15, 3, 5, 1.2, 0)
-          return self.flow_to_image(flow)
+          return flow
 
 class LucasKanadeFlow(Flow):
 
