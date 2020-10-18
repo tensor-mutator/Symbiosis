@@ -1,7 +1,6 @@
 import tensorflow.compat.v1 as tf
 from typing import Callable
 from .progress import Progress
-from .scheduler import Scheduler
 
 class RegisterWriter:
 
