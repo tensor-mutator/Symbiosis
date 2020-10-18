@@ -173,7 +173,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._frame_buffer = deque()
              self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
              if self.config & config.SAVE_FLOW:
-                self._flow_inventory = Inventory("FLOW", "flow", "PNG", self.env, self.alias, self.progress)
+                self._flow_inventory = Inventory("FLOW", "flow", "FLO", self.env, self.alias, self.progress)
                 self._buffer_len = self.flow_skip if getattr(self, "flow_skip") else 1
                 self._buffer_len = max(1, self._buffer_len)
                 self._flow_skip_buffer = deque(maxlen=self._buffer_len)
@@ -190,7 +190,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                 self._flow_buffer.append(dict(path=self._flow_inventory.path, frame=self.flow.flow_map(x_t, x_t1)))
                 if len(self._flow_buffer) == self.frame_buffer_size:
                    for frame in self._flow_buffer:
-                       cv2.imwrite(frame["path"], frame["frame"])
+                       self.flow.write_flow(frame["frame"], frame["path"])
                    self._flow_buffer.clear()
              self._flow_meta_buffer.append({"flow": self._flow_inventory.path,
                                             "src_image": path_t,
