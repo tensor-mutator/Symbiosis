@@ -214,7 +214,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                  cv2.imwrite(frame["path"], frame["frame"])
              if self.config & config.SAVE_FLOW and self.flow:
                 for frame in self._flow_buffer:
-                    cv2.imwrite(frame["path"], frame["frame"])
+                    self.flow.write_flow(frame["frame"], frame["path"])
                 flow_meta = list()
                 if os.path.exists(os.path.join(self._flow_inventory.inventory_path, "flow.meta")):
                    with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "r") as f_obj:
