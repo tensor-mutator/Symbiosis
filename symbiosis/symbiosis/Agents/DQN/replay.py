@@ -7,8 +7,10 @@ from random import choices, sample
 from typing import Tuple, List
 from glob import glob
 from collections import deque
+import tensorflow.compat.v1 as tf
 from ..Utilities.exceptions import *
 from ..Utilities import Progress, BetaScheduler
+from ..config import config
 
 __all__ = ["ExperienceReplay", "PrioritizedExperienceReplay"]
 
@@ -74,11 +76,12 @@ class ExperienceReplay:
 class PrioritizedExperienceReplay(ExperienceReplay):
 
       def __init__(self, alpha: float, beta: float, offset: float, limit: int,
-                   scheme: "str", batch_size: int, progress: Progress) -> None:
+                   scheme: "str", batch_size: int, progress: Progress, config_: config,
+                   writer: tf.summary.FileWriter) -> None:
           self._alpha = alpha
           self._offset = offset
           self._priorities = deque(maxlen=limit)
-          self._beta_scheduler = BetaScheduler(scheme, beta, progress)
+          self._beta_scheduler = BetaScheduler(scheme, beta, progress, config_, writer)
           self._base = super(PrioritizedExperienceReplay, self)
           self._base.__init__(limit, batch_size)
 
