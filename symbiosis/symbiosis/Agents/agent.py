@@ -285,16 +285,16 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           ...
 
       def save_(self) -> None:
-          if not self.config & config.SAVE_WEIGHTS:
-             return
-          if not getattr(self, "_saver", None):
-             with self.graph.as_default():
-                  self._saver = tf.train.Saver(max_to_keep=5)
-          self._saver.save(self.session, os.path.join(self.workspace, "{}.ckpt".format(self.alias)))
-          with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "wb") as f_obj:
-               dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
-          self._reward_manager.save(self.workspace, self.alias, self._session)
-          self.save()
+          if self.config & config.SAVE_WEIGHTS:
+             if not getattr(self, "_saver", None):
+                with self.graph.as_default():
+                     self._saver = tf.train.Saver(max_to_keep=5)
+             self._saver.save(self.session, os.path.join(self.workspace, "{}.ckpt".format(self.alias)))
+             with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "wb") as f_obj:
+                  dill.dump(self.progress, f_obj, protocol=dill.HIGHEST_PROTOCOL)
+          if self.config & config.REWARD_EVENT:
+             self._reward_manager.save(self.workspace, self.alias, self._session)
+             self.save()
 
       def load_progress(self) -> Progress:
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
