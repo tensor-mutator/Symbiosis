@@ -114,8 +114,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           self._check_hyperparams()
           self._save_hyperparams()
           self._create_handler()
-          self._writer = self._summary_writer()
-          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self._writer)
+          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self.writer)
           self._initiate_inventories()
           self._load()
           self._set_checkpoint_interval()
@@ -124,8 +123,8 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           self.env.close()
           self._save()
           self._save_all_frames()
-          if self._writer:
-             self._writer.close()
+          if self.writer:
+             self.writer.close()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, frame_t, s_t, path_t]:
@@ -161,6 +160,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           if self.config & config.REWARD_EVENT+config.LOSS_EVENT+config.EPSILON_EVENT+config.BETA_EVENT+config.LR_EVENT:
              return tf.summary.FileWriter(os.path.join(self.workspace, "{} EVENTS".format(self.alias)), self.graph)
           return None
+
+      @property
+      def writer(self) -> tf.summary.FileWriter:
+          if getattr(self, "_writer", None) is None:
+             self._writer = self._summary_writer()
+          return self._writer
 
       def _set_checkpoint_interval(self) -> None:
           if not getattr(self, "checkpoint_interval"):
