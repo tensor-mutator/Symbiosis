@@ -110,7 +110,6 @@ class EpsilonGreedyScheduler(Scheduler):
           self._epsilon = epsilon_range[0]
           self._progress = progress
           self._scheme = scheme
-          self._writer = 
           if scheme == "exponential":
              self._decay_factor = 1-epsilon_range[1]
           self._set_writer('Hyperparams Schedule/Steps - Epsilon', config_ & config.EPSILON_EVENT,
