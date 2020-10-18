@@ -2,6 +2,7 @@ from typing import Callable, Tuple, List
 import tensorflow.compat.v1 as tf
 from .progress import Progress
 from .exceptions import *
+from .event_writer import EventWriter
 from ...config import config
 
 __all__ = ["LRScheduler", "BetaScheduler", "EpsilonGreedyScheduler"]
@@ -72,23 +73,19 @@ class Scheduler(RegisterSchemes):
           return self._scheme(p, *args, **kwargs)
 
 @Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
-class LRScheduler(Scheduler):
+class LRScheduler(EventWriter, Scheduler):
 
       def __init__(self, scheme: str, learning_rate: float, progress: Progress, config_: config,
                    writer: tf.summary.FileWriter) -> None:
           self._lr = learning_rate
           self._progress = progress
-          self._lr_event = config_ & config.LR_EVENT
-          self._writer = writer
+          self._set_writer('Hyperparams Schedule/Epoch - Learning Rate', config_ & config.LR_EVENT,
+                           writer, progress, "training_clock")
 
+      @EventWriter.registerwriter
       @property
       def lr(self) -> float:
-          lr = self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
-          if self._lr_event:
-             summary = tf.Summary()
-             summary.value.add(tag='Hyperparams Schedule/Epoch - Learning Rate', simple_value=lr)
-             self._writer.add_summary(summary, self._progress.training_clock)
-          return lr
+          return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
 
 @Scheduler.register(["constant", "linear"])
 class BetaScheduler(Scheduler):
@@ -97,17 +94,13 @@ class BetaScheduler(Scheduler):
                    writer: tf.summary.FileWriter) -> None:
           self._beta = beta
           self._progress = progress
-          self._beta_event = config_ & config.BETA_EVENT
-          self._writer = writer
+          self._set_writer('Hyperparams Schedule/Epoch - Beta', config_ & config.BETA_EVENT,
+                           writer, progress, "training_clock")
 
+      @EventWriter.registerwriter
       @property
       def beta(self) -> float:
-          beta = min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
-          if self._beta_event:
-             summary = tf.Summary()
-             summary.value.add(tag='Hyperparams Schedule/Epoch - Beta', simple_value=beta)
-             self._writer.add_summary(summary, self._progress.training_clock)
-          return beta
+          return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
 
 @Scheduler.register(["constant", "linear", "exponential"])
 class EpsilonGreedyScheduler(Scheduler):
@@ -117,20 +110,17 @@ class EpsilonGreedyScheduler(Scheduler):
           self._epsilon = epsilon_range[0]
           self._progress = progress
           self._scheme = scheme
+          self._writer = 
           if scheme == "exponential":
              self._decay_factor = 1-epsilon_range[1]
-          self._epsilon_event = config_ & config.EPSILON_EVENT
-          self._writer = writer
+          self._set_writer('Hyperparams Schedule/Steps - Epsilon', config_ & config.EPSILON_EVENT,
+                           writer, progress, "clock")
 
+      @EventWriter.registerwriter
       @property
       def epsilon(self) -> float:
           if self._scheme == "exponential":
              multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
           else:
              multiplier = self.value(self._progress.explore_clock/self._progress.explore)
-          epsilon = self._epsilon*multiplier
-          if self._epsilon_event:
-             summary = tf.Summary()
-             summary.value.add(tag='Hyperparams Schedule/Steps - Epsilon', simple_value=epsilon)
-             self._writer.add_summary(summary, self._progress.clock)
-          return epsilon
+          return self._epsilon*multiplier
