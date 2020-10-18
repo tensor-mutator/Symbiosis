@@ -17,7 +17,7 @@ class RegisterWriter:
 
 class EventWriter(RegisterWriter):
 
-      def __init__(self, tag: str, write: bool, writer: tf.summary.FileWriter, progress: Progress,
+      def _set_writer(self, tag: str, write: bool, writer: tf.summary.FileWriter, progress: Progress,
                    y: str) -> None:
           self._tag = tag
           self._write = write
