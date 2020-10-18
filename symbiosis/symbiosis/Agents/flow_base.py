@@ -11,6 +11,18 @@ class Flow(metaclass=ABCMeta):
       def flow_map(self, x_t: np.ndarray, x_t1: np.ndarray) -> np.ndarray:
           ...
 
+      def write_flow(self, flow: np.ndarray, filename: str) -> None:
+          f = open(filename, 'wb')
+          magic = np.array([202021.25], dtype=np.float32)
+          (height, width) = flow.shape[0:2]
+          w = np.array([width], dtype=np.int32)
+          h = np.array([height], dtype=np.int32)
+          magic.tofile(f)
+          w.tofile(f)
+          h.tofile(f)
+          flow.tofile(f)
+          f.close()
+
       def flow_to_image(self, flow):
           u = flow[:, :, 0]
           v = flow[:, :, 1]
