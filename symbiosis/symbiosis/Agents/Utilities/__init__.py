@@ -1,4 +1,4 @@
-from .scheduler import LRScheduler, BetaScheduler, EpsilonGreedyScheduler
+from .scheduler import LRScheduler, BetaScheduler, EpsilonGreedyScheduler, Scheduler
 from .progress import Progress
 from .exceptions import *
 from .reward_manager import RewardManager
