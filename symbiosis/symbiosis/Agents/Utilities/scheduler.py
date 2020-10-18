@@ -1,6 +1,8 @@
 from typing import Callable, Tuple, List
+import tensorflow.compat.v1 as tf
 from .progress import Progress
 from .exceptions import *
+from ...config import config
 
 __all__ = ["LRScheduler", "BetaScheduler", "EpsilonGreedyScheduler"]
 
@@ -72,34 +74,53 @@ class Scheduler(RegisterSchemes):
 @Scheduler.register(["constant", "linear", "middle_drop", "double_linear_con", "double_middle_drop"])
 class LRScheduler(Scheduler):
 
-      def __init__(self, scheme: str, learning_rate: float, progress: Progress) -> None:
+      def __init__(self, scheme: str, learning_rate: float, progress: Progress, config_: config,
+                   progress: Progress, writer: tf.summary.FileWriter) -> None:
           self._lr = learning_rate
           self._progress = progress
+          self._lr_event = config_ & config.LR_EVENT
+          self._writer = writer
 
       @property
       def lr(self) -> float:
-          return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
+          lr = self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
+          if self._lr_event:
+             summary = tf.Summary()
+             summary.value.add(tag='Hyperparams Schedule/Epoch - Learning Rate', simple_value=lr)
+             self._writer.add_summary(summary, self._progress.training_clock)
+          return lr
 
 @Scheduler.register(["constant", "linear"])
 class BetaScheduler(Scheduler):
 
-      def __init__(self, scheme: str, beta: float, progress: Progress) -> None:
+      def __init__(self, scheme: str, beta: float, progress: Progress, config_: config,
+                   progress: Progress, writer: tf.summary.FileWriter) -> None:
           self._beta = beta
           self._progress = progress
+          self._beta_event = config_ & config.BETA_EVENT
+          self._writer = writer
 
       @property
       def beta(self) -> float:
-          return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
+          beta = min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
+          if self._beta_event:
+             summary = tf.Summary()
+             summary.value.add(tag='Hyperparams Schedule/Epoch - Beta', simple_value=beta)
+             self._writer.add_summary(summary, self._progress.training_clock)
+          return beta
 
 @Scheduler.register(["constant", "linear", "exponential"])
 class EpsilonGreedyScheduler(Scheduler):
 
-      def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress) -> None:
+      def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress, config_: config,
+                   progress: Progress, writer: tf.summary.FileWriter) -> None:
           self._epsilon = epsilon_range[0]
           self._progress = progress
           self._scheme = scheme
           if scheme == "exponential":
              self._decay_factor = 1-epsilon_range[1]
+          self._epsilon_event = config_ & config.EPSILON_EVENT
+          self._writer = writer
 
       @property
       def epsilon(self) -> float:
@@ -107,4 +128,9 @@ class EpsilonGreedyScheduler(Scheduler):
              multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
           else:
              multiplier = self.value(self._progress.explore_clock/self._progress.explore)
-          return self._epsilon*multiplier
+          epsilon = self._epsilon*multiplier
+          if self._epsilon_event:
+             summary = tf.Summary()
+             summary.value.add(tag='Hyperparams Schedule/Steps - Epsilon', simple_value=epsilon)
+             self._writer.add_summary(summary, self._progress.clock)
+          return epsilon
