@@ -75,7 +75,7 @@ class Scheduler(RegisterSchemes):
 class LRScheduler(Scheduler):
 
       def __init__(self, scheme: str, learning_rate: float, progress: Progress, config_: config,
-                   progress: Progress, writer: tf.summary.FileWriter) -> None:
+                   writer: tf.summary.FileWriter) -> None:
           self._lr = learning_rate
           self._progress = progress
           self._lr_event = config_ & config.LR_EVENT
@@ -94,7 +94,7 @@ class LRScheduler(Scheduler):
 class BetaScheduler(Scheduler):
 
       def __init__(self, scheme: str, beta: float, progress: Progress, config_: config,
-                   progress: Progress, writer: tf.summary.FileWriter) -> None:
+                   writer: tf.summary.FileWriter) -> None:
           self._beta = beta
           self._progress = progress
           self._beta_event = config_ & config.BETA_EVENT
@@ -113,7 +113,7 @@ class BetaScheduler(Scheduler):
 class EpsilonGreedyScheduler(Scheduler):
 
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress, config_: config,
-                   progress: Progress, writer: tf.summary.FileWriter) -> None:
+                   writer: tf.summary.FileWriter) -> None:
           self._epsilon = epsilon_range[0]
           self._progress = progress
           self._scheme = scheme
