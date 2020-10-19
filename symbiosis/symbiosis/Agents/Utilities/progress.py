@@ -11,6 +11,7 @@ class Progress:
           self._observe = observe
           self._explore = explore
           self._clock = 0
+          self._train = False
           self._explore_clock = 0
           self._training_clock = 0
           self._episodic_clock = 0
@@ -27,6 +28,10 @@ class Progress:
       @clock.setter
       def clock(self, clock: int) -> None:
           self._clock = clock
+
+      @property
+      def train(self) -> bool:
+          return self._train
 
       @property
       def explore_clock(self) -> int:
@@ -65,6 +70,8 @@ class Progress:
           self._episodic_clock += 1
           self._explore_clock = np.clip(self._clock-self._observe, 0, self._explore)
           self._training_clock = np.clip((self._clock-self._observe)//self._train_interval, 0, self._n_train_steps)
+          if self._clock > self._observe:
+             self._train = True if (self._clock-self._observe)%self._train_interval == 0 else False
 
       def bump_episode(self) -> None:
           self._episode += 1
