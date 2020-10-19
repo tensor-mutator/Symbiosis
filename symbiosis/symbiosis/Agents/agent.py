@@ -137,10 +137,10 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                      self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
                      self.replay.append((s_t, a_t, r_t, s_t1, done,))
                      x_t, frame_t, s_t, path_t = x_t1, frame_t1, s_t1, path_t1
+                     if self.progress.train:
+                        self.train()
                      if self.progress.explore_clock:
-                        if self.progress.training_clock%self.training_interval == 0:
-                           self.train()
-                        if self.progress.training_clock%self.target_frequency == 0:
+                        if (self.progress.clock-self.progress.observe)%self.target_frequency == 0:
                            self.update_target()
                      self.progress.bump()
 
