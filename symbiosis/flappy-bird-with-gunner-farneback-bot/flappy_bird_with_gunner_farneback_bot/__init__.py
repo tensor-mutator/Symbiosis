@@ -69,6 +69,7 @@ class FlappyBird(Environment):
           state = self._env.reset()
           self.state.frame = state
           self._state_shape = (state.shape[0], state.shape[1],)
+          self._ended = False
           return state
 
       def _decide_reward(self, predicted_label: np.ndarray) -> int:
