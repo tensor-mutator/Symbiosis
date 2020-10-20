@@ -82,7 +82,7 @@ class FlappyBird(Environment):
       def step(self, action: Any) -> Sequence:
           state, _, done, info = self._env.step(action)
           self.state.frame = state
-          #downscaled_img = cv2.resize(state, (64, 64,))
+          downscaled_img = cv2.resize(state, (64, 64,))
           flow = np.resize(self._flow.flow_map(self._img_buffer[0], state), (256, 256, 2))
           label = self._session.run(self._y_hat, feed_dict={self._X: np.expand_dims(flow, axis=0)})
           self._reward = self._decide_reward(label)
@@ -94,7 +94,7 @@ class FlappyBird(Environment):
       def render(self) -> np.ndarray:
           state = self._env.render(mode="rgb_array")
           self.state.frame = state
-          #downscaled_img = cv2.resize(state, (64, 64,))
+          downscaled_img = cv2.resize(state, (64, 64,))
           self._img_buffer.append(state)
           return downscaled_img
 
