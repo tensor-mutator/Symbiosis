@@ -8,7 +8,7 @@ class RegisterWriter:
       def registerwriter(func) -> Callable:
           def inner(inst: "<Scheduler inst>") -> float:
               val = func(inst)
-              if inst._writer is not None:
+              if inst._writer is not None and inst._write:
                  summary = tf.Summary()
                  summary.value.add(tag=inst._tag, simple_value=val)
                  inst._writer.add_summary(summary, getattr(inst._progress, inst._y))
