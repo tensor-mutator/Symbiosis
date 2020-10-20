@@ -88,7 +88,7 @@ class FlappyBird(Environment):
           self._reward = self._decide_reward(label)
           if self._reward == -5 or done:
              self._ended = True
-          self._img_buffer.append(downscaled_img)
+          self._img_buffer.append(state)
           return downscaled_img, self._reward, self._ended, info
 
       def render(self) -> np.ndarray:
