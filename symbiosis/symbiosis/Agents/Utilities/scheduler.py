@@ -84,9 +84,13 @@ class LRScheduler(EventWriter, Scheduler):
                            writer, progress, "training_clock")
 
       @property
+      def _p(self) -> float:
+          return self._progress.training_clock/self._progress.training_steps
+
+      @property
       @EventWriter.registerwriter
       def lr(self) -> float:
-          return self._lr*self.value(self._progress.training_clock/self._progress.training_steps)
+          return self._lr*self.value(self._p)
 
 @Scheduler.register(["constant", "linear"])
 class BetaScheduler(EventWriter, Scheduler):
@@ -99,9 +103,13 @@ class BetaScheduler(EventWriter, Scheduler):
                            writer, progress, "training_clock")
 
       @property
+      def _p(self) -> float:
+          return self._progress.training_clock/self._progress.training_steps
+
+      @property
       @EventWriter.registerwriter
       def beta(self) -> float:
-          return min(1, self._beta + (1-self._beta)*(1-self.value(self._progress.training_clock/self._progress.training_steps)))
+          return min(1, self._beta + (1-self._beta)*(1-self.value(self._p)))
 
 @Scheduler.register(["constant", "linear", "exponential"])
 class EpsilonGreedyScheduler(EventWriter, Scheduler):
@@ -117,10 +125,14 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
                            writer, progress, "clock")
 
       @property
+      def _p(self) -> float:
+          return self._progress.explore_clock/self._progress.explore
+
+      @property
       @EventWriter.registerwriter
       def epsilon(self) -> float:
           if self._scheme == "exponential":
-             multiplier = self.value(self._progress.explore_clock/self._progress.explore, decay_factor=self._decay_factor)
+             multiplier = self.value(self._p, decay_factor=self._decay_factor)
           else:
-             multiplier = self.value(self._progress.explore_clock/self._progress.explore)
+             multiplier = self.value(self._p)
           return self._epsilon*multiplier
