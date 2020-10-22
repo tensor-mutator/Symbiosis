@@ -116,7 +116,7 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
 
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress, config_: config,
                    writer: tf.summary.FileWriter) -> None:
-          self._epsilon = epsilon_range[0]
+          self._epsilon, self._final_epsilon = epsilon_range
           self._progress = progress
           self._scheme = scheme
           if scheme == "exponential":
@@ -133,6 +133,6 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
       def epsilon(self) -> float:
           if self._scheme == "exponential":
              multiplier = self.value(self._p, decay_factor=self._decay_factor)
+             return self._epsilon*multiplier
           else:
-             multiplier = self.value(self._p)
-          return self._epsilon*multiplier
+             return max(self._final_epsilon, self._epsilon - (self._epsilon-self._final_epsilon)*(1-self.value(self._p)))
