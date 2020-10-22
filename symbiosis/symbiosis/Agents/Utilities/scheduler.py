@@ -132,7 +132,6 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
       @EventWriter.registerwriter
       def epsilon(self) -> float:
           if self._scheme == "exponential":
-             multiplier = self.value(self._p, decay_factor=self._decay_factor)
-             return self._epsilon*multiplier
+             return self._epsilon*self.value(self._p, decay_factor=self._decay_factor)
           else:
              return max(self._final_epsilon, self._epsilon - (self._epsilon-self._final_epsilon)*(1-self.value(self._p)))
