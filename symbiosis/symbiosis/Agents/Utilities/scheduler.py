@@ -120,7 +120,7 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
           self._progress = progress
           self._scheme = scheme
           if scheme == "exponential":
-             self._decay_factor = 1-epsilon_range[1]
+             self.value = lambda p: self.value(p, decay_factor=1-epsilon_range[1])
           self._set_writer('Hyperparams Schedule/Steps - Epsilon', config_ & config.EPSILON_EVENT,
                            writer, progress, "clock")
 
@@ -131,7 +131,4 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
       @property
       @EventWriter.registerwriter
       def epsilon(self) -> float:
-          if self._scheme == "exponential":
-             return self._epsilon*self.value(self._p, decay_factor=self._decay_factor)
-          else:
-             return max(self._final_epsilon, self._epsilon - (self._epsilon-self._final_epsilon)*(1-self.value(self._p)))
+          return max(self._final_epsilon, self._epsilon - (self._epsilon-self._final_epsilon)*(1-self.value(self._p)))
