@@ -83,7 +83,7 @@ class FlappyBird(Environment):
       def step(self, action: Any) -> Sequence:
           state, _, done, info = self._env.step(action)
           self.state.frame = state
-          flow = np.resize(self._flow.flow_map(self._img_buffer[0], state), (256, 256, 2))
+          flow = cv2.resize(self._flow.flow_map(self._img_buffer[0], state), (64, 64))
           label = self._session.run(self._y_hat, feed_dict={self._X: np.expand_dims(flow, axis=0)})
           self._reward = self._decide_reward(label)
           if self._reward == -5 or done:
