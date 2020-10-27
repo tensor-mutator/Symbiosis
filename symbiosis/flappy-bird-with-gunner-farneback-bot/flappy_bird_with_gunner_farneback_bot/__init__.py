@@ -36,6 +36,8 @@ class FlappyBird(Environment):
           self._X, self._y_hat = self._load_ops()
           self._img_buffer = deque(maxlen=flow_skip)
           self._flow = GunnerFarnebackFlow()
+          self._writer = tf.summary.FileWriter("REGRET")
+          self._step = 0
 
       def _load_graph(self) -> tf.Session:
           if not os.path.exists(os.path.join(MODEL, "GunnerFarnebackRewardModel.ckpt.meta")):
@@ -70,6 +72,8 @@ class FlappyBird(Environment):
           self.state.frame = state
           self._state_shape = (state.shape[0], state.shape[1],)
           self._ended = False
+          self._step += 1
+          self._regret = dict(total=0, no_reward=0, success=0, hit=0)
           return state
 
       def _decide_reward(self, predicted_label: np.ndarray) -> int:
@@ -81,15 +85,33 @@ class FlappyBird(Environment):
           return -5
 
       def step(self, action: Any) -> Sequence:
-          state, _, done, info = self._env.step(action)
+          state, r_t, done, info = self._env.step(action)
           self.state.frame = state
           flow = cv2.resize(self._flow.flow_map(self._img_buffer[0], state), (64, 64))
           label = self._session.run(self._y_hat, feed_dict={self._X: np.expand_dims(flow, axis=0)})
           self._reward = self._decide_reward(label)
+          if self._reward != r_t:
+             self._regret["total"] += 1
+             if r_t == -5:
+                self._regret["hit"] += 1
+             if r_t == 0:
+                self._regret["no_reward"] += 1
+             if r_t == 1:
+                self._regret["success"] += 1
           if self._reward == -5 or done:
              self._ended = True
+          if self._ended:
+             self._rollout_smmary()
           self._img_buffer.append(state)
           return cv2.resize(state, (64, 64,)), self._reward, self._ended, info
+
+      def _rollout_summary(self) -> None:
+          summary = tf.Summary()
+          summary.value.add(tag="REGRET Statistics/Steps - Total Regret", simple_value=self._regret["total"])
+          summary.value.add(tag="REGRET Statistics/Steps - Hit Regret", simple_value=self._regret["hit"])
+          summary.value.add(tag="REGRET Statistics/Steps - Zero Regret", simple_value=self._regret["no_reward"])
+          summary.value.add(tag="REGRET Statistics/Steps - Success Regret", simple_value=self._regret["success"])
+          self._writer.add_summary(summary, self._step)
 
       def render(self) -> np.ndarray:
           state = self._env.render(mode="rgb_array")
