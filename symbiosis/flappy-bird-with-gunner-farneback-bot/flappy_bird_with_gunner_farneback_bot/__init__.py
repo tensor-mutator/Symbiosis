@@ -101,7 +101,7 @@ class FlappyBird(Environment):
           if self._reward == -5 or done:
              self._ended = True
           if self._ended:
-             self._rollout_smmary()
+             self._rollout_summary()
           self._img_buffer.append(state)
           return cv2.resize(state, (64, 64,)), self._reward, self._ended, info
 
