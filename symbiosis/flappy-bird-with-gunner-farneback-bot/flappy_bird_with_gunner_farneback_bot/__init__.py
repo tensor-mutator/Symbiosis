@@ -98,7 +98,9 @@ class FlappyBird(Environment):
                 self._regret["no_reward"] += 1
              if r_t == 1:
                 self._regret["success"] += 1
-          if self._reward == -5 or done:
+             self._reward = r_t
+             self._ended = True
+          if self._reward == -5:
              self._ended = True
           if self._ended:
              self._rollout_summary()
