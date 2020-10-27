@@ -90,6 +90,14 @@ class FlappyBird(Environment):
              return 1
           return -5
 
+      def _map_rewards(self, reward: int) -> int:
+          if reward == 0:
+             return 0
+          elif reward == 1:
+             return 1
+          else:
+             return 2
+
       def _one_hot_y(self, y: np.ndarray) -> np.ndarray:
           one_hot = np.zeros(shape=[np.size(y), 3], dtype=np.float32)
           one_hot[np.arange(np.size(y)), y] = 1
@@ -97,7 +105,7 @@ class FlappyBird(Environment):
 
       def _train(self) -> None:
           self._session.run(self._grad, feed_dict={self._X: np.array(self._flow_buffer),
-                                                   self._y: self._one_hot_y(np.array(self._reward_buffer))})
+                                                   self._y: self._one_hot_y(np.array(list(map(self._map_rewards, self._reward_buffer))))})
           self._flow_buffer.clear()
           self._reward_buffer.clear()
 
