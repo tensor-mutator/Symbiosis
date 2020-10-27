@@ -31,13 +31,17 @@ class FlappyBird(Environment):
             def __init__(self, msg: str) -> None:
                 super(FlappyBird.RewardModelNotFoundError, self).__init__(msg)
 
-      def __init__(self, flow_skip: int = 1) -> None:
+      def __init__(self, flow_skip: int = 1, batch_size: int = 32) -> None:
           self._session = self._load_graph()
-          self._X, self._y_hat = self._load_ops()
+          self._X, self._y, self._y_hat, self._grad = self._load_ops()
           self._img_buffer = deque(maxlen=flow_skip)
           self._flow = GunnerFarnebackFlow()
           self._writer = tf.summary.FileWriter("REGRET")
+          self._batch_size = batch_size
+          self._flow_buffer = deque(maxlen=batch_size)
+          self._reward_buffer = deque(maxlen=batch_size)
           self._step = 0
+          self._train_clock = 0
 
       def _load_graph(self) -> tf.Session:
           if not os.path.exists(os.path.join(MODEL, "GunnerFarnebackRewardModel.ckpt.meta")):
@@ -57,7 +61,9 @@ class FlappyBird(Environment):
           graph = self._session.graph
           X = graph.get_operation_by_name("target/X").outputs[0]
           y_hat = graph.get_operation_by_name("target/y_hat/Softmax").outputs[0]
-          return X, y_hat
+          y = graph.get_operation_by_name("target/y").outputs[0]
+          grad = graph.get_operation_by_name("target/train")
+          return X, y, y_hat, grad
 
       @property
       def name(self) -> str:
@@ -84,10 +90,26 @@ class FlappyBird(Environment):
              return 1
           return -5
 
+      def _one_hot_y(self, y: np.ndarray) -> np.ndarray:
+          one_hot = np.zeros(shape=[np.size(y), 3], dtype=np.float32)
+          one_hot[np.arange(np.size(y)), y] = 1
+          return one_hot
+
+      def _train(self) -> None:
+          self._session.run(self._grad, feed_dict={self._X: np.array(self._flow_buffer),
+                                                   self._y: self._one_hot_y(np.array(self._reward_buffer))})
+          self._flow_buffer.clear()
+          self._reward_buffer.clear()
+
       def step(self, action: Any) -> Sequence:
           state, r_t, done, info = self._env.step(action)
           self.state.frame = state
           flow = cv2.resize(self._flow.flow_map(self._img_buffer[0], state), (64, 64))
+          self._flow_buffer.append(flow)
+          self._reward_buffer.append(r_t)
+          self._train_clock += 1
+          if self._train_clock%self._batch_size==0:
+             self._train()
           label = self._session.run(self._y_hat, feed_dict={self._X: np.expand_dims(flow, axis=0)})
           self._reward = self._decide_reward(label)
           if self._reward != r_t:
