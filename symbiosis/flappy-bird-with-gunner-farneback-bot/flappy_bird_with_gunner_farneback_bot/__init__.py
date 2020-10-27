@@ -62,7 +62,7 @@ class FlappyBird(Environment):
           X = graph.get_operation_by_name("target/X").outputs[0]
           y_hat = graph.get_operation_by_name("target/y_hat/Softmax").outputs[0]
           y = graph.get_operation_by_name("target/y").outputs[0]
-          grad = graph.get_operation_by_name("target/train_1")
+          grad = graph.get_operation_by_name("target/train")
           return X, y, y_hat, grad
 
       @property
