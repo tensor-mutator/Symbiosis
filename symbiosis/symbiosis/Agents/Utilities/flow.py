@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 from ..flow_base import Flow
 
-__all__ = ["GunnerFarnebackFlow", "LucasKanadeFlow"]
+__all__ = ["GunnarFarnebackFlow", "LucasKanadeFlow"]
 
-class GunnerFarnebackFlow(Flow):
+class GunnarFarnebackFlow(Flow):
 
       def flow_map(self, x_t: np.ndarray, x_t1: np.ndarray) -> np.ndarray:
           flow_map = np.zeros_like(x_t)
