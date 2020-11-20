@@ -2,7 +2,7 @@
 A Reinforcement Learning library for solving custom environments 
 
 #### Installation steps
-```bash
+```
 <i>(symbiosis)</i> poetry install
 ```
 
