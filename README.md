@@ -2,8 +2,8 @@
 A Reinforcement Learning library for solving custom environments 
 
 #### Installation steps
-```
-<i>(symbiosis)</i> poetry install
+```bash
+(symbiosis) poetry install
 ```
 
 #### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with implicit rewards
