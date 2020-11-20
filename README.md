@@ -13,7 +13,7 @@ A Reinforcement Learning library for solving custom environments
 
 #### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with <i>Gunnar-Farneback</i> reward model
 ```bash
-(symbiosis) poetry run python3.6 -m flappy_bird_bot
+(symbiosis) poetry run python3.6 -m flappy_bird_with_gunnar_farneback_bot
 ```
 
 ### Discrete Agents
