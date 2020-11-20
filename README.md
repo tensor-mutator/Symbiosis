@@ -6,9 +6,14 @@ A Reinforcement Learning library for solving custom environments
 (symbiosis) poetry install
 ```
 
-```python
+## Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with implicit rewards
+```bash
+(symbiosis) poetry run python3.6 -m flappy_bird_bot
+```
 
-def gg():
+## Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with <i>Gunnar-Farneback</i> reward model
+```bash
+(symbiosis) poetry run python3.6 -m flappy_bird_bot
 ```
 
 ### Discrete Agents
