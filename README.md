@@ -1,17 +1,17 @@
 # Symbiosis
 A Reinforcement Learning library for solving custom environments 
 
-## Installation steps
+#### Installation steps
 ```bash
 (symbiosis) poetry install
 ```
 
-## Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with implicit rewards
+#### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with implicit rewards
 ```bash
 (symbiosis) poetry run python3.6 -m flappy_bird_bot
 ```
 
-## Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with <i>Gunnar-Farneback</i> reward model
+#### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with <i>Gunnar-Farneback</i> reward model
 ```bash
 (symbiosis) poetry run python3.6 -m flappy_bird_bot
 ```
