@@ -1,7 +1,7 @@
 import tensorflow.compat.v1 as tf
 from symbiosis import Environment, State, Action, config
 from symbiosis.Agents import DDQN, DQNNet
-from symbiosis.Agents.Utilities import GunnerFarnebackFlow
+from symbiosis.Agents.Utilities import GunnarFarnebackFlow
 from typing import Tuple, Sequence, Any, List
 import numpy as np
 from collections import deque
@@ -10,7 +10,7 @@ import gym
 import gym_ple
 import cv2
 
-MODEL = os.path.join(os.path.split(__file__)[0], "GunnerFarnebackRewardModel")
+MODEL = os.path.join(os.path.split(__file__)[0], "GunnarFarnebackRewardModel")
 
 class FlappyBirdState(State):
 
@@ -44,9 +44,9 @@ class FlappyBird(Environment):
           self._train_clock = 0
 
       def _load_graph(self) -> tf.Session:
-          if not os.path.exists(os.path.join(MODEL, "GunnerFarnebackRewardModel.ckpt.meta")):
-             raise FlappyBird.RewardModelNotFoundError("Gunner Farneback reward model not found")
-          saver = tf.train.import_meta_graph(os.path.join(MODEL, "GunnerFarnebackRewardModel.ckpt.meta"))
+          if not os.path.exists(os.path.join(MODEL, "GunnarFarnebackRewardModel.ckpt.meta")):
+             raise FlappyBird.RewardModelNotFoundError("Gunnar Farneback reward model not found")
+          saver = tf.train.import_meta_graph(os.path.join(MODEL, "GunnarFarnebackRewardModel.ckpt.meta"))
           session = tf.Session(config=self._config)
           saver.restore(session, tf.train.get_checkpoint_state(MODEL).model_checkpoint_path)
           return session
@@ -67,7 +67,7 @@ class FlappyBird(Environment):
 
       @property
       def name(self) -> str:
-          return "FlappyBird-v0"
+          return "FlappyBirdGunnarFarneback-v0"
 
       def make(self) -> None:
           self._env = gym.make("FlappyBird-v0")
