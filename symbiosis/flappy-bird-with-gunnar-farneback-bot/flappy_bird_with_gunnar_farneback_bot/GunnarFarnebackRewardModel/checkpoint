@@ -1,0 +1,2 @@
+model_checkpoint_path: "GunnarFarnebackRewardModel.ckpt"
+all_model_checkpoint_paths: "GunnarFarnebackRewardModel.ckpt"

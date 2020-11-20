@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "flappy-bird-with-gunner-farneback-bot"
+name = "flappy-bird-with-gunnar-farneback-bot"
 version = "0.1.0"
 description = ""
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
