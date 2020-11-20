@@ -23,7 +23,7 @@ A Reinforcement Learning library for solving custom environments
 ```
 ##### peformance with <i>Gunnar-Farneback</i> reward model
 ```bash
-(FlappyBirdGunnarFaneback-v0) tensorboard --logdir .
+(FlappyBirdGunnarFarneback-v0) tensorboard --logdir .
 ```
 
 ### Discrete Agents
