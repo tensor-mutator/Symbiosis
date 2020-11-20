@@ -1,6 +1,11 @@
 # Symbiosis
 A Reinforcement Learning library for solving custom environments 
 
+## Installation steps
+```bash
+(symbiosis) poetry install
+```
+
 ```python
 
 def gg():
