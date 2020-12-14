@@ -80,7 +80,7 @@ class LRScheduler(EventWriter, Scheduler):
                    writer: tf.summary.FileWriter) -> None:
           self._lr = learning_rate
           self._progress = progress
-          self._set_writer('Hyperparams Schedule/Epoch - Learning Rate', config_ & config.LR_EVENT,
+          self._set_writer("Hyperparams Schedule/Epoch - Learning Rate", config_ & config.LR_EVENT,
                            writer, progress, "training_clock")
 
       @property
@@ -99,7 +99,7 @@ class BetaScheduler(EventWriter, Scheduler):
                    writer: tf.summary.FileWriter) -> None:
           self._beta = beta
           self._progress = progress
-          self._set_writer('Hyperparams Schedule/Epoch - Beta', config_ & config.BETA_EVENT,
+          self._set_writer("Hyperparams Schedule/Epoch - Beta", config_ & config.BETA_EVENT,
                            writer, progress, "training_clock")
 
       @property
@@ -121,7 +121,7 @@ class EpsilonGreedyScheduler(EventWriter, Scheduler):
           self._scheme = scheme
           if scheme == "exponential":
              self.value = lambda p: self.value(p, decay_factor=1-epsilon_range[1])
-          self._set_writer('Hyperparams Schedule/Steps - Epsilon', config_ & config.EPSILON_EVENT,
+          self._set_writer("Hyperparams Schedule/Steps - Epsilon", config_ & config.EPSILON_EVENT,
                            writer, progress, "clock")
 
       @property
