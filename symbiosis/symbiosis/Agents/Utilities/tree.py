@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 from typing import List, Iterator, Dict, Generator
 from contextlib import contextmanager
 
+__all__ = ["Tree"]
+
 @dataclass
 class Node:
 
