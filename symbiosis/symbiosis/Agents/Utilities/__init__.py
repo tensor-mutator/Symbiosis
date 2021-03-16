@@ -6,6 +6,7 @@ from .inventory import Inventory
 from .lego import NetBlocks
 from .flow import LucasKanadeFlow, GunnarFarnebackFlow
 from .event_writer import EventWriter
+from .tree import Tree
 
 __all__ = ["LRScheduler", "Progress", "Exceptions", "RewardManager", "NetBlocks", "Inventory", "LucasKanadeFlow",
-           "GunnarFarnebackFlow", "BetaScheduler", "EpsilonGreedyScheduler"]
+           "GunnarFarnebackFlow", "BetaScheduler", "EpsilonScheduler", "Tree"]
