@@ -5,7 +5,7 @@ from .exceptions import *
 from .event_writer import EventWriter
 from ...config import config
 
-__all__ = ["LRScheduler", "BetaScheduler", "EpsilonGreedyScheduler"]
+__all__ = ["LRScheduler", "BetaScheduler", "EpsilonScheduler"]
 
 class RegisterSchemes:
 
@@ -112,7 +112,7 @@ class BetaScheduler(EventWriter, Scheduler):
           return min(1, self._beta + (1-self._beta)*(1-self.value(self._p)))
 
 @Scheduler.register(["constant", "linear", "exponential"])
-class EpsilonGreedyScheduler(EventWriter, Scheduler):
+class EpsilonScheduler(EventWriter, Scheduler):
 
       def __init__(self, scheme: str, epsilon_range: Tuple[float, float], progress: Progress, config_: config,
                    writer: tf.summary.FileWriter) -> None:
