@@ -61,9 +61,17 @@ class Tree:
           return state in self._tree.keys()
 
       def expand(self, state: str, policy: List) -> None:
+          """
+              Expands the tree with a node
+          """
+
           self._tree[state].p = policy
 
       def simulate(self, state: str, action: str) -> None:
+          """
+              Traverses a node while applying virtual loss
+          """
+
           with self._lock():
                node = self._tree[state]
                node.sum_n += self._virtual_loss
@@ -73,6 +81,10 @@ class Tree:
                edge.q = edge.w/edge.n
 
       def backpropagate(self, state: str, value: float) -> None:
+          """
+              Updates the visitation frequency and the action value of a node
+          """
+
           with self._lock():
                node = self._tree[state]
                node.sum_n += -self._virtual_loss + 1
