@@ -12,7 +12,8 @@ from typing import List
 @dataclass
 class Node:
 
-      """Represents a node of the tree
+      """
+          Represents a node of the tree
       """
 
       edges: List = field(default_factory=lambda: defaultdict(Edge))
@@ -21,7 +22,8 @@ class Node:
 @dataclass
 class Edge:
 
-      """Represents an edge of the tree
+      """
+          Represents an edge of the tree
       """
 
       n: int = 0
@@ -31,7 +33,8 @@ class Edge:
 
 class Tree:
 
-      """Implements a game tree
+      """
+          Implements a game tree
       """
 
       def __init__(self, depth: int, branching_factor: int) -> None:
