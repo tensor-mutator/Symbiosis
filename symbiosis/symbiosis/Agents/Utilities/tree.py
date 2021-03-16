@@ -37,7 +37,6 @@ class Edge:
       p: float = 0
 
 class Tree:
-
       """
           Implements a game tree
       """
