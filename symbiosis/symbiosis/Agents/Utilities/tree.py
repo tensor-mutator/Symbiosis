@@ -9,6 +9,8 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict, Generator
 from contextlib import contextmanager
+from .exceptions import TreeError
+from ...colors import COLORS
 
 __all__ = ["Tree"]
 
@@ -67,6 +69,11 @@ class Tree:
               Expands the tree with a node
           """
 
+          if len(policy) > self._branching_factor:
+             raise TreeError("Number of edges attached to the node exceeds the branching factor of the tree: {}{} > {}{}".format(COLOR.RED,
+                                                                                                                                 len(policy),
+                                                                                                                                 COLOR.MAGENTA,
+                                                                                                                                 self._branching_factor))
           self._tree[state].p = policy
 
       def simulate(self, state: str, action: str) -> None:
