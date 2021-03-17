@@ -63,7 +63,7 @@ class Tree:
       def __contains__(self, state: str) -> bool:
           return state in self._tree.keys()
 
-      def expand(self, state: str, policy: List) -> None:
+      def expand(self, state: str, policy: List[float], actions: List[str]) -> None:
           """
               Expands the tree with a node
           """
@@ -73,7 +73,9 @@ class Tree:
                                                                                                                                  len(policy),
                                                                                                                                  COLOR.MAGENTA,
                                                                                                                                  self._branching_factor))
-          self._tree[state].p = policy
+          normalizing_factor = sum(policy)+1e-08
+          for action, p in zip(actions, policy):
+              self._tree[state].edges[action].p = p/normalizing_factor
 
       def simulate(self, state: str, action: str) -> None:
           """
