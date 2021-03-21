@@ -7,8 +7,7 @@ Implements game tree to run Monte-Carlo Tree Search (MCTS) on
 from threading import Lock
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import List, Iterator, Dict, Generator
-from contextlib import contextmanager
+from typing import List, Iterator, Dict
 from .exceptions import TreeError
 from ...colors import COLORS
 
@@ -42,17 +41,11 @@ class Tree:
       """
 
       def __init__(self, depth: int, branching_factor: int, virtual_loss: float) -> None:
-          self._lock = Lock()
+          self._lock = defaultdict(Lock)
           self._depth = depth
           self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
           self._tree = defaultdict(Node)
-
-      @contextmanager
-      def _lock(self) -> Generator:
-          self._lock.acquire()
-          yield
-          self._lock.release()
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -82,7 +75,7 @@ class Tree:
               Traverses a node while applying virtual loss
           """
 
-          with self._lock():
+          with self._lock(state):
                node = self._tree[state]
                node.sum_n += self._virtual_loss
                edge = node.edges[action]
@@ -95,7 +88,7 @@ class Tree:
               Updates the visitation frequency and the action value of a node
           """
 
-          with self._lock():
+          with self._lock(state):
                node = self._tree[state]
                node.sum_n += -self._virtual_loss + 1
                edge = node.edges[action]
