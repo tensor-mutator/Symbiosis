@@ -1,7 +1,7 @@
 """
 @author: Debajyoti Raychaudhuri
 
-Implements game tree to run Monte-Carlo Tree Search (MCTS) on
+Implements game tree to run Monte-Carlo Search on
 """
 
 from threading import Lock
