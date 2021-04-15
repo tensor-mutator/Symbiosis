@@ -11,7 +11,7 @@ class DQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder(state_shape + (trace,))
-               nature_out = NetBlocks.layers.Conv2DNature()(self._state)
+               nature_out = NetBlocks.NN.Conv2DNature()(self._state)
                self._q_predicted = NetBlocks.layers.Dense(units=action_size, activation="linear")(nature_out)
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
@@ -44,7 +44,7 @@ class DRQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder((trace,) + state_shape + (3,))
-               nature_out = NetBlocks.layers.Conv2DNature(time_distributed=True)(self._state)
+               nature_out = NetBlocks.NN.Conv2DNature(time_distributed=True)(self._state)
                lstm_out = NetBLocks.LSTM(units=512)(nature_out)
                self._q_predicted = NetBlocks.layers.Dense(units=action_size, activation="linear")(lstm_out)
                if scope == "local":
@@ -78,7 +78,7 @@ class DuelingDQNNet(NetworkBaseDQN):
                    scope: str, **params) -> None:
           with tf.variable_scope(scope):
                self._state = NetBlocks.placeholder(state_shape + (trace,))
-               nature_out_adv, nature_out_val = NetBlocks.layers.Conv2DNatureDueling()(self._state)
+               nature_out_adv, nature_out_val = NetBlocks.NN.Conv2DNatureDueling()(self._state)
                self._q_predicted = self._fuse_adv_val(nature_out_adv, nature_out_val, action_size)
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
