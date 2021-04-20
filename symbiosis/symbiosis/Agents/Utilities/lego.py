@@ -77,6 +77,22 @@ class NetBlocks:
                 return _op
 
             @staticmethod
+            def ResidualBlock(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1,1,),
+                              batch_norm: bool = False, time_distributed: bool = False) -> Callable:
+                def _op(tensor: tf.Tensor) -> tf.Tensor:
+                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
+                                                         batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
+                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, activation="linear",
+                                                         batch_norm=batch_norm, time_distributed=time_distributed)(tensor_out)
+                    skip_out = tf.add(tensor, tensor_out)
+                    if time_distributed:
+                       return layers.TimeDistributed(layers.Activation("relu"))(skip_out)
+                    return layers.Activation("relu")(skip_out)
+                return _op
+
+      class NN:      
+
+            @staticmethod
             def Conv2DNature(batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
                     conv1 = NetBlocks.layers.Conv2D(filters=32, kernel_size=(8, 8), strides=(4, 4),
@@ -101,6 +117,12 @@ class NetBlocks:
                     flattened = layers.TimeDistributed(layers.Flatten())(conv3) if time_distributed else layers.Flatten()(conv3)
                     return [NetBlocks.layers.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened),
                             NetBlocks.layers.Dense(units=256, batch_norm=batch_norm, time_distributed=time_distributed)(flattened)]
+                return _op
+
+            @staticmethod
+            def AGZChess(batch_norm: bool = False) -> Callable:
+                def _op(tensor: tf.Tensor) -> tf.Tensor:
+                    
                 return _op
 
       class losses:
