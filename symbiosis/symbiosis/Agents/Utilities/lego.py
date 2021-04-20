@@ -1,6 +1,7 @@
 import tensorflow.compat.v1 as tf
 import tensorflow.compat.v1.keras.layers as layers
-from typing import Callable, Tuple, Any
+import tensorflow.compat.v1.keras.regularizers as regularizers
+from typing import Callable, Tuple, Any, List
 
 __all__ = ["NetBlocks"]
 
@@ -30,13 +31,16 @@ class NetBlocks:
       class layers:
 
             @staticmethod
-            def Conv2D(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1,1,),
-                       activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False) -> Callable:
+            def Conv2D(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1, 1),
+                       activation: str = "relu", padding: str = "valid", batch_norm: bool = False, time_distributed: bool = False,
+                       **optional_params) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
                     if time_distributed:
-                       tensor_out = layers.TimeDistributed(layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides))(tensor)
+                       tensor_out = layers.TimeDistributed(layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
+                                                                         padding=padding, **optional_params))(tensor)
                     else:
-                       tensor_out = layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides)(tensor)
+                       tensor_out = layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding=padding,
+                                                  **optional_params)(tensor)
                     if batch_norm:
                        if time_distributed:
                           tensor_out = layers.TimeDistributed(layers.BatchNomalization())(tensor_out)
@@ -50,12 +54,13 @@ class NetBlocks:
                 return _op
 
             @staticmethod
-            def Dense(units: int, activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False) -> Callable:
+            def Dense(units: int, activation: str = "relu", batch_norm: bool = False, time_distributed: bool = False, **optional_params) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
                     if time_distributed:
-                       tensor_out = layers.TimeDistributed(layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal()))(tensor)
+                       tensor_out = layers.TimeDistributed(layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal(),
+                                                                        **optional_params))(tensor)
                     else:
-                       tensor_out = layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal())(tensor)
+                       tensor_out = layers.Dense(units=units, kernel_initializer=tf.initializers.glorot_normal(), **optional_params)(tensor)
                     if batch_norm:
                        if time_distributed:
                           tensor_out = layers.TimeDistributed(layers.BatchNomalization())(tensor_out)
@@ -77,13 +82,14 @@ class NetBlocks:
                 return _op
 
             @staticmethod
-            def ResidualBlock(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1,1,),
+            def ResidualBlock(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1, 1),
                               batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
-                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides,
+                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
                                                          batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
-                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, activation="linear",
-                                                         batch_norm=batch_norm, time_distributed=time_distributed)(tensor_out)
+                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
+                                                         activation="linear", batch_norm=batch_norm,
+                                                         time_distributed=time_distributed)(tensor_out)
                     skip_out = tf.add(tensor, tensor_out)
                     if time_distributed:
                        return layers.TimeDistributed(layers.Activation("relu"))(skip_out)
@@ -121,8 +127,20 @@ class NetBlocks:
 
             @staticmethod
             def AGZChess(batch_norm: bool = False) -> Callable:
-                def _op(tensor: tf.Tensor) -> tf.Tensor:
-                    
+                def _op(tensor: tf.Tensor) -> List[tf.Tensor, tf.Tensor]:
+                    tensor_out = NetBlocks.layers.Conv2D(filters=256, kernel_size=(5, 5), padding="same", batch_norm=batch_norm,
+                                                         kernel_regularizer=regularizers.l2(1e-4))(tensor)
+                    for _ in range(7):
+                        tensor_out = NetBlocks.layers.ResidualBlock(filters=256, kernel_size(3, 3), batch_norm=batch_norm)(tensor_out)
+                    policy_out = NetBlocks.layers.Conv2D(filters=2, kernel_size=(1, 1), batch_norm=batch_norm,
+                                                         kernel_regularizer=regularizers.l2(1e-4))(tensor_out)
+                    policy_out = layers.Flatten()(policy_out)
+                    value_out = NetBlocks.layers.Conv2D(filters=4, kernel_size=(1, 1), batch_norm=batch_norm,
+                                                        kernel_regularizer=regularizers.l2(1e-4))(tensor_out)
+                    value_out = layers.Flatten()(value_out)
+                    value_out = NetBlocks.layers.Dense(units=256, kernel_regularizer=regularizers.l2(1e-4))(value_out)
+                    value_out = NetBlocks.layers.Dense(units=1, activation="tanh", kernel_regularizer=regularizers.l2(1e-4))(value_out)
+                    return policy_out, value_out
                 return _op
 
       class losses:
