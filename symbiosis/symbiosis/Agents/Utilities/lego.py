@@ -131,7 +131,7 @@ class NetBlocks:
                     tensor_out = NetBlocks.layers.Conv2D(filters=256, kernel_size=(5, 5), padding="same", batch_norm=batch_norm,
                                                          kernel_regularizer=regularizers.l2(1e-4))(tensor)
                     for _ in range(7):
-                        tensor_out = NetBlocks.layers.ResidualBlock(filters=256, kernel_size(3, 3), batch_norm=batch_norm)(tensor_out)
+                        tensor_out = NetBlocks.layers.ResidualBlock(filters=256, kernel_size=(3, 3), batch_norm=batch_norm)(tensor_out)
                     policy_out = NetBlocks.layers.Conv2D(filters=2, kernel_size=(1, 1), batch_norm=batch_norm,
                                                          kernel_regularizer=regularizers.l2(1e-4))(tensor_out)
                     policy_out = layers.Flatten()(policy_out)
