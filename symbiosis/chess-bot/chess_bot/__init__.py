@@ -12,10 +12,10 @@ class ChessState(State):
 
 class ChessAction(Action):
 
-      X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-      Y = ['1', '2', '3', '4', '5', '6', '7', '8']
-      TRADE_WITH = ['q', 'r', 'b', 'n']
-      uci_labels = list()
+      _X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+      _Y = ['1', '2', '3', '4', '5', '6', '7', '8']
+      _TRADE_WITH = ['q', 'r', 'b', 'n']
+      _uci_labels = set()
 
       @property
       def labels(self) -> List[str]:
@@ -29,21 +29,21 @@ class ChessAction(Action):
                                                                                                (-1, 2), (1, -2), (-1, -2)]))
                   destinations = horizontal_moves+vertical_moves+slanted_moves_pos+slanted_moves_neg+knight_moves
                   destinations = list(filter(lambda tup: tup != (x, y) and tup[0] in range(8) and tup[1] in range(8), destinations))
-                  labels = list(map(lambda tup: self.X[x]+self.Y[y]+self.X[tup[0]]+self.Y[tup[1]], destinations))
-                  self.uci_labels.extend(labels)
+                  labels = list(map(lambda tup: self._X[x]+self._Y[y]+self._X[tup[0]]+self._Y[tup[1]], destinations))
+                  self._uci_labels.update(set(labels))
           for x in range(8):
-              for p in self.TRADE_WITH:
-                  promotion_moves = [self.X[x]+'7'+self.X[x]+'8'+p, self.X[x]+'2'+self.X[x]+'1'+p]
+              for p in self._TRADE_WITH:
+                  promotion_moves = [self._X[x]+'7'+self._X[x]+'8'+p, self._X[x]+'2'+self._X[x]+'1'+p]
                   if x > 0:
-                     promotion_moves.extend([self.X[x]+'7'+self.X[x-1]+'8'+p, self.X[x]+'2'+self.X[x-1]+'1'+p])
+                     promotion_moves.extend([self._X[x]+'7'+self._X[x-1]+'8'+p, self._X[x]+'2'+self._X[x-1]+'1'+p])
                   if x < 7:
-                     promotion_moves.extend([self.X[x]+'7'+self.X[x+1]+'8'+p, self.X[x]+'2'+self.X[x+1]+'1'+p])
-              self.uci_labels.extend(promotion_moves)
-          return self.uci_labels
+                     promotion_moves.extend([self._X[x]+'7'+self._X[x+1]+'8'+p, self._X[x]+'2'+self._X[x+1]+'1'+p])
+              self._uci_labels.update(set(promotion_moves))
+          return list(self._uci_labels)
 
       @property
       def size(self) -> int:
-          return len(self.uci_labels)
+          return len(self._uci_labels)
 
 class Chess(Environment):
 
