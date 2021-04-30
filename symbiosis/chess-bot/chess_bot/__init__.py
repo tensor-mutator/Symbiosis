@@ -14,6 +14,7 @@ class ChessAction(Action):
 
       _X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
       _Y = ['1', '2', '3', '4', '5', '6', '7', '8']
+      _KNIGHT_DELTAS = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
       _TRADE_WITH = ['q', 'r', 'b', 'n']
       _uci_labels = set()
 
@@ -25,8 +26,7 @@ class ChessAction(Action):
                   vertical_moves = [(_y, x) for _y in range(8)]
                   slanted_moves_pos = list(map(lambda delta: (x+delta, y+delta), range(-7, 8))) 
                   santed_moves_neg = list(map(lambda delta: (x-delta, y+delta), range(-7, 8)))
-                  knight_moves = list(map(lambda delta_tup: (x+delta_tup[0], y+delta_tup[1]), [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2),
-                                                                                               (-1, 2), (1, -2), (-1, -2)]))
+                  knight_moves = list(map(lambda delta_tup: (x+delta_tup[0], y+delta_tup[1]), self._KNIGHT_DELTAS))
                   destinations = horizontal_moves+vertical_moves+slanted_moves_pos+slanted_moves_neg+knight_moves
                   destinations = list(filter(lambda tup: tup != (x, y) and tup[0] in range(8) and tup[1] in range(8), destinations))
                   labels = list(map(lambda tup: self._X[x]+self._Y[y]+self._X[tup[0]]+self._Y[tup[1]], destinations))
