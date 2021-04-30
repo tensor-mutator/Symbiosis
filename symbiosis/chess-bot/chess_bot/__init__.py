@@ -67,6 +67,11 @@ class Chess(Environment):
           return self._board
 
       def step(self, action: Any) -> Sequence:
+          info = None
+          self._reward = 0
+          if action is None:
+             info = self._resign()
+             self._reward = -1
           
 
       def render(self) -> chess.Board:
