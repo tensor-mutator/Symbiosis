@@ -25,7 +25,7 @@ class ChessAction(Action):
                   horizontal_moves = [(_x, y) for _x in range(8)]
                   vertical_moves = [(_y, x) for _y in range(8)]
                   slanted_moves_pos = list(map(lambda delta: (x+delta, y+delta), range(-7, 8))) 
-                  santed_moves_neg = list(map(lambda delta: (x-delta, y+delta), range(-7, 8)))
+                  slanted_moves_neg = list(map(lambda delta: (x-delta, y+delta), range(-7, 8)))
                   knight_moves = list(map(lambda delta_tup: (x+delta_tup[0], y+delta_tup[1]), self._KNIGHT_DELTAS))
                   destinations = horizontal_moves+vertical_moves+slanted_moves_pos+slanted_moves_neg+knight_moves
                   destinations = list(filter(lambda tup: tup != (x, y) and tup[0] in range(8) and tup[1] in range(8), destinations))
