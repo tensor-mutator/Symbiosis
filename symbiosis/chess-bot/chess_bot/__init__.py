@@ -12,11 +12,12 @@ class ChessState(State):
 
 class ChessAction(Action):
 
-      _X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
-      _Y = ['1', '2', '3', '4', '5', '6', '7', '8']
-      _KNIGHT_DELTAS = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
-      _TRADE_WITH = ['q', 'r', 'b', 'n']
-      _uci_labels = set()
+      def __init__(self) -> None:
+          self._X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
+          self._Y = ['1', '2', '3', '4', '5', '6', '7', '8']
+          self._KNIGHT_DELTAS = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
+          self._TRADE_WITH = ['q', 'r', 'b', 'n']
+          self._uci_labels = set()
 
       @property
       def labels(self) -> List[str]:
