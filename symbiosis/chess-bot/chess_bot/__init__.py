@@ -24,8 +24,8 @@ class ChessAction(Action):
       def labels(self) -> List[str]:
           for x in range(8):
               for y in range(8):
-                  horizontal_moves = [(_x, y) for _x in range(8)]
-                  vertical_moves = [(_y, x) for _y in range(8)]
+                  horizontal_moves = list(map(lamda _x: (_x, y), range(8)))
+                  vertical_moves = list(map(lamda _y: (_y, x), range(8)))
                   slanted_moves_pos = list(map(lambda delta: (x+delta, y+delta), range(-7, 8))) 
                   slanted_moves_neg = list(map(lambda delta: (x-delta, y+delta), range(-7, 8)))
                   knight_moves = list(map(lambda delta_tup: (x+delta_tup[0], y+delta_tup[1]), self._KNIGHT_DELTAS))
@@ -53,3 +53,40 @@ class Chess(Environment):
       def name(self) -> str:
           return "Chess-v0"
 
+      def make(self) -> None:
+          self._board = chess.Board()
+          self._num_halfmoves = 0
+          self._winner = None
+          self._resigned = False
+
+      def reset(self) -> chess.Board:
+          self._board = chess.Board()
+          self._num_halfmoves = 0
+          self._winner = None
+          self._resigned = False
+          return self._board
+
+      def step(self, action: Any) -> Sequence:
+          
+
+      def render(self) -> chess.Board:
+          return self._board
+
+      @property
+      def state(self) -> State:
+          return ChessState()
+
+      @property
+      def action(self) -> Action:
+          return ChessAction()
+
+      @property
+      def ended(self) -> bool:
+          return self._ended
+ 
+      @property
+      def reward(self) -> float:
+          return self._reward
+
+      def close(self) -> bool:
+          self._board = None
