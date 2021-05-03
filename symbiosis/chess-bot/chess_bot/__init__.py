@@ -134,7 +134,7 @@ class Chess(Environment):
       def render(self, mode="None") -> chess.Board:
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
-          elif mode == "ascii":
+          if mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           elif mode == "fen":
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
