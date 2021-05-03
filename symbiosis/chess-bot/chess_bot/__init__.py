@@ -96,18 +96,14 @@ class Chess(Environment):
           return self.state.frame, self._reward, self._resigned, info
 
       def _check_mate(self) -> Tuple:
-          reward = 0
-          winner = None
-          resigned = False
+          reward, winner, resigned = 0, None, False
           result = self._board.result(claim_draw=True)
           if result != "*":
              resigned = True
              if result == "1-0":
-                winner = Chess.WHITE
-                reward = 1
+                winner, reward = Chess.WHITE, 1
              else:
-                winner = Chess.BLACK
-                reward = -1
+                winner, reward = Chess.BLACK, -1
           return resigned, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
