@@ -3,6 +3,12 @@ from symbiosis.Agents import AGZ
 from symbiosis.colors import COLORS
 from typing import Tuple, Sequence, Any
 import numpy as np
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPM
+import numpy as np
+import cv2
+import os
+import tempfile
 from enum import Enum
 import chess.pgn
 
@@ -62,6 +68,7 @@ class Chess(Environment):
 
       def make(self) -> None:
           self._board = chess.Board()
+          self.state.frame = self._rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
@@ -69,11 +76,12 @@ class Chess(Environment):
 
       def reset(self) -> chess.Board:
           self._board.reset_board()
+          self.state.frame = self._rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
           self._resigned = False
-          return self._board
+          return self.state.frame
 
       def step(self, action: Any) -> Tuple:
           if action is None:
@@ -83,8 +91,9 @@ class Chess(Environment):
              self._board.push_uci(action)
              self._num_halfmoves += 1
              self._resigned, info, self._reward, self._winner = self._check_mate()
+          self.state.frame = self._rgb(self._board)
           self.state.observation = self._board
-          return self._board, self._reward, self._resigned, info
+          return self.state.frame, self._reward, self._resigned, info
 
       def _check_mate(self) -> Tuple:
           reward = 0
@@ -110,17 +119,28 @@ class Chess(Environment):
              reward = 1
           return dict(winner=winner), reward, winner
 
-      def render(self, mode="ascii") -> chess.Board:
+      def _rgb(self, board: chess.Board) -> np.ndarray:
+          svg = chess.svg.board(self._board, size=700)
+          with tempfile.TemporaryDirectory() as dir:
+               svg_file = os.path.join(dir, "board.svg")
+               with open(svg_file, "w") as f:
+                    f.write(svg)
+               drawing = svg2rlg(svg_file)
+               png_file = os.path.join(dir, "board.png")
+               renderPM.drawToFile(drawing, png_file, fmt="PNG")
+               rgb = cv2.imread(png_file)
+          return rgb
+
+      def render(self, mode="None") -> chess.Board:
+          self.state.frame = self._rgb(self._board)
           self.state.observation = self._board
-          if mode == "uci":
-             :TODO
           elif mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           elif mode == "fen":
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
           else:
              print(f"{COLOR.BOLD_MAGENTA}FAILED TO RENDER THE BOARD. {COLOR.RED}INVALID MODE{COLOR.DEFAULT}")
-          return self._board
+          return self.state.frame
 
       @property
       def state(self) -> State:
@@ -145,3 +165,4 @@ class Chess(Environment):
       def close(self) -> bool:
           self._board = None
           self.state.observation = None
+          self.state.frame = None
