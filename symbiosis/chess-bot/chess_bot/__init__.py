@@ -61,6 +61,7 @@ class Chess(Environment):
 
       def reset(self) -> chess.Board:
           self._board = chess.Board()
+          self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
           self._resigned = False
@@ -74,6 +75,7 @@ class Chess(Environment):
              self._board.push_uci(action)
              self._num_halfmoves += 1
              self._resigned, info, self._reward, self._winner = self._check_mate()
+          self.state.observation = self._board
           return self._board, self._reward, self._resigned, info
 
       def _check_mate(self) -> Tuple:
@@ -101,6 +103,7 @@ class Chess(Environment):
           return dict(winner=winner), reward, winner
 
       def render(self) -> chess.Board:
+          self.state.observation = self._board
           return self._board
 
       @property
