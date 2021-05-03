@@ -12,12 +12,6 @@ import tempfile
 from enum import IntEnum
 import chess.pgn
 
-class Chess(IntEnum):
-
-      BLACK = 0
-      WHITE = 1
-      DRAW = 2
-
 class ChessState(State):
 
       @property
@@ -63,6 +57,13 @@ class ChessAction(Action):
 
 class Chess(Environment):
 
+      class Winner(IntEnum):
+
+            NONE = 0
+            BLACK = 1
+            WHITE = 2
+            DRAW = 3
+
       @property
       def name(self) -> str:
           return "Chess-v0"
@@ -72,7 +73,7 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
-          self._winner = None
+          self._winner = Chess.Winner.NONE
           self._ended = False
 
       def reset(self) -> np.ndarray:
@@ -80,7 +81,7 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
-          self._winner = None
+          self._winner = Chess.Winner.NONE
           self._ended = False
           return self.state.frame
 
@@ -97,23 +98,23 @@ class Chess(Environment):
           return self.state.frame, self._reward, self._ended, info
 
       def _check_ended(self) -> Tuple:
-          reward, winner, ended = 0, None, False
+          reward, winner, ended = 0, Chess.Winner.NONE, False
           result = self._board.result(claim_draw=True)
           if result != "*":
              ended = True
              if result == "1-0":
-                winner, reward = Chess.WHITE, 1
+                winner, reward = Chess.Winner.WHITE, 1
              elif result == "0-1":
-                winner, reward = Chess.BLACK, -1
+                winner, reward = Chess.Winner.BLACK, -1
              else:
-                winner, reward = Chess.DRAW, 0.5
+                winner, reward = Chess.Winner.DRAW, 0.5
           return ended, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
           if self._board.turn == chess.WHITE:
-             winner, reward = Chess.BLACK, -1
+             winner, reward = Chess.Winner.BLACK, -1
           else:
-             winner, reward = Chess.WHITE, 1
+             winner, reward = Chess.Winner.WHITE, 1
           return dict(winner=winner), reward, winner
 
       def _to_rgb(self, board: chess.Board) -> np.ndarray:
@@ -164,3 +165,5 @@ class Chess(Environment):
           self._board = None
           self.state.observation = None
           self.state.frame = None
+          self._num_halfmoves = 0
+          self._winner = Chess.Winner.NONE
