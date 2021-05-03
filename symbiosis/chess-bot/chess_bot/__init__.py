@@ -67,7 +67,7 @@ class Chess(Environment):
           self._resigned = False
 
       def reset(self) -> chess.Board:
-          self._board = chess.Board()
+          self._board.reset_board()
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
