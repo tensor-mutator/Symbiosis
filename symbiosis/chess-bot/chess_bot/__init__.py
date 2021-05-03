@@ -2,7 +2,13 @@ from symbiosis import Environment, State, Action, config
 from symbiosis.Agents import AGZ
 from typing import Tuple, Sequence, Any
 import numpy as np
+from enum import Enum
 import chess.pgn
+
+class Chess(Enum):
+
+      WHITE = 1
+      BLACK = 0
 
 class ChessState(State):
 
@@ -87,19 +93,19 @@ class Chess(Environment):
           if result != "*":
              resigned = True
              if result == "1-0":
-                winner = chess.WHITE
+                winner = Chess.WHITE
                 reward = 1
              else:
-                winner = chess.BLACK
+                winner = Chess.BLACK
                 reward = -1
           return resigned, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
           if self._board.turn == chess.WHITE:
-             winner = chess.BLACK
+             winner = Chess.BLACK
              reward = -1
           else:
-             winner = chess.WHITE
+             winner = Chess.WHITE
              reward = 1
           return dict(winner=winner), reward, winner
 
