@@ -66,13 +66,39 @@ class Chess(Environment):
           self._resigned = False
           return self._board
 
-      def step(self, action: Any) -> Sequence:
-          info = None
-          self._reward = 0
+      def step(self, action: Any) -> Tuple:
           if action is None:
-             info = self._resign()
-             self._reward = -1
-          
+             self._resigned = True
+             info, self._reward, self._winner = self._resign()
+          else:
+             self._board.push_uci(action)
+             self._num_halfmoves += 1
+             self._resigned, info, self._reward, self._winner = self._check_mate()
+          return self._board, self._reward, self._resigned, info
+
+      def _check_mate(self) -> Tuple:
+          reward = 0
+          winner = None
+          resigned = False
+          result = self._board.result(claim_draw=True)
+          if result != "*":
+             resigned = True
+             if result == "1-0":
+                winner = chess.WHITE
+                reward = 1
+             else:
+                winner = chess.BLACK
+                reward = -1
+          return resigned, dict(winner=winner), reward, winner
+
+      def _resign(self) -> Tuple:
+          if self._board.turn == chess.WHITE:
+             winner = chess.BLACK
+             reward = -1
+          else:
+             winner = chess.WHITE
+             reward = 1
+          return dict(winner=winner), reward, winner
 
       def render(self) -> chess.Board:
           return self._board
@@ -87,11 +113,15 @@ class Chess(Environment):
 
       @property
       def ended(self) -> bool:
-          return self._ended
+          return self._resigned
  
       @property
       def reward(self) -> float:
           return self._reward
+
+      @property
+      def winner(self) -> int:
+          return self._winner
 
       def close(self) -> bool:
           self._board = None
