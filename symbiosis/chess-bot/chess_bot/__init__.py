@@ -68,7 +68,7 @@ class Chess(Environment):
 
       def make(self) -> None:
           self._board = chess.Board()
-          self.state.frame = self._rgb(self._board)
+          self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
@@ -76,7 +76,7 @@ class Chess(Environment):
 
       def reset(self) -> chess.Board:
           self._board.reset_board()
-          self.state.frame = self._rgb(self._board)
+          self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
@@ -91,7 +91,7 @@ class Chess(Environment):
              self._board.push_uci(action)
              self._num_halfmoves += 1
              self._resigned, info, self._reward, self._winner = self._check_mate()
-          self.state.frame = self._rgb(self._board)
+          self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           return self.state.frame, self._reward, self._resigned, info
 
@@ -119,7 +119,7 @@ class Chess(Environment):
              reward = 1
           return dict(winner=winner), reward, winner
 
-      def _rgb(self, board: chess.Board) -> np.ndarray:
+      def _to_rgb(self, board: chess.Board) -> np.ndarray:
           svg = chess.svg.board(self._board, size=700)
           with tempfile.TemporaryDirectory() as dir:
                svg_file = os.path.join(dir, "board.svg")
@@ -132,7 +132,7 @@ class Chess(Environment):
           return rgb
 
       def render(self, mode="None") -> chess.Board:
-          self.state.frame = self._rgb(self._board)
+          self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           elif mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
