@@ -110,11 +110,11 @@ class Chess(Environment):
              reward = 1
           return dict(winner=winner), reward, winner
 
-      def render(self, mode="pgn") -> chess.Board:
+      def render(self, mode="ascii") -> chess.Board:
           self.state.observation = self._board
           if mode == "uci":
              :TODO
-          elif mode == "pgn":
+          elif mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           elif mode == "fen":
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
