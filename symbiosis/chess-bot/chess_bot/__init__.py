@@ -130,10 +130,8 @@ class Chess(Environment):
           self.state.observation = self._board
           if mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
-          elif mode == "fen":
+          if mode == "fen":
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
-          else:
-             print(f"{COLOR.BOLD_MAGENTA}FAILED TO RENDER THE BOARD. {COLOR.RED}INVALID MODE{COLOR.DEFAULT}")
           return self.state.frame
 
       @property
