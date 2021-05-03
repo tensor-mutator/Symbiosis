@@ -1,5 +1,6 @@
 from symbiosis import Environment, State, Action, config
 from symbiosis.Agents import AGZ
+from symbiosis.colors import COLORS
 from typing import Tuple, Sequence, Any
 import numpy as np
 from enum import Enum
@@ -114,11 +115,11 @@ class Chess(Environment):
           if mode == "uci":
              :TODO
           elif mode == "pgn":
-             print(self._board)
+             print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           elif mode == "fen":
-             print(self._board.fen())
+             print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
           else:
-             print("INVALID MODE")
+             print(f"{COLOR.BOLD_MAGENTA}FAILED TO RENDER THE BOARD. {COLOR.RED}INVALID MODE{COLOR.DEFAULT}")
           return self._board
 
       @property
