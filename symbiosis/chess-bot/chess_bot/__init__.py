@@ -9,13 +9,14 @@ import numpy as np
 import cv2
 import os
 import tempfile
-from enum import Enum
+from enum import IntEnum
 import chess.pgn
 
-class Chess(Enum):
+class Chess(IntEnum):
 
-      WHITE = 1
       BLACK = 0
+      WHITE = 1
+      DRAW = 2
 
 class ChessState(State):
 
@@ -90,20 +91,22 @@ class Chess(Environment):
           else:
              self._board.push_uci(action)
              self._num_halfmoves += 1
-             self._ended, info, self._reward, self._winner = self._check_mate()
+             self._ended, info, self._reward, self._winner = self._check_ended()
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           return self.state.frame, self._reward, self._ended, info
 
-      def _check_mate(self) -> Tuple:
-          reward, winner, resigned = 0, None, False
+      def _check_ended(self) -> Tuple:
+          reward, winner, ended = 0, None, False
           result = self._board.result(claim_draw=True)
           if result != "*":
              ended = True
              if result == "1-0":
                 winner, reward = Chess.WHITE, 1
-             else:
+             elif result == "0-1":
                 winner, reward = Chess.BLACK, -1
+             else:
+                winner, reward = Chess.DRAW, 0.5
           return ended, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
@@ -133,6 +136,9 @@ class Chess(Environment):
           if mode == "fen":
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
           return self.state.frame
+
+      def legal_moves(self) -> List[str]:
+          return list(map(lambda move: move.uci(), list(self._board.legal_moves)))
 
       @property
       def state(self) -> State:
