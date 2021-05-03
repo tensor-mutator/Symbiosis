@@ -20,7 +20,7 @@ class Node:
           Represents a node of the tree
       """
 
-      edges: Dict = field(default_factory=lambda: defaultdict(Edge))
+      edges: Dict = field(default_factory=lambda: defaultdict(lambda: Edge))
       sum_n: int = 0
 
 @dataclass
