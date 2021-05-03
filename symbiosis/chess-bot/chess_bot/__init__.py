@@ -109,12 +109,16 @@ class Chess(Environment):
              reward = 1
           return dict(winner=winner), reward, winner
 
-      def render(self, mode="uci") -> chess.Board:
+      def render(self, mode="pgn") -> chess.Board:
           self.state.observation = self._board
           if mode == "uci":
              :TODO
-          else:
+          elif mode == "pgn":
              print(self._board)
+          elif mode == "fen":
+             print(self._board.fen())
+          else:
+             print("INVALID MODE")
           return self._board
 
       @property
