@@ -125,7 +125,7 @@ class Chess(Environment):
                rgb = cv2.imread(png_file)
           return rgb
 
-      def render(self, mode="None") -> chess.Board:
+      def render(self, mode=None) -> chess.Board:
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
           if mode == "ascii":
