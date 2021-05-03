@@ -72,7 +72,7 @@ class Chess(Environment):
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
-          self._resigned = False
+          self._ended = False
 
       def reset(self) -> np.ndarray:
           self._board.reset_board()
@@ -80,31 +80,31 @@ class Chess(Environment):
           self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
-          self._resigned = False
+          self._ended = False
           return self.state.frame
 
       def step(self, action: Any) -> Tuple:
           if action is None:
-             self._resigned = True
+             self._ended = True
              info, self._reward, self._winner = self._resign()
           else:
              self._board.push_uci(action)
              self._num_halfmoves += 1
-             self._resigned, info, self._reward, self._winner = self._check_mate()
+             self._ended, info, self._reward, self._winner = self._check_mate()
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
-          return self.state.frame, self._reward, self._resigned, info
+          return self.state.frame, self._reward, self._ended, info
 
       def _check_mate(self) -> Tuple:
           reward, winner, resigned = 0, None, False
           result = self._board.result(claim_draw=True)
           if result != "*":
-             resigned = True
+             ended = True
              if result == "1-0":
                 winner, reward = Chess.WHITE, 1
              else:
                 winner, reward = Chess.BLACK, -1
-          return resigned, dict(winner=winner), reward, winner
+          return ended, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
           if self._board.turn == chess.WHITE:
@@ -144,7 +144,7 @@ class Chess(Environment):
 
       @property
       def ended(self) -> bool:
-          return self._resigned
+          return self._ended
  
       @property
       def reward(self) -> float:
