@@ -108,11 +108,9 @@ class Chess(Environment):
 
       def _resign(self) -> Tuple:
           if self._board.turn == chess.WHITE:
-             winner = Chess.BLACK
-             reward = -1
+             winner, reward = Chess.BLACK, -1
           else:
-             winner = Chess.WHITE
-             reward = 1
+             winner, reward = Chess.WHITE, 1
           return dict(winner=winner), reward, winner
 
       def _to_rgb(self, board: chess.Board) -> np.ndarray:
