@@ -74,7 +74,7 @@ class Chess(Environment):
           self._winner = None
           self._resigned = False
 
-      def reset(self) -> chess.Board:
+      def reset(self) -> np.ndarray:
           self._board.reset_board()
           self.state.frame = self._to_rgb(self._board)
           self.state.observation = self._board
