@@ -55,6 +55,7 @@ class Chess(Environment):
 
       def make(self) -> None:
           self._board = chess.Board()
+          self.state.observation = self._board
           self._num_halfmoves = 0
           self._winner = None
           self._resigned = False
@@ -128,3 +129,4 @@ class Chess(Environment):
 
       def close(self) -> bool:
           self._board = None
+          self.state.observation = None
