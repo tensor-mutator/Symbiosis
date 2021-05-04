@@ -15,7 +15,6 @@ __all__ = ["Tree"]
 
 @dataclass
 class Node:
-
       """
           Represents a node of the tree
       """
@@ -25,7 +24,6 @@ class Node:
 
 @dataclass
 class Edge:
-
       """
           Represents an edge of the tree
       """
