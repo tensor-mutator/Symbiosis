@@ -4,7 +4,7 @@
 Implements game tree to run Monte-Carlo Search on
 """
 
-from multiprocessing import Lock, Array
+from multiprocessing import Lock, Array, Value
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
@@ -44,6 +44,8 @@ class Tree:
           self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
           self._tree = defaultdict(lambda: Node)
+          self._shared_mem_node_edges = defaultdict(lambda: defaultdict(lambda: Array('f', 4)))
+          self._shared_mem_node_visitation_freq = defaultdict(lambda: Value('d'))
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -65,8 +67,10 @@ class Tree:
                                                                                                                                  COLOR.MAGENTA,
                                                                                                                                  self._branching_factor))
           normalizing_factor = sum(policy)+1e-08
+          actions_mem = self._shared_mem_node_edges[state]
           for action, p in zip(actions, policy):
               self._tree[state].edges[action].p = p/normalizing_factor
+              actions_mem[action][3] = p/normalizing_factor
 
       def simulate(self, state: str, action: str) -> None:
           """
@@ -75,11 +79,18 @@ class Tree:
 
           with self._lock(state):
                node = self._tree[state]
-               node.sum_n += self._virtual_loss
+               sum_n = self._shared_mem_node_visitation_freq[state].value
+               sum_n += self._virtual_loss
+               node.sum_n = sum_n
                edge = node.edges[action]
-               edge.n += self._virtual_loss
-               edge.w += -self._virtual_loss
-               edge.q = edge.w/edge.n
+               n, w, q, _ = self._shared_mem_node_edges[state][action]
+               n += self._virtual_loss
+               edge.n = n
+               w += -self._virtual_loss
+               edge.w = w
+               q = w/n
+               edge.q = q
+               self._shared_mem_node_edges[state][action][:-1] = [n, w, q]
 
       def backpropagate(self, state: str, value: float) -> None:
           """
@@ -88,8 +99,15 @@ class Tree:
 
           with self._lock(state):
                node = self._tree[state]
-               node.sum_n += -self._virtual_loss + 1
+               sum_n = self._shared_mem_node_visitation_freq[state].value
+               sum_n += -self._virtual_loss + 1
+               node.sum_n = sum_n
                edge = node.edges[action]
-               edge.n += -self._virtual_loss + 1
-               edge.w += self._virtual_loss + value
-               edge.q = edge.w/edge.n
+               n, w, q, _ = self._shared_mem_node_edges[state][action]
+               n += -self._virtual_loss + 1
+               edge.n = n
+               w += self._virtual_loss + value
+               edge.w = w
+               q = w/n
+               edge.q = q
+               self._shared_mem_node_edges[state][action][:-1] = [n, w, q]
