@@ -55,8 +55,6 @@ class Tree:
       def __contains__(self, state: str) -> bool:
           return state in self._tree.keys()
 
-      def _init_
-
       def expand(self, state: str, policy: List[float], actions: List[str]) -> None:
           """
               Expands the tree with a node
