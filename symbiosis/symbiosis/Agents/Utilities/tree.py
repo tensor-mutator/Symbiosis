@@ -44,7 +44,7 @@ class Tree:
           self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
           self._tree = defaultdict(lambda: Node)
-          self._shared_mem = defaultdict(lambda: dict(sum_n=defaultdict(lambda: Value('d')), edges=defaultdict(lambda: Array('f', 4))))
+          self._shared_mem = defaultdict(lambda: dict(sum_n=Value('d'), edges=defaultdict(lambda: Array('f', 4))))
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -54,6 +54,8 @@ class Tree:
 
       def __contains__(self, state: str) -> bool:
           return state in self._tree.keys()
+
+      def _init_
 
       def expand(self, state: str, policy: List[float], actions: List[str]) -> None:
           """
