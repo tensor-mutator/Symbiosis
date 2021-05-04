@@ -38,10 +38,9 @@ class Tree:
           Implements a game tree
       """
 
-      def __init__(self, depth: int, virtual_loss: float) -> None:
-          self._lock = defaultdict(Lock)
-          self._depth = depth
+      def __init__(self, virtual_loss: float) -> None:
           self._virtual_loss = virtual_loss
+          self._lock = defaultdict(Lock)
           self._tree = defaultdict(Node)
           self._shared_mem = defaultdict(lambda: dict(sum_n=Value('d'), edges=defaultdict(lambda: Array('f', 4))))
 
