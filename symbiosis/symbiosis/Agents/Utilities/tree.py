@@ -38,10 +38,9 @@ class Tree:
           Implements a game tree
       """
 
-      def __init__(self, depth: int, branching_factor: int, virtual_loss: float) -> None:
+      def __init__(self, depth: int, virtual_loss: float) -> None:
           self._lock = defaultdict(lambda: Lock)
           self._depth = depth
-          self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
           self._tree = defaultdict(lambda: Node)
           self._shared_mem = defaultdict(lambda: dict(sum_n=Value('d'), edges=defaultdict(lambda: Array('f', 4))))
@@ -60,11 +59,6 @@ class Tree:
               Expands the tree with a node
           """
 
-          if len(policy) > self._branching_factor:
-             raise TreeError("Number of edges attached to the node exceeds the branching factor of the tree: {}{} > {}{}".format(COLOR.RED,
-                                                                                                                                 len(policy),
-                                                                                                                                 COLOR.MAGENTA,
-                                                                                                                                 self._branching_factor))
           normalizing_factor = sum(policy)+1e-08
           actions_mem = self._shared_mem[state]["edges"]
           for action, p in zip(actions, policy):
