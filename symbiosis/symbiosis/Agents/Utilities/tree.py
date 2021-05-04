@@ -4,7 +4,7 @@
 Implements game tree to run Monte-Carlo Search on
 """
 
-from threading import Lock
+from multiprocessing import Lock, Array
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
@@ -39,11 +39,11 @@ class Tree:
       """
 
       def __init__(self, depth: int, branching_factor: int, virtual_loss: float) -> None:
-          self._lock = defaultdict(Lock)
+          self._lock = defaultdict(lambda: Lock)
           self._depth = depth
           self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
-          self._tree = defaultdict(Node)
+          self._tree = defaultdict(lambda: Node)
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
