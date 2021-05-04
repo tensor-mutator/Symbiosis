@@ -19,7 +19,7 @@ class Node:
           Represents a node of the tree
       """
 
-      edges: Dict = field(default_factory=lambda: defaultdict(lambda: Edge))
+      edges: Dict = field(default_factory=lambda: defaultdict(Edge))
       sum_n: int = 0
 
 @dataclass
@@ -39,10 +39,10 @@ class Tree:
       """
 
       def __init__(self, depth: int, virtual_loss: float) -> None:
-          self._lock = defaultdict(lambda: Lock)
+          self._lock = defaultdict(Lock)
           self._depth = depth
           self._virtual_loss = virtual_loss
-          self._tree = defaultdict(lambda: Node)
+          self._tree = defaultdict(Node)
           self._shared_mem = defaultdict(lambda: dict(sum_n=Value('d'), edges=defaultdict(lambda: Array('f', 4))))
 
       def __iter__(self) -> Iterator:
