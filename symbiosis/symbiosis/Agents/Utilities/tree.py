@@ -8,8 +8,6 @@ from multiprocessing import Lock, Array, Value
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
-from .exceptions import TreeError
-from ...colors import COLORS
 
 __all__ = ["Tree"]
 
