@@ -44,7 +44,7 @@ class Tree:
           self._branching_factor = branching_factor
           self._virtual_loss = virtual_loss
           self._tree = defaultdict(lambda: Node)
-          self._shared_mem = defaultdict(lambda: dict(n_sum=defaultdict(lambda: Value('d')), edges=defaultdict(lambda: Array('f', 4))))
+          self._shared_mem = defaultdict(lambda: dict(sum_n=defaultdict(lambda: Value('d')), edges=defaultdict(lambda: Array('f', 4))))
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -78,7 +78,7 @@ class Tree:
 
           with self._lock(state):
                node = self._tree[state]
-               sum_n = self._shared_mem[state]["n_sum"].value
+               sum_n = self._shared_mem[state]["sum_n"].value
                sum_n += self._virtual_loss
                node.sum_n = sum_n
                edge = node.edges[action]
@@ -98,7 +98,7 @@ class Tree:
 
           with self._lock(state):
                node = self._tree[state]
-               sum_n = self._shared_mem[state]["n_sum"].value
+               sum_n = self._shared_mem[state]["sum_n"].value
                sum_n += -self._virtual_loss + 1
                node.sum_n = sum_n
                edge = node.edges[action]
