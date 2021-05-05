@@ -23,7 +23,7 @@ class Node:
 @dataclass
 class Edge:
       """
-          Represents an edge of the tree
+          Represents an edge pertaining to a node of the tree
       """
 
       n: int = 0
