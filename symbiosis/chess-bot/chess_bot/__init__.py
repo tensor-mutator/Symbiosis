@@ -62,6 +62,9 @@ class ChessAction(Action):
       def move2index(self, move: str) -> int:
           return list(self._uci_labels).index(move)
 
+      def moves2indices(self, moves: List[str]) -> List[int]:
+          return list(map(lambda mov: list(self._uci_labels).index(mov), moves))
+
       @property
       def turn(self) -> IntEnum:
           if self._board.turn == chess.WHITE:
