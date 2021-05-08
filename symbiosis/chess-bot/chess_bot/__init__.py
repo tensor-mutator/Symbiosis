@@ -66,9 +66,8 @@ class Chess(Environment):
 
       class Turn(IntEnum):
 
-            NONE = 0
-            BLACK = 1
-            WHITE = 2
+            BLACK = 0
+            WHITE = 1
  
       @property
       def name(self) -> str:
@@ -78,9 +77,7 @@ class Chess(Environment):
       def turn(self) -> IntEnum:
           if self._board.turn == chess.WHITE:
              return Chess.Turn.WHITE
-          if self._board.turn == chess.BLACK:
-             return Chess.Turn.BLACK
-          return Chess.Turn.NONE
+          return Chess.Turn.BLACK
 
       def make(self) -> None:
           self._board = chess.Board()
