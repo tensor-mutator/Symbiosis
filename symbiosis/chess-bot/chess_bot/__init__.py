@@ -62,6 +62,12 @@ class ChessAction(Action):
       def move2index(self, move: str) -> int:
           return list(self._uci_labels).index(move)
 
+      @property
+      def turn(self) -> IntEnum:
+          if self._board.turn == chess.WHITE:
+             return Chess.Turn.WHITE
+          return Chess.Turn.BLACK
+
 class Chess(Environment):
 
       class Winner(IntEnum):
@@ -79,12 +85,6 @@ class Chess(Environment):
       @property
       def name(self) -> str:
           return "Chess-v0"
-
-      @property
-      def turn(self) -> IntEnum:
-          if self._board.turn == chess.WHITE:
-             return Chess.Turn.WHITE
-          return Chess.Turn.BLACK
 
       def make(self) -> None:
           self._board = chess.Board()
