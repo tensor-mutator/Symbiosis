@@ -25,8 +25,9 @@ class ChessAction(Action):
       _KNIGHT_DELTAS = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
       _TRADE_WITH = ['q', 'r', 'b', 'n']
 
-      def __init__(self) -> None:
+      def __init__(self, board: chess.Board) -> None:
           self._uci_labels = set()
+          self._board = board
 
       @property
       def labels(self) -> List[str]:
@@ -54,6 +55,12 @@ class ChessAction(Action):
       @property
       def size(self) -> int:
           return len(self._uci_labels)
+
+      def legal_moves(self) -> List[str]:
+          return list(map(lambda move: move.uci(), list(self._board.legal_moves)))
+
+      def move2index(self, move: str) -> int:
+          return list(self._uci_labels).index(move)
 
 class Chess(Environment):
 
@@ -149,16 +156,13 @@ class Chess(Environment):
              print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
           return self.state.frame
 
-      def legal_moves(self) -> List[str]:
-          return list(map(lambda move: move.uci(), list(self._board.legal_moves)))
-
       @property
       def state(self) -> State:
           return ChessState()
 
       @property
       def action(self) -> Action:
-          return ChessAction()
+          return ChessAction(self._board)
 
       @property
       def ended(self) -> bool:
