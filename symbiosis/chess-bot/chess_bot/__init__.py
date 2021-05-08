@@ -20,6 +20,11 @@ class ChessState(State):
 
 class ChessAction(Action):
 
+      class Turn(IntEnum):
+
+            BLACK = 0
+            WHITE = 1
+
       _X = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
       _Y = ['1', '2', '3', '4', '5', '6', '7', '8']
       _KNIGHT_DELTAS = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
@@ -68,8 +73,8 @@ class ChessAction(Action):
       @property
       def turn(self) -> IntEnum:
           if self._board.turn == chess.WHITE:
-             return Chess.Turn.WHITE
-          return Chess.Turn.BLACK
+             return ChessAction.Turn.WHITE
+          return ChessAction.Turn.BLACK
 
 class Chess(Environment):
 
@@ -79,11 +84,6 @@ class Chess(Environment):
             BLACK = 1
             WHITE = 2
             DRAW = 3
-
-      class Turn(IntEnum):
-
-            BLACK = 0
-            WHITE = 1
  
       @property
       def name(self) -> str:
