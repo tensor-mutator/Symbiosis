@@ -7,6 +7,8 @@ A precise implementation of Monte-Carlo Tree Search Algorithm
 from multiprocessing import Process, Lock, Queue
 from .tree import Tree
 
+__all__ = ["MCTS"]
+
 class MCTS:
 
       def __init__(self, tree: Tree, virtual_loss: float, n_procs: int) -> None:
