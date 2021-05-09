@@ -42,7 +42,7 @@ class Tree:
           self._tree = defaultdict(Node)
           self._n_procs = n_procs
 
-      def __eq__(self, other: "<Tree>") -> None:
+      def update(self, other: "<Tree>") -> None:
           self._tree = other._tree
           self._lock = other._lock
 
