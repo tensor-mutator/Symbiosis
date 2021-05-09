@@ -34,6 +34,10 @@ class Edge:
 class Tree:
       """
           Implements a game tree
+          
+          Arguments:
+                 virtual_loss (float): Virtual loss to be used during traversal for simulation
+                 n_procs (int): No of simultaneous processes this tree is going to be used with
       """
 
       def __init__(self, virtual_loss: float, n_procs: int) -> None:
