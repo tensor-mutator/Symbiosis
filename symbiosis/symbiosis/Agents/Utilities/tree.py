@@ -91,7 +91,7 @@ class Tree:
           normalizing_factor = sum(policy)+1e-08
           for action, p in zip(actions, policy):
               self._tree[state].edges[action].p = p/normalizing_factor
-          self._send_update(send_queue, data=dict(state={state: self._tree[state]}, lock=dict(state=self._lock(state))))
+          self._send_update(send_queue, data=dict(state={state: self._tree[state]}, lock=dict(state=self._lock[state])))
           lock.release()
 
       def simulate(self, state: str, action: str, send_queue: Queue, recv_queues: List[Queue]) -> None:
