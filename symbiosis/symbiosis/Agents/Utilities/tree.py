@@ -42,9 +42,9 @@ class Tree:
 
       def __init__(self, virtual_loss: float, n_procs: int) -> None:
           self._virtual_loss = virtual_loss
+          self._n_procs = n_procs
           self._lock = defaultdict(Lock)
           self._tree = defaultdict(Node)
-          self._n_procs = n_procs
 
       def update(self, other: "<Tree>") -> None:
           self._tree = other._tree
@@ -66,15 +66,14 @@ class Tree:
       def _recv_update(self, queues: List[Queue]) -> None:
           for queue in queues:
               if not queue.empty():
-                 updated_meta = queue.get()
-                 self._tree = updated_meta["tree"]
-                 self._lock = updted_meta["lock"]
+                 data = queue.get()
+                 self._tree.update(data["state"])
+                 self._lock.update(data["lock"])
                  return
 
-      def _send_update(self, queue: Queue) -> None:
-          meta = dict(tree=self._tree, lock=self._lock)
+      def _send_update(self, queue: Queue, data: Dict) -> None:
           for _ in range(self._n_procs-1):
-              queue.put(meta)
+              queue.put(data)
 
       def is_missing(self, state: str, lock: Lock, recv_queues: List[Queue]) -> bool:
           lock.acquire()
@@ -90,11 +89,9 @@ class Tree:
           """
 
           normalizing_factor = sum(policy)+1e-08
-          actions_mem = self._shared_mem[state]["edges"]
           for action, p in zip(actions, policy):
               self._tree[state].edges[action].p = p/normalizing_factor
-              actions_mem[action][3] = p/normalizing_factor
-          self._send_update(send_queue)
+          self._send_update(send_queue, data=dict(state={state: self._tree[state]}, lock=dict(state=self._lock(state))))
           lock.release()
 
       def simulate(self, state: str, action: str, send_queue: Queue, recv_queues: List[Queue]) -> None:
@@ -110,7 +107,7 @@ class Tree:
                edge.n += self._virtual_loss
                edge.w += -self._virtual_loss
                edge.q = edge.w/edge.n
-               self._send_update(send_queue)
+               self._send_update(send_queue, data=dict(state={state: node}, lock=dict()))
 
       def backpropagate(self, state: str, value: float, send_queue: Queue, recv_queues: List[Queue]) -> None:
           """
@@ -125,4 +122,4 @@ class Tree:
                edge.n += -self._virtual_loss + 1
                edge.w += self._virtual_loss + value
                edge.q = edge.w/edge.n
-               self._send_update(send_queue)
+               self._send_update(send_queue, data=dict(state={state: node, lock=dict()))
