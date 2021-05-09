@@ -42,6 +42,14 @@ class Tree:
           self._tree = defaultdict(Node)
           self._n_procs = n_procs
 
+      @property
+      def tree(self) -> Dict:
+          return self._tree
+
+      @tree.setter
+      def tree(self, tree: Dict) -> None:
+          self._tree = tree
+
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
 
