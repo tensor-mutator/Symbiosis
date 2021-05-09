@@ -76,11 +76,10 @@ class Tree:
               queue.put(meta)
 
       def is_missing(self, state: str, lock: Lock, recv_queues: List[Queue]) -> bool:
-          _lock = lock()
-          _lock.acquire()
+          lock.acquire()
           self._recv_update(recv_queues)
           if state in self._tree:
-             _lock.release()
+             lock.release()
              return False
           return True
 
@@ -89,14 +88,13 @@ class Tree:
               Expands the tree with a node
           """
 
-          _lock = lock()
           normalizing_factor = sum(policy)+1e-08
           actions_mem = self._shared_mem[state]["edges"]
           for action, p in zip(actions, policy):
               self._tree[state].edges[action].p = p/normalizing_factor
               actions_mem[action][3] = p/normalizing_factor
           self._send_update(send_queue)
-          _lock.release()
+          lock.release()
 
       def simulate(self, state: str, action: str, send_queue: Queue, recv_queues: List[Queue]) -> None:
           """
