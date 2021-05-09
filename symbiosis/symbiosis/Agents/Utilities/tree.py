@@ -42,13 +42,9 @@ class Tree:
           self._tree = defaultdict(Node)
           self._n_procs = n_procs
 
-      @property
-      def tree(self) -> Dict:
-          return self._tree
-
-      @tree.setter
-      def tree(self, tree: Dict) -> None:
-          self._tree = tree
+      def __eq__(self, other: "<Tree>") -> None:
+          self._tree = other._tree
+          self._lock = other._lock
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -61,6 +57,7 @@ class Tree:
 
       def reset(self) -> None:
           self._tree = defaultdict(Node)
+          self._lock = defaultdict(Lock)
 
       def _recv_update(self, queues: List[Queue]) -> None:
           for queue in queues:
