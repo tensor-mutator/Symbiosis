@@ -79,7 +79,7 @@ class ChessAction(Action):
 
 class Chess(Environment):
 
-      PIECES_TO_INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+      PIECES2INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
 
       class Winner(IntEnum):
 
@@ -205,7 +205,7 @@ class Chess(Environment):
               for file in range(8):
                   p = piece_pos[rank * 8 + file]
                   if p.isalpha():
-                     planes[self.PIECES_TO_INDICES[p]][rank][file] = 1
+                     planes[self.PIECES2INDICES[p]][rank][file] = 1
           return planes
 
       def render(self, mode=None) -> np.ndarray:
