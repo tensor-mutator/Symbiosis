@@ -1,7 +1,7 @@
 """
 @author: Debajyoti Raychaudhuri
 
-A precise implementation of an AlphaGoZero agent
+A precise implementation of an AlphaGo Zero agent
 """
 
 import tensorflow.compat.v1 as tf
