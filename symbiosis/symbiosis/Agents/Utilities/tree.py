@@ -68,7 +68,7 @@ class Tree:
                  updated_meta = queue.get()
                  self._tree = updated_meta["tree"]
                  self._lock = updted_meta["lock"]
-                 break
+                 return
 
       def _send_update(self, queue: Queue) -> None:
           meta = dict(tree=self._tree, lock=self._lock)
