@@ -122,4 +122,4 @@ class Tree:
                edge.n += -self._virtual_loss + 1
                edge.w += self._virtual_loss + value
                edge.q = edge.w/edge.n
-               self._send_update(send_queue, data=dict(state={state: node, lock=dict()))
+               self._send_update(send_queue, data=dict(state={state: node}, lock=dict()))
