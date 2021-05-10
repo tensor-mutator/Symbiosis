@@ -1,7 +1,7 @@
 """
 @author: Debajyoti Raychaudhuri
 
-A precise implementation of Monte-Carlo Tree Search Algorithm
+A precise implementation of Monte-Carlo Tree Search algorithm
 """
 
 from multiprocessing import Process, Lock, Queue
