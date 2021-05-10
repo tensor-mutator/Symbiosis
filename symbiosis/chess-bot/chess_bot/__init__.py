@@ -183,7 +183,7 @@ class Chess(Environment):
           en_passant_plane = np.zeros(shape=(8, 8), dtype=np.float32)
           if en_passant != '-':
              rank, file = alg_to_coordn(en_passant)
-             en_passant_plane[rank][plane] = 1
+             en_passant_plane[rank][file] = 1
           en_passant_plane = np.expand_dims(en_passant_plane, axis=0)
           fifty_move_plane = np.expand_dims(np.full((8, 8), int(fifty_move), dtype=np.float32), axis=0)
           castle_K_plane = np.expand_dims(np.full((8, 8), int('K' in castle), dtype=np.float32), axis=0)
