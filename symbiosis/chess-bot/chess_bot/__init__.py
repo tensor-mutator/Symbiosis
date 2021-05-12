@@ -91,7 +91,10 @@ class Chess(Environment):
 
       @dataclass
       class Observation:
-
+            """
+                Holds the current observation
+            """
+            
             position: str
             active: str
             castle: str
