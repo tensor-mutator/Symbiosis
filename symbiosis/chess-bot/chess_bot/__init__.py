@@ -183,7 +183,7 @@ class Chess(Environment):
 
       def _to_observation(self, board: chess.Board) -> Chess.Observation:
           obs = board.fen().rsplit(' ', 1)[0]
-          return Chess.Observation(*obs)
+          return Chess.Observation(*obs.split())
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
           fen = board.fen()
