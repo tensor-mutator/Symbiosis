@@ -48,6 +48,10 @@ class Tree:
           self._tree = other._tree
           self._lock = other._lock
 
+      @property
+      def n_procs(self) -> int:
+          return self._n_procs
+
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
 
