@@ -47,11 +47,10 @@ class MCTS:
                     float: State value
           """
 
-          env = self._env.copy()
           futures = list()
           with ThreadPoolExecutor(max_workers=self._n_threads) as executor:
                for idx in range(self._n_simulations):
-                   futures.append(executor.submit(self._search, env=env))
+                   futures.append(executor.submit(self._search, env=self._env.copy()))
           return np.max([f.result() for f in futures])
 
       def _search(self, env: Environment, root: bool = True) -> float:
