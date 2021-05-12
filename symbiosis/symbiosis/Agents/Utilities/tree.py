@@ -4,7 +4,7 @@
 Implements game tree to run Monte-Carlo Search on
 """
 
-from multiprocessing import Lock, Queue
+from threading import Lock
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
@@ -40,21 +40,8 @@ class Tree:
       """
 
       def __init__(self) -> None:
-          self._n_procs = None
           self._lock = defaultdict(Lock)
           self._tree = defaultdict(Node)
-
-      def update(self, other: "<Tree>") -> None:
-          self._tree = other._tree
-          self._lock = other._lock
-
-      @property
-      def n_procs(self) -> int:
-          return self._n_procs
-
-      @n_procs.setter
-      def n_procs(self, n_procs: int) -> int:
-          self._n_procs = n_procs
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
@@ -69,23 +56,10 @@ class Tree:
           self._tree = defaultdict(Node)
           self._lock = defaultdict(Lock)
 
-      def _recv_update(self, queues: List[Queue]) -> None:
-          for queue in queues:
-              if not queue.empty():
-                 data = queue.get()
-                 self._tree.update(data["state"])
-                 self._lock.update(data["lock"])
-                 return
-
-      def _send_update(self, queue: Queue, data: Dict) -> None:
-          for _ in range(self._n_procs-1):
-              queue.put(data)
-
-      def is_missing(self, state: str, lock: Lock, recv_queues: List[Queue]) -> bool:
-          lock.acquire()
-          self._recv_update(recv_queues)
+      def is_missing(self, state: str) -> bool:
+          self._lock[state].acquire()
           if state in self._tree:
-             lock.release()
+             self._lock[state].release()
              return False
           return True
 
@@ -97,37 +71,30 @@ class Tree:
           normalizing_factor = sum(policy)+1e-08
           for action, p in zip(actions, policy):
               self._tree[state].edges[action].p = p/normalizing_factor
-          self._send_update(send_queue, data=dict(state={state: self._tree[state]}, lock=dict(state=self._lock[state])))
-          lock.release()
+          self._lock[state].release()
 
-      def simulate(self, state: str, action: str, virtual_loss: float,
-                   send_queue: Queue, recv_queues: List[Queue]) -> None:
+      def simulate(self, state: str, action: str, virtual_loss: float) -> None:
           """
               Traverses a node while applying virtual loss
           """
 
           with self._lock(state):
-               self._recv_update(recv_queues)
                node = self._tree[state]
                node.sum_n += virtual_loss
                edge = node.edges[action]
                edge.n += virtual_loss
                edge.w += -virtual_loss
                edge.q = edge.w/edge.n
-               self._send_update(send_queue, data=dict(state={state: node}, lock=dict()))
 
-      def backpropagate(self, state: str, value: float, virtual_loss: float,
-                        send_queue: Queue, recv_queues: List[Queue]) -> None:
+      def backpropagate(self, state: str, action: str, value: float, virtual_loss: float) -> None:
           """
               Updates the visitation frequency and the action value of a node
           """
 
           with self._lock(state):
-               self._recv_update(recv_queues)
                node = self._tree[state]
                node.sum_n += -virtual_loss + 1
                edge = node.edges[action]
                edge.n += -virtual_loss + 1
                edge.w += virtual_loss + value
                edge.q = edge.w/edge.n
-               self._send_update(send_queue, data=dict(state={state: node}, lock=dict()))
