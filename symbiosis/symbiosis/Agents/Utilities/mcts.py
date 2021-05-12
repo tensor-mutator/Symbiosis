@@ -34,10 +34,6 @@ class MCTS:
                self._network = model()
           return session
 
-      def _predict_p_and_v(self, env: Environment) -> Tuple:
-          return self._session.run([self._network.policy, self._network.value],
-                                   feed_dict={self._network.state: env.state.canonical})
-
       def search(self) -> float:
           """
               Arguments:
@@ -55,3 +51,6 @@ class MCTS:
 
       def _search(self, env: Environment, root: bool = True) -> float:
           
+      def _predict_p_and_v(self, env: Environment) -> Tuple:
+          return self._session.run([self._network.policy, self._network.value],
+                                   feed_dict={self._network.state: env.state.canonical})
