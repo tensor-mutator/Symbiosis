@@ -5,6 +5,7 @@ from typing import Tuple, Sequence, Any, List, Dict
 import numpy as np
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
+from dataclasses import dataclass
 import numpy as np
 import cv2
 import os
@@ -87,7 +88,16 @@ class Chess(Environment):
             BLACK: int = 1
             WHITE: int = 2
             DRAW: int = 3
- 
+
+      @dataclass
+      class Observation:
+
+            position: str
+            active: str
+            castle: str
+            en_passant: str
+            fifty_move: str
+
       @property
       def name(self) -> str:
           return "Chess-v0"
@@ -95,7 +105,8 @@ class Chess(Environment):
       def make(self) -> None:
           self._board = chess.Board()
           self.state.frame = self._to_rgb(self._board)
-          self.state.observation = self._to_canonical(self._board)
+          self.state.canonical = self._to_canonical(self._board)
+          self.state.observation = self._to_observation(self._board)
           self._num_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
@@ -103,7 +114,8 @@ class Chess(Environment):
       def reset(self) -> np.ndarray:
           self._board.reset_board()
           self.state.frame = self._to_rgb(self._board)
-          self.state.observation = self._to_canonical(self._board)
+          self.state.canonical = self._to_canonical(self._board)
+          self.state.observation = self._to_observation(self._board)
           self._num_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
@@ -118,7 +130,8 @@ class Chess(Environment):
              self._num_halfmoves += 1
              self._ended, info, self._reward, self._winner = self._check_ended()
           self.state.frame = self._to_rgb(self._board)
-          self.state.observation = self._to_canonical(self._board)
+          self.state.canonical = self._to_canonical(self._board)
+          self.state.observation = self._to_observation(self._board)
           return self.state.frame, self._reward, self._ended, info
 
       def _check_ended(self) -> Tuple:
@@ -152,6 +165,10 @@ class Chess(Environment):
                renderPM.drawToFile(drawing, png_file, fmt="PNG")
                rgb = cv2.imread(png_file)
           return rgb
+
+      def _to_observation(self, board: chess.Board) -> Chess.Observation:
+          obs = board.fen().rsplit(' ', 1)[0]
+          return Chess.Observation(*obs)
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
           fen = board.fen()
@@ -210,7 +227,8 @@ class Chess(Environment):
 
       def render(self, mode=None) -> np.ndarray:
           self.state.frame = self._to_rgb(self._board)
-          self.state.observation = self._board
+          self.state.canonical = self._to_canonical(self._board)
+          self.state.observation = self._to_observation(self._board)
           if mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           if mode == "fen":
@@ -239,6 +257,7 @@ class Chess(Environment):
 
       def close(self) -> bool:
           self._board = None
+          self.state.canonical = None
           self.state.observation = None
           self.state.frame = None
           self._num_halfmoves = 0
