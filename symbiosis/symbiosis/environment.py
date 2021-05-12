@@ -1,6 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any, Sequence, Dict, Tuple
 import numpy as np
+from inspect import stack
 
 __all__ = ["Environment", "State", "Action"]
 
@@ -9,9 +10,10 @@ class Singleton:
       _singleton: Dict = dict()
 
       def __new__(cls, *args, **kwargs) -> "<Singleton inst>":
-          if Singleton._singleton.get(cls, None) is None:
-             Singleton._singleton[cls] = super(Singleton, cls).__new__(cls, *args, **kwargs)
-          return Singleton._singleton[cls]
+          owner = stack()[1][0].f_locals.get("self")
+          if Singleton._singleton.get(owner, None) is None:
+             Singleton._singleton[owner] = super(Singleton, cls).__new__(cls, *args, **kwargs)
+          return Singleton._singleton[owner]
 
 class State(Singleton, metaclass=ABCMeta):
 
