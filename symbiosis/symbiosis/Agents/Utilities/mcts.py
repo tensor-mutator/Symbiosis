@@ -4,7 +4,8 @@
 A precise implementation of Monte-Carlo Tree Search algorithm
 """
 
-from multiprocessing import Process, Lock, Queue
+from multiprocessing import Lock, Queue
+from concurrent.futures import ProcessPoolExecutor
 from dataclasses import dataclass
 from typing import List, Tuple, Any
 import tensorflow.compat.v1 as tf
@@ -17,11 +18,12 @@ __all__ = ["MCTS"]
 class MCTS:
 
       def __init__(self, env: Environment, tree: Tree, virtual_loss: float, n_procs: int,
-                   model: NetworkBaseAGZ) -> None:
-          self._env = env.copy()
+                   n_simulations: int, model: NetworkBaseAGZ) -> None:
+          self._env = env
           self._tree = tree
           self._virtual_loss = virtual_loss
           self._n_procs = n_procs
+          self._n_simulations = n_simulations
           self._tree.n_procs = n_procs
           self._network = None
           self._session = self._build_computation_graph(model)
@@ -38,7 +40,7 @@ class MCTS:
           return self._session.run([self._network.policy, self._network.value],
                                    feed_dict={self._network.state: canonical_state})
 
-      def search(self, state: str) -> float:
+      def search(self) -> float:
           """
               Arguments:
                     state (str): The canonical observation
@@ -47,18 +49,20 @@ class MCTS:
                     float: State value
           """
 
+          env = self._env.copy()
           lock = Lock()
           send_queues = [Queue() for _ in range(self._n_procs)]
           recv_queues = [send_queues]*self._n_procs
           recv_queues_all = list(map(lambda queues, send_queue: queues.remove(send_queue), recv_queues,
                                      send_queues))
-          procs = list()
-          for send_queue, recv_queues in zip(send_queues, recv_queues_all):
-              p = Process(target=self._search, args=(state, send_queue, recv_queues,))
-              procs.append(p)
-          for p in procs:
-              p.join()
+          futures = list()
+          with ProcessPoolExecutor(max_workers=self._n_procs) as executor:
+               for idx in range(self._n_simulations):
+                   futures.append(executor.submit(self._search, env=env, send_queue=send_queues[idx],
+                                                  recv_queues=recv_queues_all[idx], tree=self._tree))
+                   self._tree.update(tree)
 
-      def _search(self, state: dataclass, send_queue: Queue, recv_queues: List[Queue], root: bool = True) -> float:
-          
-      
+      def _search(self, env: Environment, send_queue: Queue, recv_queues: List[Queue], tree: Tree,
+                  root: bool = True) -> float:
+          value = self._simulate(state, send_queue, recv_queues, root)
+          return value, self._tree
