@@ -114,6 +114,18 @@ class Chess(Environment):
           self._winner = Chess.Winner.NONE
           self._ended = False
 
+      def _copy_vars(self, other: Chess) -> Chess:
+          variables = vars(self)
+          other.__dict__.update(variables)
+          return other
+
+      def copy(self) -> Chess:
+          env = Chess()
+          env.make()
+          env = self._copy_vars(env)
+          env._board = self._board.copy()
+          return env
+
       def reset(self) -> np.ndarray:
           self._board.reset_board()
           self.state.frame = self._to_rgb(self._board)
