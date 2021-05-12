@@ -39,8 +39,8 @@ class Tree:
                  n_procs (int): No of simultaneous processes this tree is going to be used with
       """
 
-      def __init__(self, n_procs: int) -> None:
-          self._n_procs = n_procs
+      def __init__(self) -> None:
+          self._n_procs = None
           self._lock = defaultdict(Lock)
           self._tree = defaultdict(Node)
 
@@ -51,6 +51,10 @@ class Tree:
       @property
       def n_procs(self) -> int:
           return self._n_procs
+
+      @n_procs.setter
+      def n_procs(self, n_procs: int) -> int:
+          self._n_procs = n_procs
 
       def __iter__(self) -> Iterator:
           return list(self._tree.keys())
