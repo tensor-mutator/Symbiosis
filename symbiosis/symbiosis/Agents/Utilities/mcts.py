@@ -27,7 +27,7 @@ class MCTS:
           self._network = None
           self._session = self._build_computation_graph(model)
           self._noise_eps = hyperparams.get("noise_eps", 0.25)
-          self._c_puct = hyperparams.get("c_puct". 1.5)
+          self._c_puct = hyperparams.get("c_puct", 1.5)
           self._dirichlet_alpha = hyperparams.get("dirichlet_alpha", 0.3)
 
       def _build_computation_graph(self, model: NetworkBaseAGZ) -> tf.Session:
