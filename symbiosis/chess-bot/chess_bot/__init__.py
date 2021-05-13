@@ -22,11 +22,6 @@ class ChessState(State):
 
 class ChessAction(Action):
 
-      class Turn(IntEnum):
-
-            BLACK: int = 0
-            WHITE: int = 1
-
       _FILES: List = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']
       _RANKS: List = ['1', '2', '3', '4', '5', '6', '7', '8']
       _KNIGHT_DELTAS: List = [(2, 1), (2, -1), (-2, 1), (-2, -1), (1, 2), (-1, 2), (1, -2), (-1, -2)]
@@ -96,12 +91,17 @@ class ChessAction(Action):
       @property
       def turn(self) -> IntEnum:
           if self._board.turn == chess.WHITE:
-             return ChessAction.Turn.WHITE
-          return ChessAction.Turn.BLACK
+             return Chess.Turn.WHITE
+          return Chess.Turn.BLACK
 
 class Chess(Environment):
 
       PIECES2INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+
+      class Turn(IntEnum):
+
+            BLACK: int = 0
+            WHITE: int = 1
 
       class Winner(IntEnum):
 
