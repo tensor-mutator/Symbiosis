@@ -34,9 +34,6 @@ class Edge:
 class Tree:
       """
           Implements a game tree
-          
-          Arguments:
-                 n_procs (int): No of simultaneous processes this tree is going to be used with
       """
 
       def __init__(self) -> None:
