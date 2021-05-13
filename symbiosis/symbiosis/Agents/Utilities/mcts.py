@@ -50,7 +50,27 @@ class MCTS:
           return np.max([f.result() for f in futures])
 
       def _search(self, env: Environment, root: bool = True) -> float:
+          if env.ended:
+             if env.winner == env.Winner.DRAW:
+                return 0
+             return -1
+          obs = env.state.observation
+          if self._tree.is_missing(obs):
+             p, v = self._get_p_v(env)
+             policy = p[env.action.moves2indices(env.action.legal_moves)]
+             self._tree.expand(obs, policy, env.action.legal_moves)
+             return v
+          action = self._choose_q_and_u(obs, root)
+          self._tree.simulate(obs, action, self._virtual_loss)
+          env.step(action)
+          value = self._search(env, root=False)
+          self._tree.backpropagate(obs, action, -value, self._virtual_loss)
+          return -value
+
+      def _choose_q_and_u(self, state: str, root: bool = True) -> str:
           
-      def _predict_p_and_v(self, env: Environment) -> Tuple:
-          return self._session.run([self._network.policy, self._network.value],
+    
+      def _get_p_v(self, env: Environment) -> Tuple:
+          p, v = self._session.run([self._network.policy, self._network.value],
                                    feed_dict={self._network.state: env.state.canonical})
+          return env.predict(p, v)
