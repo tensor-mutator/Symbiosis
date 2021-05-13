@@ -1,7 +1,7 @@
 from symbiosis import Environment, State, Action, config
 from symbiosis.Agents import AGZ
 from symbiosis.colors import COLORS
-from typing import Tuple, Sequence, Any, List, Dict, Callable
+from typing import Tuple, Sequence, Any, List, Dict
 import numpy as np
 from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
@@ -290,12 +290,10 @@ class Chess(Environment):
       def winner(self) -> int:
           return self._winner
 
-      def predict(self) -> Callable:
-          def _predict(p: np.ndarray, v: float) -> Tuple[np.ndarray, float]:
-              if self.action.turn == Chess.Turn.BLACK:
-                 p = p[self.action.flipped2unflipped()]
-              return p, v   
-          return _predict
+      def predict(self, p: np.ndarray, v: float) -> Tuple[np.ndarray, float]:
+          if self.action.turn == Chess.Turn.BLACK:
+             p = p[self.action.flipped2unflipped()]
+          return p, v
 
       def close(self) -> bool:
           self._board = None
