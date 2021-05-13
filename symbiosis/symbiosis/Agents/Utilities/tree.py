@@ -63,7 +63,7 @@ class Tree:
              return False
           return True
 
-      def expand(self, state: str, policy: List[float], actions: List[str], lock: Lock, send_queue: Queue) -> None:
+      def expand(self, state: str, policy: List[float], actions: List[str]) -> None:
           """
               Expands the tree with a node
           """
