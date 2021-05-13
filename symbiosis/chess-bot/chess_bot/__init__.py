@@ -72,6 +72,7 @@ class ChessAction(Action):
       def size(self) -> int:
           return len(self._uci_labels)
 
+      @property
       def legal_moves(self) -> List[str]:
           return list(map(lambda move: move.uci(), list(self._board.legal_moves)))
 
