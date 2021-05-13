@@ -37,12 +37,15 @@ class ChessAction(Action):
           self._uci_labels_flipped = set()
           self._board = board
 
-      def _flip_labels(self, labels: List[str]) -> None:
+      def _flip_labels(self, labels: Any) -> None:
           def flip(move: str) -> str:
               return "".join([9-int(alg) if alg.isdigit() else alg for alg in move])
           flipped_labels = set()
-          for l in labels:
-              flipped_labels.add(flip(l))
+          if isinstance(labels, list):
+             for l in labels:
+                 flipped_labels.add(flip(l))
+          else:
+             flipped_labels.add(flip(labels))
           return flipped_labels
 
       @property
@@ -83,10 +86,12 @@ class ChessAction(Action):
       def moves2indices(self, moves: List[str]) -> List[int]:
           return list(map(lambda mov: list(self._uci_labels).index(mov), moves))
 
-      def flipped2unflipped(self, moves: Any = "all") -> List[int]:
+      def flipped2unflipped(self, moves: Any = "all") -> Any:
           if moves == "all":
              return self.moves2indices(list(self._uci_labels_flipped))
-          return self.moves2indices(list(self._flip_labels(list(moves))))
+          if isinstance(moves, list):
+             return self.moves2indices(list(self._flip_labels(list(moves))))
+          return self.move2index(list(self._flip_labels(moves))[0])
 
       @property
       def turn(self) -> IntEnum:
