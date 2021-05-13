@@ -34,7 +34,16 @@ class ChessAction(Action):
 
       def __init__(self, board: chess.Board) -> None:
           self._uci_labels = set()
+          self._uci_labels_flipped = set()
           self._board = board
+
+      def _flip_labels(self, labels: List[str]) -> None:
+          def flip(move: str) -> str:
+              return "".join([9-int(alg) if alg.isdigit() else alg for alg in move])
+          flipped_labels = set()
+          for l in labels:
+              flipped_labels.add(flip(l))
+          return flipped_labels
 
       @property
       def labels(self) -> List[str]:
@@ -57,6 +66,8 @@ class ChessAction(Action):
                   if x < 7:
                      promotion_moves.extend([self._FILES[file]+'7'+self._FILES[file+1]+'8'+p, self._FILES[file]+'2'+self._FILES[file+1]+'1'+p])
               self._uci_labels.update(set(promotion_moves))
+          flipped_labels = self._flip_labels(list(self._uci_labels))
+          self._uci_labels_flipped.update(flipped_labels)
           return list(self._uci_labels)
 
       @property
@@ -71,6 +82,11 @@ class ChessAction(Action):
 
       def moves2indices(self, moves: List[str]) -> List[int]:
           return list(map(lambda mov: list(self._uci_labels).index(mov), moves))
+
+      def flipped2unflipped(self, moves: Any = "all") -> List[int]:
+          if moves == "all":
+             return self.moves2indices(list(self._uci_labels_flipped))
+          return self.moves2indices(list(self._flip_labels(list(moves))))
 
       @property
       def turn(self) -> IntEnum:
