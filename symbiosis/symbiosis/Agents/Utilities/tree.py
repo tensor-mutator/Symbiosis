@@ -47,7 +47,7 @@ class Tree:
           return list(self._tree.keys())
 
       def __getitem__(self, state: str) -> List[Edge]:
-          return self._tree[state].edges
+          return self._tree[state]
 
       def __contains__(self, state: str) -> bool:
           return state in self._tree.keys()
