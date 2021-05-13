@@ -39,9 +39,6 @@ class MCTS:
 
       def search(self) -> float:
           """
-              Arguments:
-                    state (str): The canonical observation
-          
               Returns:
                     float: State value
           """
