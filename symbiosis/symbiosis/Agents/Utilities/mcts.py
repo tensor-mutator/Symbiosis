@@ -78,7 +78,7 @@ class MCTS:
               p_ = stat.p
               if root:
                  p_ = (1 - self._noise_eps) * p_ + self._noise_eps * noise[x]
-              q_plus_u = stat.q + self._c_puct * p_ * xx_ / (1 + stat.n)
+              q_plus_u = stat.q + self._c_puct * p_ * (xx_ / (1 + stat.n))
               q_plus_us.append(q_plus_u)
           return actions[np.argmax(q_plus_us)]
 
