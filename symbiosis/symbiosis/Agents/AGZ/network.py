@@ -7,7 +7,7 @@ from ..Utilities import NetBlocks
 
 class AGZChessNet(NetworkBaseAGZ):
 
-      type: str = "AGZ"
+      type: str = "AGZChess"
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> None:
           self._state = NetBlocks.placeholder(state_shape)
