@@ -11,8 +11,8 @@ class AGZChessNet(NetworkBaseAGZ):
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> None:
           self._state = NetBlocks.placeholder(state_shape)
-          p_predicted, self._v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(self._state)
-          logits =  NetBlocks.layers.Dense(units=action_size, kernel_regularizer=regularizers.l2(1e-4))(p_predicted)
+          p_out, self._v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(self._state)
+          logits =  NetBlocks.layers.Dense(units=action_size, kernel_regularizer=regularizers.l2(1e-4))(p_out)
           self._p_predicted = layers.Activation("softmax")(logits)
           self._grad = self._build_training_ops(action_size, logits, **params)
 
