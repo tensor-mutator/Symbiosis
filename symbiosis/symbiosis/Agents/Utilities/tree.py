@@ -8,6 +8,7 @@ from threading import Lock
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
+import json
 
 __all__ = ["Tree"]
 
@@ -48,6 +49,9 @@ class Tree:
 
       def __contains__(self, state: str) -> bool:
           return state in self._tree.keys()
+
+      def __repr__(self) -> str:
+          return json.dumps(self._tree)
 
       def reset(self) -> None:
           self._tree = defaultdict(Node)
