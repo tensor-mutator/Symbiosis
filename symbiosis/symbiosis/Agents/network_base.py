@@ -48,3 +48,38 @@ class NetworkBaseDQN(metaclass=NetworkMeta):
       def loss(self) -> tf.Tensor:
           return self._loss
 
+class NetworkBaseAGZ(metaclass=NetworkMeta):
+
+      type: str = "AGZ"
+
+      @property
+      def state(self) -> tf.Tensor:
+          return self._state
+
+      @property
+      def v_predicted(self) -> tf.Tensor:
+          return self._v_predicted
+
+      @property
+      def v_target(self) -> tf.Tensor:
+          return self._v_target
+
+      @property
+      def p_predicted(self) -> tf.Tensor:
+          return self._v_predicted
+
+      @property
+      def p_target(self) -> tf.Tensor:
+          return self._v_target
+
+      @property
+      def learning_rate(self) -> float:
+          return self._learning_rate
+
+      @property
+      def grad(self) -> tf.Tensor:
+          return self._grad
+
+      @property
+      def loss(self) -> tf.Tensor:
+          return self._loss
