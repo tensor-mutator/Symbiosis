@@ -8,7 +8,9 @@ from threading import Lock
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
+from io import FileIO
 import json
+import dill
 
 __all__ = ["Tree"]
 
@@ -99,3 +101,9 @@ class Tree:
                edge.n += -virtual_loss + 1
                edge.w += virtual_loss + value
                edge.q = edge.w/edge.n
+
+      def save(self, io: FileIO) -> None:
+          dill.dump(self._tree, io, protocol=dill.HIGHEST_PROTOCOL)
+
+      def load(self, io: FileIO) -> None:
+          self._tree = dill.load(io)
