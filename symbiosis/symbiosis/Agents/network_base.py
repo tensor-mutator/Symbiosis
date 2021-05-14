@@ -66,11 +66,11 @@ class NetworkBaseAGZ(metaclass=NetworkMeta):
 
       @property
       def p_predicted(self) -> tf.Tensor:
-          return self._v_predicted
+          return self._p_predicted
 
       @property
       def p_target(self) -> tf.Tensor:
-          return self._v_target
+          return self._p_target
 
       @property
       def learning_rate(self) -> float:
