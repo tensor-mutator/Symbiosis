@@ -22,7 +22,7 @@ class AGZChessNet(NetworkBaseAGZ):
           self._learning_rate = NetBlocks.placeholder(shape="scalar")
           policy_error = tf.losses.softmax_cross_entropy(onehot_labels=self._p_target, logits=logits, weights=params.get("policy_weights", 1.25))
           value_error = tf.losses.mean_squared_error(labels=self._v_target, predictions=self._v_predicted, weights=params.get("value_weights", 1.0))
-          self._loss = policy_error + value_error
+          self._loss = policy_error+value_error
           optimizer = tf.train.AdamOptimizer(learning_rate=self._learning_rate)
           if params.get("gradient_clip_norm") is not None:
              gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
