@@ -1,21 +1,19 @@
 import numpy as np
 
-__all__ = ["Progress"]
+__all__ = ["Progress", "ProgressDQN"]
 
 class Progress:
 
-      def __init__(self, n_steps: int, train_interval: int, observe: int = 0, 
-                   explore: float = np.inf) -> None:
-          self._n_train_steps = (n_steps-observe)//train_interval
+      def __init__(self, n_steps: int, train_interval: int, explore: float = np.inf) -> None:
+          self._n_train_steps = n_steps//train_interval
           self._train_interval = train_interval
-          self._observe = observe
           self._explore = explore
           self._clock = 0
           self._train = False
           self._explore_clock = 0
           self._training_clock = 0
           self._episodic_clock = 0
-          self._episode = 0
+          self._episode = 0      
 
       @property
       def training_steps(self) -> int:
@@ -56,14 +54,38 @@ class Progress:
       @epi_clock.setter
       def epi_clock(self, epi_clock: int) -> None:
           self._episodic_clock = epi_clock
-      
-      @property
-      def observe(self) -> int:
-          return self._observe
 
       @property
       def explore(self) -> int:
           return self._explore
+
+      def reset(self) -> None:
+          self._clock = 0
+          self._episodic_clock = 0
+          self._episode = 0
+
+      def bump(self) -> None:
+          self._clock += 1
+          self._episodic_clock += 1
+          self._explore_clock = np.clip(self._clock, 0, self._explore)
+          self._training_clock = np.clip(self._clock//self._train_interval, 0, self._n_train_steps)
+          self._train = True if self._clock%self._train_interval == 0 else False
+
+      def bump_episode(self) -> None:
+          self._episode += 1
+          self._episodic_clock = 0
+
+class ProgressDQN(Progress):
+
+      def __init__(self, n_steps: int, train_interval: int, observe: int = 0, 
+                   explore: float = np.inf) -> None:
+          super().__init__(n_steps, train_interval, explore)
+          self._n_train_steps = (n_steps-observe)//train_interval
+          self._observe = observe
+      
+      @property
+      def observe(self) -> int:
+          return self._observe
 
       def bump(self) -> None:
           self._clock += 1
@@ -73,11 +95,3 @@ class Progress:
           if self._clock > self._observe:
              self._train = True if (self._clock-self._observe)%self._train_interval == 0 else False
 
-      def bump_episode(self) -> None:
-          self._episode += 1
-          self._episodic_clock = 0
-
-      def reset(self) -> None:
-          self._clock = 0
-          self._episodic_clock = 0
-          self._episode = 0
