@@ -95,10 +95,6 @@ class ChessAction(Action):
              return Chess.Turn.WHITE
           return Chess.Turn.BLACK
 
-      @property
-      def halfmove_clock(self) -> int:
-          return self._board.halfmove_clock
-
 class Chess(Environment):
 
       PIECES2INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
@@ -136,7 +132,7 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
           self.state.observation = self._to_observation(self._board)
-          self._num_halfmoves = 0
+          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
 
@@ -157,7 +153,7 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
           self.state.observation = self._to_observation(self._board)
-          self._num_halfmoves = 0
+          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
           return self.state.frame
@@ -168,7 +164,7 @@ class Chess(Environment):
              info, self._reward, self._winner = self._resign()
           else:
              self._board.push_uci(action)
-             self._num_halfmoves += 1
+             self._n_halfmoves += 1
              self._ended, info, self._reward, self._winner = self._check_ended()
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
@@ -300,10 +296,14 @@ class Chess(Environment):
              p = p[self.action.flipped2unflipped()]
           return p, v
 
+      @property
+      def n_halfmoves(self) -> int:
+          return self._n_halfmoves
+
       def close(self) -> bool:
           self._board = None
           self.state.canonical = None
           self.state.observation = None
           self.state.frame = None
-          self._num_halfmoves = 0
+          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
