@@ -110,11 +110,24 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._save()
 
       @contextmanager
-      def _run_context(self) -> Generator:
+      def _episode_context_mcts(self, env: Environment, progress: Progress) -> Generator:
+          env.reset()
+          image = env.render()
+          _, path = self.state(image)
+          yield env.state.frame, path
+          if self.config & config.SAVE_FLOW:
+             self._flow_skip_buffer.clear()
+          progress.bump_episode()
+          if self.progress.episode%self.checkpoint_interval==0:
+             self._save()
+
+      @contextmanager
+      def _run_context(self, reward_manager: bool = True) -> Generator:
           self._check_hyperparams()
           self._save_hyperparams()
           self._create_handler()
-          self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self.writer)
+          if reward_manager:
+             self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self.writer)
           self._initiate_inventories()
           self._load()
           self._set_checkpoint_interval()
@@ -125,6 +138,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           self._save_all_frames()
           if self.writer:
              self.writer.close()
+
+      def _suite_dqn(self) -> None:
+          with self._run_context():
+               with suppress(Exception):
+                    while self.progress.clock < self.total_steps:
+                          self._episode_suite_dqn()
 
       def _episode_suite_dqn(self) -> None:
           with self._episode_context(self.env, self.progress, self._reward_manager) as [x_t, frame_t, s_t, path_t]:
@@ -144,6 +163,25 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                            self.update_target()
                      self.progress.bump()
 
+      def _suite_agz(self) -> None:
+          with self._run_context(reward_manager=False):
+               with suppress(Exception):
+                    while self.progress.clock < self.total_steps:
+                          self._episode_suite_agz()
+
+      def _episode_suite_agz(self) -> None:
+          with self._episode_context_mcts(self.env, self.progress) as [frame_t, path_t]:
+               while not self.env.ended and self.progress.clock < self.total_steps:
+                     a_t = self.action(self.env)
+                     _, r_t, _, _ = self.env.step(a_t)
+                     _, path_t1 = self.state(x_t1, s_t)
+                     frame_t1 = self.env.state.frame
+                     self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
+                     frame_t, path_t = frame_t1, path_t1
+                     if self.progress.train:
+                        self.train()
+                     self.progress.bump()
+
       @AgentDecorators.register_handler(UNIX_SIGNALS)
       def _create_handler(self, signal_id: int = None, frame: Any = None):
           raise AgentInterrupt("Agent interrupted")
@@ -151,10 +189,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
       def _run(self, suite: Callable) -> None:
           if not suite:
              raise MissingSuiteError("Matching suite not found for class: {}".format(self.__class__.__name__))
-          with self._run_context():
-               with suppress(Exception):
-                    while self.progress.clock < self.total_steps:
-                          suite()
+          suite()
 
       def _summary_writer(self) -> tf.summary.FileWriter:
           if self.config & config.REWARD_EVENT+config.LOSS_EVENT+config.EPSILON_EVENT+config.BETA_EVENT+config.LR_EVENT:
