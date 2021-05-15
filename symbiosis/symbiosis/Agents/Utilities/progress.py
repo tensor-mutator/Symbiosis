@@ -1,8 +1,8 @@
-import numpy as np
+import numpy as np,
 
 __all__ = ["Progress", "ProgressDQN"]
 
-class Progress:
+class _Progress:
 
       def __init__(self, n_steps: int, train_interval: int, explore: float = np.inf) -> None:
           self._n_train_steps = n_steps//train_interval
@@ -75,7 +75,7 @@ class Progress:
           self._episode += 1
           self._episodic_clock = 0
 
-class ProgressDQN(Progress):
+class ProgressDQN(_Progress):
 
       def __init__(self, n_steps: int, train_interval: int, observe: int = 0, 
                    explore: float = np.inf) -> None:
@@ -95,3 +95,6 @@ class ProgressDQN(Progress):
           if self._clock > self._observe:
              self._train = True if (self._clock-self._observe)%self._train_interval == 0 else False
 
+class Progress:
+
+      DQN: _Progress = ProgressDQN
