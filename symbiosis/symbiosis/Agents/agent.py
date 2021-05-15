@@ -13,7 +13,7 @@ from collections import deque
 from .flow_base import Flow
 from .network_base import NetworkMeta
 from .DQN.replay import ExperienceReplay
-from .Utilities import Progress, RewardManager, Inventory
+from .Utilities import Progress, ProgressDQN, RewardManager, Inventory
 from .Utilities.exceptions import *
 from ..colors import COLORS
 from ..environment import Environment
@@ -301,12 +301,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._reward_manager.save(self.workspace, self.alias, self._session)
              self.save()
 
-      def load_progress(self) -> Progress:
+      def load_progress(self, progress: Progress) -> Progress:
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
                                                                                  "{}.progress".format(self.alias))):
              with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
-          return Progress(self.total_steps, self.training_interval, self.observe, self.explore)
+          return progress(self.total_steps, self.training_interval, self.observe, self.explore)
 
       def _save_hyperparams(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
