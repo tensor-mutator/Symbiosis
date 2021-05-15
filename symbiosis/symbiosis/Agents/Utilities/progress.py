@@ -97,6 +97,6 @@ class ProgressDQN(_Progress):
 
 class Progress:
 
-      Base: _Progress = _Progress
+      BASE: _Progress = _Progress
       DQN: _Progress = ProgressDQN
       AGZ: _Progress = _Progress
