@@ -95,6 +95,10 @@ class ChessAction(Action):
              return Chess.Turn.WHITE
           return Chess.Turn.BLACK
 
+      @property
+      def halfmove_clock(self) -> int:
+          return self._board.halfmove_clock
+
 class Chess(Environment):
 
       PIECES2INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
