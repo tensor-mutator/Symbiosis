@@ -5,7 +5,7 @@ from .exceptions import *
 from .event_writer import EventWriter
 from ...config import config
 
-__all__ = ["LRScheduler", "BetaScheduler", "EpsilonScheduler"]
+__all__ = ["LRScheduler", "BetaScheduler", "EpsilonScheduler", "TauScheduler"]
 
 class RegisterSchemes:
 
