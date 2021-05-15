@@ -207,7 +207,7 @@ class DDQN(Agent):
       def load(self) -> None:
           self._replay.load(self.workspace, self._alias)
 
-      @Agent.register("episode_suite_dqn")
+      @Agent.register("suite_dqn")
       def run(self) -> None:
           ...
 
