@@ -132,3 +132,25 @@ class EpsilonScheduler(EventWriter, Scheduler):
       @EventWriter.registerwriter
       def epsilon(self) -> float:
           return max(self._final_epsilon, self._epsilon - (self._epsilon-self._final_epsilon)*(1-self.value(self._p)))
+
+@Scheduler.register(["constant", "linear", "exponential"])
+class TauScheduler(EventWriter, Scheduler):
+
+      def __init__(self, scheme: str, tau_range: Tuple[float, float], progress: Progress, config_: config,
+                   writer: tf.summary.FileWriter) -> None:
+          self._tau, self._final_tau = tau_range
+          self._progress = progress
+          self._scheme = scheme
+          if scheme == "exponential":
+             self.value = lambda p: self.value(p, decay_factor=1-tau_range[1])
+          self._set_writer("Hyperparams Schedule/Steps - Tau", config_ & config.TAU_EVENT,
+                           writer, progress, "clock")
+
+      @property
+      def _p(self) -> float:
+          return self._progress.explore_clock/self._progress.explore
+
+      @property
+      @EventWriter.registerwriter
+      def epsilon(self) -> float:
+          return max(self._final_tau, self._tau - (self._tau-self._final_tau)*(1-self.value(self._p)))
