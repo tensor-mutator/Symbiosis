@@ -6,6 +6,7 @@ A precise implementation of an AlphaGo Zero agent
 
 import tensorflow.compat.v1 as tf
 from typing import Dict
+from collections import deque
 from .network import AGZChessNet
 from ..agent import Agent
 from ..flow_base import Flow
@@ -22,10 +23,10 @@ class AGZ(Agent):
           self._env = env
           self._config = config
           self._flow = flow
-          self._alias = self._define_alias(network.type, hyperparams)
+          self._alias = network.type
           self._progress = self.load_progress()
-          self._alias = "AGZ"
           self._mcts = self._initiate_tree(network, hyperparams)
+          self._self_play_buffer = deque()
 
       def _initiate_tree(self, network: NetworkBaseAGZ, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
