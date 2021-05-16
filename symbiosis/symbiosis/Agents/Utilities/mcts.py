@@ -18,23 +18,23 @@ __all__ = ["MCTS"]
 class MCTS:
 
       def __init__(self, env: Environment, tree: Tree, virtual_loss: float, n_threads: int,
-                   n_simulations: int, model: NetworkBaseAGZ, **params) -> None:
+                   n_simulations: int, network: NetworkBaseAGZ, **params) -> None:
           self._env = env
           self._tree = tree
           self._virtual_loss = virtual_loss
           self._n_threads = n_threads
           self._n_simulations = n_simulations
           self._network = None
-          self._session = self._build_computation_graph(model)
+          self._session = self._build_computation_graph(network)
           self._noise_eps = params.get("noise_eps", 0.25)
           self._c_puct = params.get("c_puct", 1.5)
           self._dirichlet_alpha = params.get("dirichlet_alpha", 0.3)
 
-      def _build_computation_graph(self, model: NetworkBaseAGZ) -> tf.Session:
+      def _build_computation_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
           session = tf.Session(graph=graph)
           with graph.as_default():
-               self._network = model()
+               self._network = network()
           return session
 
       def search(self) -> float:
