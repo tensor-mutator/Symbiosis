@@ -112,8 +112,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
       @contextmanager
       def _episode_context_mcts(self, env: Environment, progress: Progress) -> Generator:
           env.reset()
-          image = env.render()
-          _, path = self.state(image)
+          _, path = self.state(env)
           yield env.state.frame, path
           if self.config & config.SAVE_FLOW:
              self._flow_skip_buffer.clear()
@@ -174,7 +173,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                while not self.env.ended and self.progress.clock < self.total_steps:
                      a_t = self.action(self.env)
                      _, r_t, _, _ = self.env.step(a_t)
-                     _, path_t1 = self.state(x_t1, s_t)
+                     _, path_t1 = self.state(env)
                      frame_t1 = self.env.state.frame
                      self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
                      frame_t, path_t = frame_t1, path_t1
