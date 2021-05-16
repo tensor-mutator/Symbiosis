@@ -69,16 +69,16 @@ class MCTS:
 
       def _choose_q_and_u(self, state: str, root: bool = True) -> str:
           node = self._tree[state]
-          xx_ = np.sqrt(node.sum_n + 1)
+          _xx = np.sqrt(node.sum_n + 1)
           if root:
              noise = np.random.dirichlet([self._dirichlet_alpha] * len(node.edges))
           q_plus_us = list()
           actions = list(node.edges.keys())
           for x, (action, stat) in enumerate(node.edges.items()):
-              p_ = stat.p
+              _p = stat.p
               if root:
-                 p_ = (1 - self._noise_eps) * p_ + self._noise_eps * noise[x]
-              q_plus_u = stat.q + self._c_puct * p_ * (xx_ / (1 + stat.n))
+                 _p = (1 - self._noise_eps) * _p + self._noise_eps * noise[x]
+              q_plus_u = stat.q + self._c_puct * _p * (_xx / (1 + stat.n))
               q_plus_us.append(q_plus_u)
           return actions[np.argmax(q_plus_us)]
 
