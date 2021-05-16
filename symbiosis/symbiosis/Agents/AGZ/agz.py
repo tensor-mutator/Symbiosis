@@ -10,7 +10,7 @@ from .network import AGZChessNet
 from ..agent import Agent
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
-from ..Utilities import Tree, Progress, MCTS
+from ..Utilities import Tree, Progress, MCTS, TauScheduler
 from ...environment import Environment
 from ...config import config
 
