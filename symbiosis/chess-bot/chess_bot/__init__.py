@@ -97,7 +97,8 @@ class ChessAction(Action):
 
 class Chess(Environment):
 
-      PIECES2INDICES: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+      PIECE2INDEX: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+      PIECE2VALUE: Dict = dict(K=3, Q=14, R=5, B=3.25, N=3, P=1, k=3, q=14, r=5, b=3.25, n=3, p=1)
 
       class Turn(IntEnum):
 
@@ -170,6 +171,31 @@ class Chess(Environment):
           self.state.canonical = self._to_canonical(self._board)
           self.state.observation = self._to_observation(self._board)
           return self.state.frame, self._reward, self._ended, info
+
+      def adjudicate(self) -> None:
+          def evaluate() -> float:
+              pos = self._board.fen().split()[0]
+              val = 0
+              sum = 0
+              for p in list(filter(lambda p: p.isalpha(), pos)):
+                  if p.isupper():
+                     val += self.PIECE2VALUE[p]
+                     sum += self.PIECE2VALUE[p]
+                  else:
+                     val -= self.PIECE2VALUE[p]
+                     sum += self.PIECE2VALUE[p]
+              score = val/sum
+              if self.action.turn == Chess.Turn.BLACK:
+                 score = -score
+              return np.tanh(score*3)
+          self._ended = True
+          score = evaluate()
+          if abs(score) < 0.01:
+             self._winner, self_reward = Chess.Winner.DRAW, 0.5
+          elif score > 0:
+             self._winner, self_reward = Chess.Winner.WHITE, 1
+          else:
+             self._winner, self_reward = Chess.Winner.BLACK, -1
 
       def _check_ended(self) -> Tuple:
           reward, winner, ended = 0, Chess.Winner.NONE, False
@@ -258,7 +284,7 @@ class Chess(Environment):
               for file in range(8):
                   p = piece_pos[rank * 8 + file]
                   if p.isalpha():
-                     planes[self.PIECES2INDICES[p]][rank][file] = 1
+                     planes[self.PIECE2INDEX[p]][rank][file] = 1
           return planes
 
       def render(self, mode=None) -> np.ndarray:
