@@ -6,7 +6,7 @@ A precise implementation of Monte-Carlo Tree Search algorithm
 
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
-from typing import List, Tuple, Any
+from typing import List, Tuple, Any, Callable
 import tensorflow.compat.v1 as tf
 import numpy as np
 from .tree import Tree
@@ -18,24 +18,16 @@ __all__ = ["MCTS"]
 class MCTS:
 
       def __init__(self, env: Environment, tree: Tree, virtual_loss: float, n_threads: int,
-                   n_simulations: int, network: NetworkBaseAGZ, **params) -> None:
+                   n_simulations: int, predict: Callable, **params) -> None:
           self._env = env
           self._tree = tree
           self._virtual_loss = virtual_loss
           self._n_threads = n_threads
           self._n_simulations = n_simulations
-          self._network = None
-          self._session = self._build_computation_graph(network)
+          self._predict = predict
           self._noise_eps = params.get("noise_eps", 0.25)
           self._c_puct = params.get("c_puct", 1.5)
           self._dirichlet_alpha = params.get("dirichlet_alpha", 0.3)
-
-      def _build_computation_graph(self, network: NetworkBaseAGZ) -> tf.Session:
-          graph = tf.Graph()
-          session = tf.Session(graph=graph)
-          with graph.as_default():
-               self._network = network()
-          return session
 
       def search(self) -> float:
           """
@@ -56,7 +48,7 @@ class MCTS:
              return -1
           obs = env.state.observation
           if self._tree.is_missing(obs):
-             p, v = self._get_p_v(env)
+             p, v = self._predict(env)
              policy = p[env.action.moves2indices(env.action.legal_moves)]
              self._tree.expand(obs, policy, env.action.legal_moves)
              return v
@@ -81,11 +73,3 @@ class MCTS:
               q_plus_u = stat.q + self._c_puct * _p * (_xx / (1 + stat.n))
               q_plus_us.append(q_plus_u)
           return actions[np.argmax(q_plus_us)]
-
-      def _get_p_v(self, env: Environment) -> Tuple:
-          p, v = self._session.run([self._network.policy, self._network.value],
-                                   feed_dict={self._network.state: env.state.canonical})
-          return env.predict(p, v)
-
-      def __del__(self) -> None:
-          self._session.close()
