@@ -38,6 +38,8 @@ class AGZ(Agent):
       def _read_params(self, hyperparams: Dict) -> None:
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
+          self._resign_value = hyperparams.get("resign_value", -0.8)
+          self._min_resign_moves = hyperparams.get("min_resign_moves", 5)
 
       def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
@@ -63,6 +65,8 @@ class AGZ(Agent):
       def action(self, env: Environment) -> Any:
           value = self._mcts.search()
           policy = self._policy_target()
+          if value <= self._resign_value and env.n_halfmoves > self._min_resign_moves:
+             return None
           self._self_play_buffer.append((env.state.canonical, policy, value))
           action_idx = np.random.choice(np.arange(env.action.size), p=self._policy_with_temperature(policy))
           return env.action.labels[action_idx]
