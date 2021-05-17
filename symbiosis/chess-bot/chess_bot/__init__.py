@@ -97,8 +97,8 @@ class ChessAction(Action):
 
 class Chess(Environment):
 
-      PIECE2INDEX: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
-      PIECE2VALUE: Dict = dict(K=3, Q=14, R=5, B=3.25, N=3, P=1, k=3, q=14, r=5, b=3.25, n=3, p=1)
+      _PIECE2INDEX: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+      _PIECE2VALUE: Dict = dict(K=3, Q=14, R=5, B=3.25, N=3, P=1, k=3, q=14, r=5, b=3.25, n=3, p=1)
 
       class Turn(IntEnum):
 
@@ -179,11 +179,11 @@ class Chess(Environment):
               sum = 0
               for p in list(filter(lambda p: p.isalpha(), pos)):
                   if p.isupper():
-                     val += self.PIECE2VALUE[p]
-                     sum += self.PIECE2VALUE[p]
+                     val += self._PIECE2VALUE[p]
+                     sum += self._PIECE2VALUE[p]
                   else:
-                     val -= self.PIECE2VALUE[p]
-                     sum += self.PIECE2VALUE[p]
+                     val -= self._PIECE2VALUE[p]
+                     sum += self._PIECE2VALUE[p]
               score = val/sum
               if self.action.turn == Chess.Turn.BLACK:
                  score = -score
@@ -284,7 +284,7 @@ class Chess(Environment):
               for file in range(8):
                   p = piece_pos[rank * 8 + file]
                   if p.isalpha():
-                     planes[self.PIECE2INDEX[p]][rank][file] = 1
+                     planes[self._PIECE2INDEX[p]][rank][file] = 1
           return planes
 
       def render(self, mode=None) -> np.ndarray:
