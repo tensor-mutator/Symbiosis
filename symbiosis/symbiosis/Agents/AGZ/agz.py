@@ -25,7 +25,7 @@ class AGZ(Agent):
           self._config = config
           self._flow = flow
           self._alias = network.type
-          self._progress = self.load_progress(Progress..AGZ)
+          self._progress = self.load_progress(Progress.AGZ)
           self._mcts, self._tree = self._initiate_tree(network, hyperparams)
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
