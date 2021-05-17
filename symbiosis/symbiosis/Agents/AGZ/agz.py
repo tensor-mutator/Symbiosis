@@ -8,6 +8,7 @@ import tensorflow.compat.v1 as tf
 from typing import Dict
 from collections import deque
 import numpy as np
+import dill
 from .network import AGZChessNet
 from ..agent import Agent
 from ..flow_base import Flow
@@ -45,7 +46,7 @@ class AGZ(Agent):
                self._network = network()
           return session
 
-      def _initiate_tree(self, network: NetworkBaseAGZ, hyperparams: Dict) -> MCTS:
+      def _initiate_tree(self, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
           n_threads = hyperparams.get("n_threads", 3)
           n_simulations = hyperparams.get("n_simulations", 16)
@@ -91,9 +92,17 @@ class AGZ(Agent):
 
       def save(self) -> None:
           self._tree.save(self.workspace, self._alias)
+          self_play_data_path = os.path.join(self.workspace, self._alias)
+          with open(self_play_data_path, "wb") as io:
+               dill.dump(self._self_play_buffer, io, protocol=dill.HIGHEST_PROTOCOL)
 
       def load(self) -> None:
           self._tree.load(self.workspace, self._alias)
+          self_play_data_path = os.path.join(self.workspace, self._alias)
+          if len(glob(self_play_data_path)) == 0:
+             raise MissingDataError("Self play data not found")
+          with open(self_play_data_path, "rb") as io:
+               self._self_play_buffer = dill.load(io)
 
       def __del__(self) -> None:
           self._session.close()
