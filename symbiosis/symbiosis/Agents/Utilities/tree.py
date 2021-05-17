@@ -102,8 +102,10 @@ class Tree:
                edge.w += virtual_loss + value
                edge.q = edge.w/edge.n
 
-      def save(self, io: FileIO) -> None:
-          dill.dump(self._tree, io, protocol=dill.HIGHEST_PROTOCOL)
+      def save(self, path: str) -> None:
+          with open(path, 'wb') as io:
+               dill.dump(self._tree, io, protocol=dill.HIGHEST_PROTOCOL)
 
-      def load(self, io: FileIO) -> None:
-          self._tree = dill.load(io)
+      def load(self, path: str) -> None:
+          with open(path, 'rb') as io:
+               self._tree = dill.load(io)
