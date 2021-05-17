@@ -25,9 +25,16 @@ class AGZ(Agent):
           self._config = config
           self._flow = flow
           self._alias = network.type
-          self._progress = self.load_progress()
+          self._progress = self.load_progress(Progress..AGZ)
           self._mcts, self._tree = self._initiate_tree(network, hyperparams)
+          self._read_params(hyperparams)
+          self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
+                                            self.writer)
           self._self_play_buffer = deque()
+
+      def _read_params(self, hyperparams: Dict) -> None:
+          self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
+          self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
 
       def _initiate_tree(self, network: NetworkBaseAGZ, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
@@ -40,15 +47,25 @@ class AGZ(Agent):
 
       def action(self, env: Environment) -> Any:
           value = self._mcts.search()
-          policy = self._policy_target(env)
-          
+          policy = self._policy_target()
+          self._self_play_buffer.append((env.state.canonical, policy, value))
+          action_idx = np.random.choice(np.arange(env.action.size), p=self._policy_with_temperature(policy))
+          return env.action.labels[action_idx]
 
-      def _policy_target(self, env: Enviornment) -> np.ndarray:
-          policy = np.zeros(env.action.size, dtype=np.float32)
-          for action, stat in self._tree[env.state.observation].edges.items():
-              policy[env.action.move2index(action)] = stat.n
+      def _policy_target(self) -> np.ndarray:
+          policy = np.zeros(self._env.action.size, dtype=np.float32)
+          for action, stat in self._tree[self._env.state.observation].edges.items():
+              policy[self._env.action.move2index(action)] = stat.n
           policy = policy/np.sum(policy)
           return policy
+
+      def _policy_with_temperature(self, policy: np.ndarray) -> np.ndarray:
+          if self._tau_scheduler.tau < 0.1:
+             policy = np.zeros(self._env.action.size, dtype=np.float32)
+             policy[np.argmax(policy)] = 1
+             return policy
+          policy = np.power(policy, 1/self._tau_scheduler.tau)
+          return policy/np.sum(policy)
 
       @Agent.record
       def state(self, env: Environment) -> np.ndarray:
