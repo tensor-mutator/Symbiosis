@@ -26,7 +26,9 @@ class AGZ(Agent):
           self._flow = flow
           self._alias = network.type
           self._progress = self.load_progress(Progress.AGZ)
-          self._mcts, self._tree = self._initiate_tree(network, hyperparams)
+          self._session = self._build_network_graph(network)
+          self._mcts, self._tree = self._initiate_tree(hyperparams)
+            
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
@@ -36,14 +38,26 @@ class AGZ(Agent):
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
 
+      def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
+          graph = tf.Graph()
+          session = tf.Session(graph=graph)
+          with graph.as_default():
+               self._network = network()
+          return session
+
       def _initiate_tree(self, network: NetworkBaseAGZ, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
           n_threads = hyperparams.get("n_threads", 3)
           n_simulations = hyperparams.get("n_simulations", 16)
           tree = Tree()
           mcts = MCTS(env=self._env, tree=tree, virtual_loss=virtual_loss, n_threads=n_threads,
-                      n_simulations=n_simulations, network=network, **hyperparams)
+                      n_simulations=n_simulations, predict=self._predict_p_v, **hyperparams)
           return mcts, tree
+
+      def _predict_p_v(self, env: Environment) -> Tuple:
+          p, v = self._session.run([self._network.policy, self._network.value],
+                                   feed_dict={self._network.state: env.state.canonical})
+          return env.predict(p, v)
 
       def action(self, env: Environment) -> Any:
           value = self._mcts.search()
@@ -70,3 +84,12 @@ class AGZ(Agent):
       @Agent.record
       def state(self, env: Environment) -> np.ndarray:
           return env.state.frame
+
+      def save(self) -> None:
+          self._tree.save(self.workspace, self._alias)
+
+      def load(self) -> None:
+          self._tree.load(self.workspace, self._alias)
+
+      def __del__(self) -> None:
+          self._session.close()
