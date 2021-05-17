@@ -85,6 +85,10 @@ class AGZ(Agent):
       def state(self, env: Environment) -> np.ndarray:
           return env.state.frame
 
+      @Agent.register("suite_agz")
+      def run(self) -> None:
+          ...
+
       def save(self) -> None:
           self._tree.save(self.workspace, self._alias)
 
