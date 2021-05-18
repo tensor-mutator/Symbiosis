@@ -10,11 +10,14 @@ class Player(AgentForked):
       def __init__(self, env: Environment, predict_p_v: Callable, buffer: deque, alias: str,
                    tau_scheduler: TauScheduler, **hyperparams) -> None:
           self._env = env
+          self._hyperparams = hyperparams
           self._read_params(hyperparams)
-          self._mcts, self._tree = self._initiate_tree(predict_p_v, hyperparams)
+          self._alias = alias
+
+      def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
+          self._mcts, self._tree = self._initiate_tree(predict_p_v, self._hyperparams)
           self._tau_scheduer = tau_scheduler
           self._buffer = buffer
-          self._alias = alias
 
       def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> Tuple[MCTS, Tree]:
           virtual_loss = hyperparams.get("virtual_loss", 3)
