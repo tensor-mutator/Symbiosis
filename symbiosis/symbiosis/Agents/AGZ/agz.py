@@ -34,7 +34,12 @@ class AGZ(AgentMCTS):
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
           self._self_play_buffer = deque()
+          self._initiate_players(self._predict_p_v, self._self_play_buffer, self._tau_scheduer)
           self._max_state = deque(max_len=1)
+
+      def _initiate_players(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
+          self._max_player.initiate(predict_p_v, buffer, tau_scheduler)
+          self._min_player.initiate(predict_p_v, buffer, tau_scheduler)
 
       def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
