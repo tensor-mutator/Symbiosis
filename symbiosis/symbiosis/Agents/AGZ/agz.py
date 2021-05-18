@@ -34,6 +34,7 @@ class AGZ(AgentMCTS):
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
           self._self_play_buffer = deque()
+          self._max_state = deque(max_len=1)
 
       def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
@@ -55,15 +56,15 @@ class AGZ(AgentMCTS):
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
           env.step(max_action)
+          self._max_state.append(self._max_player.state(env))
           min_action = None
           if not env.ended:
              min_action = self._min_player.action(env)
           return max_action, min_action
 
       def state(self, env: Environment) -> np.ndarray:
-          self._max_player.state(env)
-          self._min_player.state(env)
-          return env.state.frame
+          min_state, min_path = self._min_player.state(env)
+          return tuple(self._max_state)+(min_state, min_path,)
 
       def train(self) -> float:
           batch_size = min(self._batch_size, len(self._self_play_buffer))
