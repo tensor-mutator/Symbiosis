@@ -436,3 +436,30 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
           return config
+
+class AgentForked(AgentDecorators, metaclass=ABCMeta):
+
+      @abstractmethod
+      @AgentDecorators.record
+      def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
+          ...
+
+      @abstractmethod
+      def action(self, state: np.ndarray) -> Any:
+          ...
+
+      @property
+      def flow(self) -> Flow:
+          return self._flow
+
+      @property
+      def hyperparams(self) -> Dict:
+          return self._hyperparams
+
+      @abstractmethod
+      def load(self) -> None:
+          ...
+
+      @abstractmethod
+      def save(self) -> None:
+          ...
