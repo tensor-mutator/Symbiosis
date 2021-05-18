@@ -95,8 +95,28 @@ class ProgressDQN(_Progress):
           if self._clock > self._observe:
              self._train = True if (self._clock-self._observe)%self._train_interval == 0 else False
 
+class ProgressAGZ(_Progress):
+
+      def __init__(self, n_steps: int, train_interval: int, explore: float = np.inf) -> None:
+          super().__init__(n_steps, train_interval, explore)
+          self._clock_half = 0
+          self._clock_full = 0
+
+      @property
+      def clock_half(self) -> int:
+          return self._clock_half
+
+      @property
+      def clock_full(self) -> int:
+          return self._clock_full
+
+      def bump(self) -> None:
+          self._clock_half += 1
+          self._clock_full = self._clock_half//2
+          super().bump()
+
 class Progress:
 
       BASE: _Progress = _Progress
       DQN: _Progress = ProgressDQN
-      AGZ: _Progress = _Progress
+      AGZ: _Progress = ProgressAGZ
