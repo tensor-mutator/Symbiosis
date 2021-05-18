@@ -104,12 +104,12 @@ class Tree:
                edge.q = edge.w/edge.n
 
       def save(self, path: str, file: str) -> None:
-          tree_path = os.path.join(path, file)
+          tree_path = os.path.join(path, f"{file}.tree")
           with open(tree_path, "wb") as io:
                dill.dump(self._tree, io, protocol=dill.HIGHEST_PROTOCOL)
 
       def load(self, path: str, file: str) -> None:
-          tree_path = os.path.join(path, file)
+          tree_path = os.path.join(path, f"{file}.tree")
           if len(glob(tree_path)) == 0:
              raise MissingTreeError('Tree not found')
           with open(tree_path, "rb") as io:
