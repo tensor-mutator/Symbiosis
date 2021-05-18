@@ -75,6 +75,8 @@ class AGZ(AgentMCTS):
           return policy/np.sum(policy)
 
       def state(self, env: Environment) -> np.ndarray:
+          self._max_player.state(env)
+          self._min_player.state(env)
           return env.state.frame
 
       @Agent.register("suite_agz")
