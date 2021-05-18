@@ -43,7 +43,7 @@ class AGZ(AgentMCTS):
 
       def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
-          session = tf.Session(graph=graph)
+          session = tf.Session(graph=graph, config=self.ConfigProto)
           with graph.as_default():
                self._network = network()
           return session
