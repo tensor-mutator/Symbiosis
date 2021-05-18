@@ -9,6 +9,7 @@ from typing import Dict, Any
 from collections import deque
 import numpy as np
 import dill
+from random import sample
 from .network import AGZChessNet
 from ..agent import AgentMCTS, AgentForked
 from ..flow_base import Flow
@@ -42,13 +43,14 @@ class AGZ(AgentMCTS):
           return session
 
       def _predict_p_v(self, env: Environment) -> Tuple:
-          p, v = self._session.run([self._network.policy, self._network.value],
+          p, v = self._session.run([self._network.p_predicted, self._network.v_predicted],
                                    feed_dict={self._network.state: env.state.canonical})
           return env.predict(p, v)
 
       def _read_params(self, hyperparams: Dict) -> None:
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
+          self._batch_size = hyperparams.get("batch_size", 32)
 
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
@@ -62,6 +64,17 @@ class AGZ(AgentMCTS):
           self._max_player.state(env)
           self._min_player.state(env)
           return env.state.frame
+
+      def train(self) -> float:
+          batch_size = min(self._batch_size, len(self._self_play_buffer))
+          self_play_data = np.array(sample(self._self_play_buffer, k=batch_size), dtype=np.float32)
+          state = np.vstack(self_play_data[:, 0])
+          p_target = np.vstack(self_play_data[:, 1])
+          v_target = np.vstack(self_play_data[:, 2])
+          loss, _ = self._session.run([self._network.loss, self._network.grad], feed_dict={self._network.state: state,
+                                                                                           self._network.p_target: p_target,
+                                                                                           self._network.v_target: v_target})
+          return loss
 
       @Agent.register("suite_agz")
       def run(self) -> None:
