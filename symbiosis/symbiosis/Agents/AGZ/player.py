@@ -7,8 +7,7 @@ from ...environment import Environment
 
 class Player(AgentForked):
 
-      def __init__(self, env: Environment, predict_p_v: Callable, buffer: deque, alias: str,
-                   tau_scheduler: TauScheduler, **hyperparams) -> None:
+      def __init__(self, env: Environment, alias: str, **hyperparams) -> None:
           self._env = env
           self._hyperparams = hyperparams
           self._read_params(hyperparams)
