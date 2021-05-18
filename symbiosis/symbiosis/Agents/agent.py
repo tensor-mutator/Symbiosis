@@ -13,7 +13,7 @@ from collections import deque
 from .flow_base import Flow
 from .network_base import NetworkMeta
 from .DQN.replay import ExperienceReplay
-from .Utilities import Progress, ProgressDQN, RewardManager, Inventory, Scheduler
+from .Utilities import Progress, ProgressDQN, RewardManager, ELOManager, Inventory, Scheduler
 from .Utilities.exceptions import *
 from ..colors import COLORS
 from ..environment import Environment
@@ -110,10 +110,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._save()
 
       @contextmanager
-      def _episode_context_mcts(self, env: Environment, progress: Progress) -> Generator:
+      def _episode_context_mcts(self, env: Environment, progress: Progress,
+                                elo_manager: ELOManager) -> Generator:
           env.reset()
           _, path = self.state(env)
           yield env.state.frame, path
+          elo_manager.elo()
           self.train()
           if self.config & config.SAVE_FLOW:
              self._flow_skip_buffer.clear()
@@ -122,12 +124,11 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._save()
 
       @contextmanager
-      def _run_context(self, reward_manager: bool = True) -> Generator:
+      def _run_context(self, reward_manager: Any) -> Generator:
           self._check_hyperparams()
           self._save_hyperparams()
           self._create_handler()
-          if reward_manager:
-             self._reward_manager = RewardManager(self.env, self.alias, self.config, self.progress, self.writer)
+          self._reward_manager = reward_manager
           self._initiate_inventories()
           self._load()
           self._set_checkpoint_interval()
@@ -140,7 +141,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self.writer.close()
 
       def _suite_dqn(self) -> None:
-          with self._run_context():
+          with self._run_context(RewardManager(self.env, self.alias, self.config, self.progress, self.writer)):
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
                           self._episode_suite_dqn()
@@ -164,13 +165,13 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                      self.progress.bump()
 
       def _suite_agz(self) -> None:
-          with self._run_context(reward_manager=False):
+          with self._run_context(ELOManager(self.env, self.alias, self.config, self.progress, self.writer)):
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
                           self._episode_suite_agz()
 
       def _episode_suite_agz(self) -> None:
-          with self._episode_context_mcts(self.env, self.progress) as [frame_t, path_t]:
+          with self._episode_context_mcts(self.env, self.progress, self._reward_manage) as [frame_t, path_t]:
                while not self.env.ended and self.progress.clock < self.total_steps:
                      _, a_t_min = self.action(self.env)
                      _, r_t_min, _, _ = self.env.step(a_t_min)
