@@ -22,14 +22,15 @@ from ...config import config
 class AGZ(AgentMCTS):
 
       def __init__(self, max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
-                   network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None) -> None:
+                   network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
+                   **hyperparams) -> None:
           self._max_player, self._min_player = max_min_players
           self._env = env
           self._config = config
           self._flow = flow
           self._alias = network.type
           self._progress = self.load_progress(Progress.AGZ)
-          self._session = self._build_network_graph(network)
+          self._session = self._build_network_graph(network, hyperparams)
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
@@ -41,11 +42,11 @@ class AGZ(AgentMCTS):
           self._max_player.initiate(predict_p_v, buffer, tau_scheduler)
           self._min_player.initiate(predict_p_v, buffer, tau_scheduler)
 
-      def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
+      def _build_network_graph(self, network: NetworkBaseAGZ, hyperparams: Dict) -> tf.Session:
           graph = tf.Graph()
           session = tf.Session(graph=graph, config=self.ConfigProto)
           with graph.as_default():
-               self._network = network()
+               self._network = network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
           return session
 
       def _predict_p_v(self, env: Environment) -> Tuple:
