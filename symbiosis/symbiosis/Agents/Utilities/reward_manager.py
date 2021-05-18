@@ -15,12 +15,81 @@ from ...config import config
 from .progress import Progress
 from .exceptions import *
 
-__all__ = ["RewardManager"]
+__all__ = ["RewardManager", "ELOManager"]
+
+class ELOManager:
+
+      def __init__(self, k_factor: int, env: Environment, agent: str, config_: config, progress: Progress,
+                   writer: tf.summary.FileWriter) -> None:
+          self._k_factor = k_factor
+          self._env = env
+          self._agent = agent
+          self._progress = progress
+          self._elo_event = config_ & config.ELO_EVENT
+          self._elo_buffer = deque()
+          self._episode_indices = deque()
+          self._writer = writer
+          self._console_summary = config_ & (config.VERBOSE_LITE+config.VERBOSE_HEAVY)
+          self._elo_rating_max, self._elo_rating_min = 0, 0
+
+      def elo(self, max_score: float, min_score: float) -> float:
+          max_expected_score = 1/(1+(10**((self._elo_rating_min-self._elo_rating_max)/400)))
+          min_expected_score = 1/(1+(10**((self._elo_rating_max-self._elo_rating_min)/400)))
+          self._elo_rating_max += self._k_factor*(max_score-max_expected_score)
+          self._elo_rating_min += self._k_factor*(min_score-min_expected_score)
+          self._episode_indices.append(self._progress.episode)
+          self._elo_buffer.append(dict(max=self._elo_rating_max, min=self._elo_rating_min))
+
+      def _generate_elo_event(self, path: str, agent: str, graph: tf.Graph) -> None:
+          for idx, rating in zip(self._episode_indices, self._elo_buffer):
+              summary = tf.Summary()
+              summary.value.add(tag='{} Performance Benchmark on {}/Episodes - ELO Rating (MAX player)'.format(self._agent, 
+                                                                                                               self._env.name),
+                                simple_value=rating["max"])
+              summary.value.add(tag='{} Performance Benchmark on {}/Episodes - ELO Rating (MIN player)'.format(self._agent, 
+                                                                                                               self._env.name),
+                                simple_value=rating["min"])
+              self._writer.add_summary(summary, idx+1)
+          self._elo_buffer.clear()
+          self._episode_indices.clear()
+
+      def _elo(self, file: str, idx: int = None) -> str:
+          if idx is None:
+             return f'{file}.elo.*'
+          return '%(file)s.elo.%(index)d' %{'file': file, 'index': idx}
+
+      def save(self, path: str, file: str, session: tf.Session) -> None:
+          def _save(obj: deque, func: Callable):
+              mem_size = self.mem_size(obj)
+              if mem_size == 0:
+                 return
+              segments = mem_size//1000000
+              segments = segments+1 if mem_size%1000000 != 0 else segments
+              step = len(obj)//segments
+              step = 1 if not step else step
+              for i, x in enumerate(range(0, len(obj), step)):
+                  with open(os.path.join(path, func(file, i+1)), 'wb') as f_obj:
+                       dill.dump(deque(itertools.islice(obj, x, x+step)), f_obj, protocol=dill.HIGHEST_PROTOCOL)
+          _save(self._elo_buffer, self._elo)
+          if self._elo_event:
+             self._generate_elo_event(path, file, session.graph)
+
+      def load(self, path: str, file: str) -> None:
+          def _load(obj: deque, func: Callable, raise_: bool = True):
+              files = glob(os.path.join(path, func(file)))
+              if len(files) == 0:
+                 if raise_:
+                    raise MissingRewardArtifactError("Reward Artifact not found")
+              for file_ in files:
+                  with open(file_, 'rb') as f_obj:
+                       obj.extend(dill.load(f_obj))
+          _load(self._elo_buffer, self._elo)
+          self._elo_rating_max, self._elo_rating_min = self._elo_buffer[-1]["max"], self._elo_buffer[-1]["min"]
 
 class RewardManager:
 
       def __init__(self, env: Environment, agent: str, config_: config, progress: Progress,
-                   writer: tf.summary.FileWriter, zero_sum: bool = False) -> None:
+                   writer: tf.summary.FileWriter) -> None:
           self._env = env
           self._agent = agent
           self._progress = progress
