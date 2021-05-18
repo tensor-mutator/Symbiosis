@@ -133,7 +133,6 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
           self.state.observation = self._to_observation(self._board)
-          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
 
@@ -154,7 +153,6 @@ class Chess(Environment):
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
           self.state.observation = self._to_observation(self._board)
-          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
           self._ended = False
           return self.state.frame
@@ -165,7 +163,6 @@ class Chess(Environment):
              info, self._reward, self._winner = self._resign()
           else:
              self._board.push_uci(action)
-             self._n_halfmoves += 1
              self._ended, info, self._reward, self._winner = self._check_ended()
           self.state.frame = self._to_rgb(self._board)
           self.state.canonical = self._to_canonical(self._board)
@@ -221,7 +218,7 @@ class Chess(Environment):
           svg = chess.svg.board(self._board, size=700)
           with tempfile.TemporaryDirectory() as dir:
                svg_file = os.path.join(dir, "board.svg")
-               with open(svg_file, "w") as f:
+               with open(svg_file, 'w') as f:
                     f.write(svg)
                drawing = svg2rlg(svg_file)
                png_file = os.path.join(dir, "board.png")
@@ -322,14 +319,9 @@ class Chess(Environment):
              p = p[self.action.flipped2unflipped()]
           return p, v
 
-      @property
-      def n_halfmoves(self) -> int:
-          return self._n_halfmoves
-
       def close(self) -> bool:
           self._board = None
           self.state.canonical = None
           self.state.observation = None
           self.state.frame = None
-          self._n_halfmoves = 0
           self._winner = Chess.Winner.NONE
