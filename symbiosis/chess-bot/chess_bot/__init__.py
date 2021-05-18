@@ -1,6 +1,7 @@
 from symbiosis import Environment, State, Action, config
 from symbiosis.Agents import AGZ
 from symbiosis.colors import COLORS
+from symbiosis.Agents.Utilities import Progress
 from typing import Tuple, Sequence, Any, List, Dict
 import numpy as np
 from svglib.svglib import svg2rlg
@@ -124,6 +125,10 @@ class Chess(Environment):
             en_passant: str
             fifty_move: str
 
+      def __init__(self, max_moves: int = None, progress: Progress = None) -> None:
+          self._max_moves = max_moves
+          self._progress = progress
+
       @property
       def name(self) -> str:
           return "Chess-v0"
@@ -158,7 +163,11 @@ class Chess(Environment):
           return self.state.frame
 
       def step(self, action: Any) -> Tuple:
-          if action is None:
+          if self._max_moves and self._progress.clock_half == self._max_moves:
+             self._ended = True
+             self._adjudicate()
+             info = dict(winner=self._winner)
+          elif action is None:
              self._ended = True
              info, self._reward, self._winner = self._resign()
           else:
@@ -169,7 +178,7 @@ class Chess(Environment):
           self.state.observation = self._to_observation(self._board)
           return self.state.frame, self._reward, self._ended, info
 
-      def adjudicate(self) -> None:
+      def _adjudicate(self) -> None:
           def evaluate() -> float:
               pos = self._board.fen().split()[0]
               val = 0
