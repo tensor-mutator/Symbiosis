@@ -10,7 +10,7 @@ class Player(AgentForked):
           self._read_params(hyperparams)
           self._mcts, self._tree = self._initiate_tree(predict_p_v, hyperparams)
 
-      def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> MCTS:
+      def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> Tuple[MCTS, Tree]:
           virtual_loss = hyperparams.get("virtual_loss", 3)
           n_threads = hyperparams.get("n_threads", 3)
           n_simulations = hyperparams.get("n_simulations", 16)
