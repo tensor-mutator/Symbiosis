@@ -6,7 +6,8 @@ from ...environment import Environment
 
 class Player(AgentForked):
 
-      def __init__(self, env: Environment, predict_p_v: Callable, buffer: deque, alias: str, **hyperparams) -> None:
+      def __init__(self, env: Environment, predict_p_v: Callable, buffer: deque, alias: str,
+                   **hyperparams) -> None:
           self._env = env
           self._read_params(hyperparams)
           self._mcts, self._tree = self._initiate_tree(predict_p_v, hyperparams)
