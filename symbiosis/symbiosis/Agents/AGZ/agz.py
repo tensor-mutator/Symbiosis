@@ -13,7 +13,7 @@ from .network import AGZChessNet
 from ..agent import AgentMCTS, AgentForked
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
-from ..Utilities import Tree, Progress, MCTS, TauScheduler
+from ..Utilities import Progress
 from ...environment import Environment
 from ...config import config
 
@@ -21,8 +21,7 @@ from ...config import config
 class AGZ(AgentMCTS):
 
       def __init__(self, max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
-                   network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
-                   **hyperparams) -> None:
+                   network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None) -> None:
           self._max_player, self._min_player = max_min_players
           self._env = env
           self._config = config
@@ -35,12 +34,6 @@ class AGZ(AgentMCTS):
                                             self.writer)
           self._self_play_buffer = deque()
 
-      def _read_params(self, hyperparams: Dict) -> None:
-          self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
-          self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
-          self._resign_value = hyperparams.get("resign_value", -0.8)
-          self._min_resign_moves = hyperparams.get("min_resign_moves", 5)
-
       def _build_network_graph(self, network: NetworkBaseAGZ) -> tf.Session:
           graph = tf.Graph()
           session = tf.Session(graph=graph)
@@ -52,6 +45,10 @@ class AGZ(AgentMCTS):
           p, v = self._session.run([self._network.policy, self._network.value],
                                    feed_dict={self._network.state: env.state.canonical})
           return env.predict(p, v)
+
+      def _read_params(self, hyperparams: Dict) -> None:
+          self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
+          self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
 
       def action(self, env: Environment) -> Tuple[str, str]:
           max_action = self._max_player.action(env)
