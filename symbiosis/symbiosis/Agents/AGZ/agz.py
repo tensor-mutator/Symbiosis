@@ -56,7 +56,7 @@ class AGZ(AgentMCTS):
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
           env.step(max_action)
-          self._max_state.append(self._max_player.state(env))
+          self._max_state.append(self._max_player.state(env)+(env.reward,))
           min_action = None
           if not env.ended:
              min_action = self._min_player.action(env)
@@ -64,7 +64,7 @@ class AGZ(AgentMCTS):
 
       def state(self, env: Environment) -> np.ndarray:
           min_state, min_path = self._min_player.state(env)
-          return tuple(self._max_state)+(min_state, min_path,)
+          return (min_state, min_path,)+tuple(self._max_state)
 
       def train(self) -> float:
           batch_size = min(self._batch_size, len(self._self_play_buffer))
