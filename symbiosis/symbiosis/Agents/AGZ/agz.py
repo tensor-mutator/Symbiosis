@@ -84,13 +84,15 @@ class AGZ(AgentMCTS):
           ...
 
       def save(self) -> None:
-          self._tree.save(self.workspace, self._alias)
+          self._max_player.save(self.workspace, self._alias+self._max_player.alias)
+          self._min_player.save(self.workspace, self._alias+self._min_player.alias)
           self_play_data_path = os.path.join(self.workspace, self._alias)
           with open(self_play_data_path, "wb") as io:
                dill.dump(self._self_play_buffer, io, protocol=dill.HIGHEST_PROTOCOL)
 
       def load(self) -> None:
-          self._tree.load(self.workspace, self._alias)
+          self._max_player.load(self.workspace, self._alias+self._max_player.alias)
+          self._min_player.load(self.workspace, self._alias+self._min_player.alias)
           self_play_data_path = os.path.join(self.workspace, self._alias)
           if len(glob(self_play_data_path)) == 0:
              raise MissingDataError("Self play data not found")
