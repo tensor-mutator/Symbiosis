@@ -59,21 +59,6 @@ class AGZ(AgentMCTS):
           min_action = self._min_player.action(env)
           return max_action, min_action
 
-      def _policy_target(self) -> np.ndarray:
-          policy = np.zeros(self._env.action.size, dtype=np.float32)
-          for action, stat in self._tree[self._env.state.observation].edges.items():
-              policy[self._env.action.move2index(action)] = stat.n
-          policy = policy/np.sum(policy)
-          return policy
-
-      def _policy_with_temperature(self, policy: np.ndarray) -> np.ndarray:
-          if self._tau_scheduler.tau < 0.1:
-             policy = np.zeros(self._env.action.size, dtype=np.float32)
-             policy[np.argmax(policy)] = 1
-             return policy
-          policy = np.power(policy, 1/self._tau_scheduler.tau)
-          return policy/np.sum(policy)
-
       def state(self, env: Environment) -> np.ndarray:
           self._max_player.state(env)
           self._min_player.state(env)
