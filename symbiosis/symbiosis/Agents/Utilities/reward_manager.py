@@ -19,8 +19,8 @@ __all__ = ["RewardManager"]
 
 class RewardManager:
 
-      def __init__(self, env: Environment, agent: str, config_: config,
-                   progress: Progress, writer: tf.summary.FileWriter) -> None:
+      def __init__(self, env: Environment, agent: str, config_: config, progress: Progress,
+                   writer: tf.summary.FileWriter, zero_sum: bool = False) -> None:
           self._env = env
           self._agent = agent
           self._progress = progress
@@ -31,6 +31,7 @@ class RewardManager:
           self._n_steps = 0
           self._reward_event = config_ & config.REWARD_EVENT
           self._writer = writer
+          self._zero_sum = zero_sum
           self._console_summary = config_ & (config.VERBOSE_LITE+config.VERBOSE_HEAVY)
 
       def update(self, reward: float) -> None:
