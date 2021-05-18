@@ -1,5 +1,6 @@
 from typing import Callable
 from collections import deque
+import tensorflow.compat.v1 as tf
 from ..agent import AgentForked
 from ..Utilities import Tree, Progress, MCTS, TauScheduler
 from ...environment import Environment
@@ -7,10 +8,11 @@ from ...environment import Environment
 class Player(AgentForked):
 
       def __init__(self, env: Environment, predict_p_v: Callable, buffer: deque, alias: str,
-                   **hyperparams) -> None:
+                   tau_scheduler: TauScheduler, **hyperparams) -> None:
           self._env = env
           self._read_params(hyperparams)
           self._mcts, self._tree = self._initiate_tree(predict_p_v, hyperparams)
+          self._tau_scheduer = tau_scheduler
           self._buffer = buffer
           self._alias = alias
 
