@@ -10,7 +10,7 @@ from collections import deque
 import numpy as np
 import dill
 from .network import AGZChessNet
-from ..agent import Agent
+from ..agent import AgentMCTS, AgentForked
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
 from ..Utilities import Tree, Progress, MCTS, TauScheduler
@@ -18,17 +18,19 @@ from ...environment import Environment
 from ...config import config
 
 @Agent.track(AGZChessNet)
-class AGZ(Agent):
+class AGZ(AgentMCTS):
 
-      def __init__(self, env: Environment, network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT,
-                   flow: Flow = None, **hyperparams) -> None:
+      def __init__(self, min_player: AgentForked, max_player: AgentForked, env: Environment,
+                   network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
+                   **hyperparams) -> None:
+          self._min_player = min_player
+          self._max_player = max_player
           self._env = env
           self._config = config
           self._flow = flow
           self._alias = network.type
           self._progress = self.load_progress(Progress.AGZ)
           self._session = self._build_network_graph(network)
-          self._mcts, self._tree = self._initiate_tree(hyperparams)
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
@@ -46,15 +48,6 @@ class AGZ(Agent):
           with graph.as_default():
                self._network = network()
           return session
-
-      def _initiate_tree(self, hyperparams: Dict) -> MCTS:
-          virtual_loss = hyperparams.get("virtual_loss", 3)
-          n_threads = hyperparams.get("n_threads", 3)
-          n_simulations = hyperparams.get("n_simulations", 16)
-          tree = Tree()
-          mcts = MCTS(env=self._env, tree=tree, virtual_loss=virtual_loss, n_threads=n_threads,
-                      n_simulations=n_simulations, predict=self._predict_p_v, **hyperparams)
-          return mcts, tree
 
       def _predict_p_v(self, env: Environment) -> Tuple:
           p, v = self._session.run([self._network.policy, self._network.value],
