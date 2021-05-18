@@ -20,10 +20,10 @@ from ...config import config
 @Agent.track(AGZChessNet)
 class AGZ(AgentMCTS):
 
-      def __init__(self, min_max_players: Tuple[AgentForked, AgentForked], env: Environment,
+      def __init__(self, max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
                    network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
                    **hyperparams) -> None:
-          self._min_player, self._max_player = min_max_players
+          self._max_player, self._min_player = max_min_players
           self._env = env
           self._config = config
           self._flow = flow
@@ -53,14 +53,11 @@ class AGZ(AgentMCTS):
                                    feed_dict={self._network.state: env.state.canonical})
           return env.predict(p, v)
 
-      def action(self, env: Environment) -> Any:
-          value = self._mcts.search()
-          policy = self._policy_target()
-          if value <= self._resign_value and env.n_halfmoves > self._min_resign_moves:
-             return None
-          self._self_play_buffer.append((env.state.canonical, policy, value))
-          action_idx = np.random.choice(np.arange(env.action.size), p=self._policy_with_temperature(policy))
-          return env.action.labels[action_idx]
+      def action(self, env: Environment) -> Tuple[str, str]:
+          max_action = self._max_player.action(env)
+          env.step(max_action)
+          min_action = self._min_player.action(env)
+          return max_action, min_action
 
       def _policy_target(self) -> np.ndarray:
           policy = np.zeros(self._env.action.size, dtype=np.float32)
@@ -77,7 +74,6 @@ class AGZ(AgentMCTS):
           policy = np.power(policy, 1/self._tau_scheduler.tau)
           return policy/np.sum(policy)
 
-      @Agent.record
       def state(self, env: Environment) -> np.ndarray:
           return env.state.frame
 
