@@ -172,11 +172,11 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           with self._episode_context_mcts(self.env, self.progress) as [frame_t, path_t]:
                while not self.env.ended and self.progress.clock < self.total_steps:
                      a_t = self.action(self.env)
-                     _, r_t, _, _ = self.env.step(a_t)
-                     _, path_t1 = self.state(env)
-                     frame_t1 = self.env.state.frame
-                     self._save_flow(frame_t, frame_t1, r_t, path_t, path_t1)
-                     frame_t, path_t = frame_t1, path_t1
+                     _, r_t_min, _, _ = self.env.step(a_t)
+                     frame_t1_min, path_t1_min, frame_t1_max, path_t1_max, r_t_max = self.state(env)
+                     self._save_flow(frame_t, frame_t1_max, r_t_max, path_t, path_t1_max)
+                     self._save_flow(frame_t1_max, frame_t1_min, r_t_min, path_t1_max, path_t1_min)
+                     frame_t, path_t = frame_t1_min, path_t1_min
                      if self.progress.train:
                         self.train()
                      self.progress.bump()
