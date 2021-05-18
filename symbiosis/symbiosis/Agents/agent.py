@@ -115,7 +115,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           env.reset()
           _, path = self.state(env)
           yield env.state.frame, path
-          elo_manager.elo()
+          elo_manager.elo(max_score=env.reward, min_score=1-env.reward)
           self.train()
           if self.config & config.SAVE_FLOW:
              self._flow_skip_buffer.clear()
