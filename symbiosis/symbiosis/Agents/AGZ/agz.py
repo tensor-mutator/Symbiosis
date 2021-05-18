@@ -5,7 +5,7 @@ A precise implementation of an AlphaGo Zero agent
 """
 
 import tensorflow.compat.v1 as tf
-from typing import Dict
+from typing import Dict, Any
 from collections import deque
 import numpy as np
 import dill
@@ -50,10 +50,12 @@ class AGZ(AgentMCTS):
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
 
-      def action(self, env: Environment) -> Tuple[str, str]:
+      def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
           env.step(max_action)
-          min_action = self._min_player.action(env)
+          min_action = None
+          if not env.ended:
+             min_action = self._min_player.action(env)
           return max_action, min_action
 
       def state(self, env: Environment) -> np.ndarray:
