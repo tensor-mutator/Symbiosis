@@ -13,7 +13,7 @@ from collections import deque
 from .flow_base import Flow
 from .network_base import NetworkMeta
 from .DQN.replay import ExperienceReplay
-from .Utilities import Progress, ProgressDQN, RewardManager, Inventory
+from .Utilities import Progress, ProgressDQN, RewardManager, Inventory, Scheduler
 from .Utilities.exceptions import *
 from ..colors import COLORS
 from ..environment import Environment
@@ -446,6 +446,10 @@ class AgentMCTS(Agent):
       @property
       def self_play_buffer(self) -> deque:
           return self._self_play_buffer
+
+      @property
+      def tau_scheduler(self) -> Scheduler:
+          return self._tau_scheduler
 
 class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
