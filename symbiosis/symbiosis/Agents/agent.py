@@ -165,7 +165,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                      self.progress.bump()
 
       def _suite_agz(self) -> None:
-          with self._run_context(ELOManager(self.env, self.alias, self.config, self.progress, self.writer)):
+          with self._run_context(ELOManager(16, self.env, self.alias, self.config, self.progress, self.writer)):
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
                           self._episode_suite_agz()
