@@ -104,16 +104,15 @@ class ProgressAGZ(_Progress):
 
       @property
       def clock_half(self) -> int:
-          return self._clock_half
+          return self._clock
 
       @property
       def clock_full(self) -> int:
           return self._clock_full
 
       def bump(self) -> None:
-          self._clock_half += 1
-          self._clock_full = self._clock_half//2
-          super().bump()
+          super().bump()            
+          self._clock_full = self._clock//2
 
 class Progress:
 
