@@ -20,11 +20,10 @@ from ...config import config
 @Agent.track(AGZChessNet)
 class AGZ(AgentMCTS):
 
-      def __init__(self, min_player: AgentForked, max_player: AgentForked, env: Environment,
+      def __init__(self, min_max_players: Tuple[AgentForked, AgentForked], env: Environment,
                    network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
                    **hyperparams) -> None:
-          self._min_player = min_player
-          self._max_player = max_player
+          self._min_player, self._max_player = min_max_players
           self._env = env
           self._config = config
           self._flow = flow
