@@ -114,6 +114,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           env.reset()
           _, path = self.state(env)
           yield env.state.frame, path
+          self.train()
           if self.config & config.SAVE_FLOW:
              self._flow_skip_buffer.clear()
           progress.bump_episode()
@@ -177,8 +178,6 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                      self._save_flow(frame_t, frame_t1_max, r_t_max, path_t, path_t1_max)
                      self._save_flow(frame_t1_max, frame_t1_min, r_t_min, path_t1_max, path_t1_min)
                      frame_t, path_t = frame_t1_min, path_t1_min
-                     if self.progress.train:
-                        self.train()
                      self.progress.bump()
 
       @AgentDecorators.register_handler(UNIX_SIGNALS)
