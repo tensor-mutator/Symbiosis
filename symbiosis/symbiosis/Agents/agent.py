@@ -437,6 +437,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           config.gpu_options.allow_growth = True
           return config
 
+class AgentMCTS(Agent):
+
+      @property
+      def predict_p_v(self) -> Callable:
+          return self._predict_p_v
+
 class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
       @abstractmethod
