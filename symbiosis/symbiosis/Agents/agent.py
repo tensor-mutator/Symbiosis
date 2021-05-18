@@ -445,6 +445,10 @@ class AgentMCTS(Agent):
 
 class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
+      @property
+      def alias(self) -> str:
+          return self._alias
+
       @abstractmethod
       @AgentDecorators.record
       def state(self, x_t1: np.ndarray, s_t: np.ndarray = None) -> np.ndarray:
