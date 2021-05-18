@@ -201,7 +201,7 @@ class Chess(Environment):
           elif score > 0:
              self._winner, self_reward = Chess.Winner.WHITE, 1
           else:
-             self._winner, self_reward = Chess.Winner.BLACK, -1
+             self._winner, self_reward = Chess.Winner.BLACK, 0
 
       def _check_ended(self) -> Tuple:
           reward, winner, ended = 0, Chess.Winner.NONE, False
@@ -211,14 +211,14 @@ class Chess(Environment):
              if result == "1-0":
                 winner, reward = Chess.Winner.WHITE, 1
              elif result == "0-1":
-                winner, reward = Chess.Winner.BLACK, -1
+                winner, reward = Chess.Winner.BLACK, 0
              else:
                 winner, reward = Chess.Winner.DRAW, 0.5
           return ended, dict(winner=winner), reward, winner
 
       def _resign(self) -> Tuple:
           if self._board.turn == chess.WHITE:
-             winner, reward = Chess.Winner.BLACK, -1
+             winner, reward = Chess.Winner.BLACK, 0
           else:
              winner, reward = Chess.Winner.WHITE, 1
           return dict(winner=winner), reward, winner
