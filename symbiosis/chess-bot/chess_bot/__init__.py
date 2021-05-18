@@ -1,5 +1,5 @@
 from symbiosis import Environment, State, Action, config
-from symbiosis.Agents import AGZ
+from symbiosis.Agents import AGZ, Player
 from symbiosis.colors import COLORS
 from symbiosis.Agents.Utilities import Progress
 from typing import Tuple, Sequence, Any, List, Dict
@@ -334,3 +334,10 @@ class Chess(Environment):
           self.state.observation = None
           self.state.frame = None
           self._winner = Chess.Winner.NONE
+
+def main():
+    env = Chess()
+    max_player = Player(env, alias="WHITE")
+    min_player = Player(env, alias="BLACK")
+    agent = AGZ(max_min_players=(max_player, min_player), env=env, config=config.VERBOSE_LITE)
+    agent.run()
