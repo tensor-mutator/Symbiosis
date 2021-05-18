@@ -443,6 +443,10 @@ class AgentMCTS(Agent):
       def predict_p_v(self) -> Callable:
           return self._predict_p_v
 
+      @property
+      def self_play_buffer(self) -> deque:
+          return self._self_play_buffer
+
 class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
       @property
