@@ -5,7 +5,7 @@ from typing import Tuple, List
 from ..network_base import NetworkBaseAGZ
 from ..Utilities import NetBlocks, Model, Pipeline
 
-class AGZChessNet:
+class AGZChessNet(NetworkBaseAGZ):
 
       type: str = "AGZChess"
 
@@ -34,6 +34,6 @@ class AGZChessNet:
                 return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
-          return Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=action_size, dtype=tf.float32),
-                                                                                        v_target=dict(shape=1, dtype=tf.float32)),
-                          model=AGZChessNet.AGZChessNetModel, **params)
+          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=action_size, dtype=tf.float32),
+                                                                                                  v_target=dict(shape=1, dtype=tf.float32)),
+                                    model=AGZChessNet.AGZChessNetModel, **params)
