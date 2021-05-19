@@ -5,7 +5,7 @@ from typing import Tuple, List
 from ..network_base import NetworkBaseAGZ
 from ..Utilities import NetBlocks, Model, Pipeline
 
-class AGZChessNet(NetworkBaseAGZ):
+class AGZChessNet:
 
       type: str = "AGZChess"
 
