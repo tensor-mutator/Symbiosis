@@ -3,6 +3,13 @@ from typing import Dict, Callable, List
 from tqdm import tqdm
 from ..model import Model
 
+GREEN = "\033[32m"
+MAGENTA = "\033[35m"
+CYAN = "\033[36m"
+DEFAULT = "\033[0m"
+WIPE = "\033[2K"
+UP = "\033[2A"
+
 class Pipeline:
 
       def __init__(self, meta_X: Dict, meta_y: Dict, model: Model, batch_size: int, **params) -> None:
@@ -67,19 +74,29 @@ class Pipeline:
                    self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_train, ys_train))
                    with tqdm(total=len(X_train)) as progress:
                         try:
+                           train_losss = 0
                            while True:
-                                 train_loss = fetch()
+                                 train_loss += fetch()
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
                    self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_test, ys_test))
                    with tqdm(total=len(X_test)) as progress:
                         try:
+                           test_loss
                            while True:
-                                 test_loss = fetch(train=False)
+                                 test_loss += fetch(train=False)
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
+                   self._print_summary(epoch+1, train_loss/n_batches_train, test_loss/n_batches_test)
+
+      def _print_summary(self, epoch: int, train_loss: float, test_loss: float) -> None:
+          print(f"{UP}\r{WIPE}\n{WIPE}EPOCH: {CYAN}{epoch}{DEFAULT}")
+          print(f"\n\tTraining set:")
+          print(f"\n\t\tLoss: {GREEN}{train_loss}{DEFAULT}")
+          print(f"\n\tTest set:")
+          print(f"\n\t\tLoss: {MAGENTA}{test_loss/n_batches_test}{DEFAULT}")
 
       def __del__(self) -> None:
           self._session.close()
