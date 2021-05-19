@@ -2,6 +2,7 @@ import tensorflow.compat.v1 as tf
 from typing import Dict, Callable, List
 from tqdm import tqdm
 from ..model import Model
+from ...colors import COLORS
 
 GREEN = "\033[32m"
 MAGENTA = "\033[35m"
@@ -92,11 +93,11 @@ class Pipeline:
                    self._print_summary(epoch+1, train_loss/n_batches_train, test_loss/n_batches_test)
 
       def _print_summary(self, epoch: int, train_loss: float, test_loss: float) -> None:
-          print(f"{UP}\r{WIPE}\n{WIPE}EPOCH: {CYAN}{epoch}{DEFAULT}")
+          print(f"{COLORS.UP}\r{COLORS.WIPE}\n{COLORS.WIPE}EPOCH: {COLORS.CYAN}{epoch}{COLORS.DEFAULT}")
           print(f"\n\tTraining set:")
-          print(f"\n\t\tLoss: {GREEN}{train_loss}{DEFAULT}")
+          print(f"\n\t\tLoss: {COLORS.GREEN}{train_loss}{COLORS.DEFAULT}")
           print(f"\n\tTest set:")
-          print(f"\n\t\tLoss: {MAGENTA}{test_loss/n_batches_test}{DEFAULT}")
+          print(f"\n\t\tLoss: {COLORS.MAGENTA}{test_loss/n_batches_test}{COLORS.DEFAULT}")
 
       def __del__(self) -> None:
           self._session.close()
