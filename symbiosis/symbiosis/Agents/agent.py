@@ -171,7 +171,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                           self._episode_suite_agz()
 
       def _episode_suite_agz(self) -> None:
-          with self._episode_context_mcts(self.env, self.progress, self._reward_manage) as [frame_t, path_t]:
+          with self._episode_context_mcts(self.env, self.progress, self._reward_manager) as [frame_t, path_t]:
                while not self.env.ended and self.progress.clock < self.total_steps:
                      _, a_t_min = self.action(self.env)
                      _, r_t_min, _, _ = self.env.step(a_t_min)
