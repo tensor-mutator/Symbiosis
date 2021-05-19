@@ -1,5 +1,6 @@
 import tensorflow.compat.v1 as tf
 from typing import Dict, Callable, List
+from tqdm import tqdm
 from ..model import Model
 
 class Pipeline:
@@ -45,8 +46,40 @@ class Pipeline:
           with self._session.graph.as_default():
                return self._session.run(self._predict_model.y_hat, feed_dict={self._X_predict: X})
 
-      def fit(self, x: np.ndarray, ys: List[np.ndarray]) -> float:
-          
+      def fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
+              ys_test: List[np.ndarray], n_epochs: int) -> float:
+          def feed_dict(X: np.ndarray, ys: np.ndarray) -> Dict:
+              feed_dict = {self._X_fit: X}
+              for plc, y in zip(self._ys_fit, ys):
+                  feed_dict.update({plc: y})
+              return feed_dict
+          def fetch(train=True) -> float:
+              if train:
+                 loss, _ = self._session.run([self._fit_model.loss, self._fit_model.grad])
+                 return loss
+              loss = self._session.run(self._fit_model.loss)
+              return loss
+          n_batches_train = np.ceil(np.size(X_train, axis=0)/self._batch_size)
+          n_batches_test = np.ceil(np.size(X_test, axis=0)/self._batch_size)
+          with self._session.graph.as_default():
+               self._session.run(tf.global_variables_initializer())
+               for epoch in range(n_epochs):
+                   self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_train, ys_train))
+                   with tqdm(total=len(X_train)) as progress:
+                        try:
+                           while True:
+                                 train_loss = fetch()
+                                 progress.update(self._batch_size)
+                        except tf.errors.OutOfRangeError:
+                           ...
+                   self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_test, ys_test))
+                   with tqdm(total=len(X_test)) as progress:
+                        try:
+                           while True:
+                                 test_loss = fetch(train=False)
+                                 progress.update(self._batch_size)
+                        except tf.errors.OutOfRangeError:
+                           ...
 
       def __del__(self) -> None:
           self._session.close()
