@@ -7,6 +7,7 @@ from .lego import NetBlocks
 from .flow import LucasKanadeFlow, GunnarFarnebackFlow
 from .event_writer import EventWriter
 from .tree import Tree
+from .pipeline import Pipeline
 
 __all__ = ["LRScheduler", "Progress", "ProgressDQN", "Exceptions", "RewardManager", "ELOManager", "NetBlocks", "Inventory", "LucasKanadeFlow",
-           "GunnarFarnebackFlow", "BetaScheduler", "EpsilonScheduler", "TauScheduler", "Tree"]
+           "GunnarFarnebackFlow", "BetaScheduler", "EpsilonScheduler", "TauScheduler", "Tree", "Pipeline"]
