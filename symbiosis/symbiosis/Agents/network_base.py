@@ -1,4 +1,5 @@
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
+import numpy as np
 import tensorflow.compat.v1 as tf
 
 class NetworkMeta(type):
@@ -52,34 +53,8 @@ class NetworkBaseAGZ(metaclass=NetworkMeta):
 
       type: str = "AGZ"
 
-      @property
-      def state(self) -> tf.Tensor:
-          return self._state
+      def predict(self, X: np.ndarray) -> Tuple:
+          return self._pipeline.predict(X)
 
-      @property
-      def v_predicted(self) -> tf.Tensor:
-          return self._v_predicted
-
-      @property
-      def v_target(self) -> tf.Tensor:
-          return self._v_target
-
-      @property
-      def p_predicted(self) -> tf.Tensor:
-          return self._p_predicted
-
-      @property
-      def p_target(self) -> tf.Tensor:
-          return self._p_target
-
-      @property
-      def learning_rate(self) -> float:
-          return self._learning_rate
-
-      @property
-      def grad(self) -> tf.Tensor:
-          return self._grad
-
-      @property
-      def loss(self) -> tf.Tensor:
-          return self._loss
+      def fit(self, X: np.ndarray, ys: List[np.ndarray]) -> float:
+          return self._pipeline.fit(X, ys)
