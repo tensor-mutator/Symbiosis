@@ -11,6 +11,10 @@ class Model:
           return self._X
 
       @property
+      def y_id(self) -> List[str]:
+          return self._y_id
+
+      @property
       def grad(self) -> tf.Tensor:
           return self._grad
 
