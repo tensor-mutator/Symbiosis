@@ -10,6 +10,7 @@ from collections import deque
 import numpy as np
 import dill
 from random import sample
+from sklearn.model_selection import train_test_split
 from .network import AGZChessNet
 from ..agent import AgentMCTS, AgentForked
 from ..flow_base import Flow
@@ -30,7 +31,7 @@ class AGZ(AgentMCTS):
           self._flow = flow
           self._alias = network.type
           self._progress = self.load_progress(Progress.AGZ)
-          self._session = self._build_network_graph(network, hyperparams)
+          self._model = self._build_network_graph(network, hyperparams)
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
                                             self.writer)
@@ -43,21 +44,16 @@ class AGZ(AgentMCTS):
           self._min_player.initiate(predict_p_v, buffer, tau_scheduler)
 
       def _build_network_graph(self, network: NetworkBaseAGZ, hyperparams: Dict) -> tf.Session:
-          graph = tf.Graph()
-          session = tf.Session(graph=graph, config=self.ConfigProto)
-          with graph.as_default():
-               self._network = network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
-          return session
+          return network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
 
       def _predict_p_v(self, env: Environment) -> Tuple:
-          p, v = self._session.run([self._network.p_predicted, self._network.v_predicted],
-                                   feed_dict={self._network.state: env.state.canonical})
+          p, v = self._model.predict(env.state.canonical)
           return env.predict(p, v)
 
       def _read_params(self, hyperparams: Dict) -> None:
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
-          self._batch_size = hyperparams.get("batch_size", 32)
+          self._n_epochs = hyperparams.get("n_epochs", 1)
 
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
@@ -72,16 +68,15 @@ class AGZ(AgentMCTS):
           min_state, min_path = self._min_player.state(env)
           return (min_state, min_path,)+tuple(self._max_state)
 
-      def train(self) -> float:
-          batch_size = min(self._batch_size, len(self._self_play_buffer))
-          self_play_data = np.array(sample(self._self_play_buffer, k=batch_size), dtype=np.float32)
+      def train(self) -> None:
+          self_play_data = np.array(self._self_play_buffer, dtype=np.float32)
           state = np.vstack(self_play_data[:, 0])
           p_target = np.vstack(self_play_data[:, 1])
           v_target = np.vstack(self_play_data[:, 2])
-          loss, _ = self._session.run([self._network.loss, self._network.grad], feed_dict={self._network.state: state,
-                                                                                           self._network.p_target: p_target,
-                                                                                           self._network.v_target: v_target})
-          return loss
+          state_train, state_test, p_target_train, p_target_test, v_target_train, v_target_test = train_test_split([state, p_target, v_target],
+                                                                                                                   train_size=0.8, test_size=0.2)
+          self._model.fit(X_train=state_train, X_test=state_test, ys_train=[p_target_train, v_target_train],
+                                    ys_test=[p_target_test, v_target_test], n_epochs=self._n_epochs)
 
       @Agent.register("suite_agz")
       def run(self) -> None:
@@ -98,6 +93,3 @@ class AGZ(AgentMCTS):
              raise MissingDataError("Self play data not found")
           with open(self_play_data_path, "rb") as io:
                self._self_play_buffer = dill.load(io)
-
-      def __del__(self) -> None:
-          self._session.close()
