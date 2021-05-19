@@ -4,13 +4,6 @@ from tqdm import tqdm
 from ..model import Model
 from ...colors import COLORS
 
-GREEN = "\033[32m"
-MAGENTA = "\033[35m"
-CYAN = "\033[36m"
-DEFAULT = "\033[0m"
-WIPE = "\033[2K"
-UP = "\033[2A"
-
 class Pipeline:
 
       def __init__(self, meta_X: Dict, meta_y: Dict, model: Model, batch_size: int, **params) -> None:
