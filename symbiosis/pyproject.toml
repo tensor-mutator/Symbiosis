@@ -5,7 +5,7 @@ description = "Symbiosis"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.6.8"
+python = "^3.6.8"
 enduro-bot = { path = "enduro-bot/" }
 flappy-bird-bot = { path = "flappy-bird-bot/" }
 flappy-bird-with-gunnar-farneback-bot = { path = "flappy-bird-with-gunnar-farneback-bot/" }
