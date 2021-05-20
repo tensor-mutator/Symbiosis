@@ -5,6 +5,7 @@ A precise implementation of a zero sum player module
 """
 
 from typing import Callable, Dict
+import numpy as np
 from collections import deque
 import tensorflow.compat.v1 as tf
 from ..agent import AgentForked
