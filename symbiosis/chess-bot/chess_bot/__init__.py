@@ -128,6 +128,7 @@ class Chess(Environment):
       def __init__(self, max_moves: int = None, progress: Progress = None) -> None:
           self._max_moves = max_moves
           self._progress = progress
+          self._board = None
 
       @property
       def name(self) -> str:
