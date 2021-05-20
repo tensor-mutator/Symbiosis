@@ -19,7 +19,7 @@ class ChessState(State):
 
       @property
       def shape(self) -> Tuple[int, int]:
-          return (8, 8,)
+          return (8, 8, 18,)
 
 class ChessAction(Action):
 
