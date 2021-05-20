@@ -22,7 +22,7 @@ class Pipeline:
           placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
           placeholders_y = list()
           for id, meta in meta_y.items():
-              placeholder_y = tf.placeholder(shape=(None,)+meta["shape"], dtype=meta["dtype"])
+              placeholder_y = tf.placeholder(shape=(None, meta["shape"],), dtype=meta["dtype"])
               placeholders_y.append(placeholder_y)
           dataset = tf.data.Dataset.from_tensor_slices((placeholder_X,)+tuple(placeholders_y))
           dataset = dataset.shuffle(tf.cast(tf.shape(placeholder_X)[0], tf.int64)).batch(batch_size).prefetch(1)
