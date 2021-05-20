@@ -30,8 +30,7 @@ class AGZ(AgentMCTS):
           self._config = config
           self._flow = flow
           self._alias = network.type
-          self._progress = self.load_progress(Progress.AGZ, n_steps=self.total_steps, train_interval=self.training_interval,
-                                              explore=self.explore)
+          self._progress = self.load_progress(Progress.AGZ, n_steps=self.total_steps, explore=self.explore)
           self._model = self._build_network_graph(network, hyperparams)
           self._read_params(hyperparams)
           self._tau_scheduer = TauScheduler(self._tau_scheduler_scheme, self._tau_range, self._progress, self._config,
@@ -55,6 +54,8 @@ class AGZ(AgentMCTS):
           self._tau_scheduler_scheme = hyperparams.get("tau_scheduler_scheme", "exponential")
           self._tau_range = hyperparams.get("tau_range", (0.99, 0.1))
           self._n_epochs = hyperparams.get("n_epochs", 1)
+          self._explore = hyperparams.get("explore", 50000)
+          self._total_steps = hyperparams.get("total_steps", 10000000)
 
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
