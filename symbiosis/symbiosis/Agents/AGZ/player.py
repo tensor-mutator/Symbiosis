@@ -1,3 +1,9 @@
+"""
+@author: Debajyoti Raychaudhuri
+
+A precise implementation of a zero sum player module
+"""
+
 from typing import Callable
 from collections import deque
 import tensorflow.compat.v1 as tf
