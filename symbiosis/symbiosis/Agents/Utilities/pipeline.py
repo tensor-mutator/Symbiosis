@@ -107,10 +107,10 @@ class Pipeline:
       def _sync_ops(self) -> tf.group:
           trainable_vars_predict = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="PREDICT")
           trainable_vars_fit = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="FIT")
-          update_ops = list()
+          sync_ops = list()
           for from_ ,to_ in zip(trainable_vars_fit, trainable_vars_predict):
-              update_ops.append(to_.assign(from_))
-          return tf.group(update_ops)
+              sync_ops.append(to_.assign(from_))
+          return tf.group(sync_ops)
 
       def __del__(self) -> None:
           self._session.close()
