@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "flappy-bird-bot"
 version = "0.1.0"
-description = ""
+description = "Flappy Bird Bot"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
