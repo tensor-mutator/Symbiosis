@@ -12,7 +12,7 @@ class AGZChessNet(NetworkBaseAGZ):
 
       class AGZChessNetModel(Model):
 
-            def __init__(self, placeholder_X: tf.placeholder, placeholders_y: Dict = None, shapes_y: Dict = None, **params) -> None:
+            def __init__(self, placeholder_X: tf.placeholder, shapes_y: Dict, placeholders_y: Dict = None, **params) -> None:
                 self._X = placeholder_X
                 p_out, v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(placeholder_X)
                 logits =  NetBlocks.layers.Dense(units=shapes_y.get("p_target"),
