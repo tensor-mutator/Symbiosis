@@ -15,7 +15,7 @@ from .network import AGZChessNet
 from ..agent import AgentMCTS, AgentForked
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
-from ..Utilities import Progress
+from ..Utilities import Progress, TauScheduler
 from ...environment import Environment
 from ...config import config
 
