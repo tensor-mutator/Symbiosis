@@ -4,7 +4,7 @@
 A precise implementation of a zero sum player module
 """
 
-from typing import Callable
+from typing import Callable, Dict
 from collections import deque
 import tensorflow.compat.v1 as tf
 from ..agent import AgentForked
