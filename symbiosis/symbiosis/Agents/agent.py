@@ -493,3 +493,7 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
       @abstractmethod
       def save(self) -> None:
           ...
+
+      @property
+      def config(self) -> config:
+          return self._config
