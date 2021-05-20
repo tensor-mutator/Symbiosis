@@ -18,6 +18,10 @@ class Pipeline:
           self._sync = self._sync_ops()
           self._session = tf.Session(config=self._config())
 
+      @property
+      def graph(self) -> tf.Graph:
+          return self._session.graph  
+
       def _generate_iterator(self, meta_X: Dict, meta_y: Dict, batch_size: int) -> Tuple[tf.data.Iterator, tf.placeholder, List[tf.placeholder]]:
           placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
           placeholders_y = list()
