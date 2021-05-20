@@ -20,7 +20,11 @@ class Pipeline:
 
       @property
       def graph(self) -> tf.Graph:
-          return self._session.graph  
+          return self._session.graph
+
+      @property
+      def session(self) -> tf.Session:
+          return self._session
 
       def _generate_iterator(self, meta_X: Dict, meta_y: Dict, batch_size: int) -> Tuple[tf.data.Iterator, tf.placeholder, List[tf.placeholder]]:
           placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
