@@ -235,7 +235,7 @@ class Chess(Environment):
                rgb = cv2.imread(png_file)
           return rgb
 
-      def _to_observation(self, board: chess.Board) -> Chess.Observation:
+      def _to_observation(self, board: chess.Board) -> "<Chess.Observation>":
           obs = board.fen().rsplit(' ', 1)[0]
           return Chess.Observation(*obs.split())
 
