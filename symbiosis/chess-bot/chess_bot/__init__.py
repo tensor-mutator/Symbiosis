@@ -113,18 +113,6 @@ class Chess(Environment):
             WHITE: int = 2
             DRAW: int = 3
 
-      @dataclass
-      class Observation:
-            """
-                Holds the current observation
-            """
-            
-            position: str
-            active: str
-            castle: str
-            en_passant: str
-            fifty_move: str
-
       def __init__(self, max_moves: int = None, progress: Progress = None) -> None:
           self._max_moves = max_moves
           self._progress = progress
@@ -237,8 +225,7 @@ class Chess(Environment):
           return rgb
 
       def _to_observation(self, board: chess.Board) -> "<Chess.Observation>":
-          obs = board.fen().rsplit(' ', 1)[0]
-          return Chess.Observation(*obs.split())
+          return board.fen()
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
           fen = board.fen()
