@@ -141,7 +141,7 @@ class Chess(Environment):
           self._winner = Chess.Winner.NONE
           self._ended = False
 
-      def _copy_vars(self, other: Chess) -> Chess:
+      def _copy_vars(self, other: "<Chess>") -> Chess:
           variables = vars(self)
           other.__dict__.update(variables)
           return other
