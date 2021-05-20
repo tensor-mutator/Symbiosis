@@ -11,9 +11,10 @@ class Singleton:
 
       def __new__(cls, *args, **kwargs) -> "<Singleton inst>":
           owner = stack()[1][0].f_locals.get("self")
-          if Singleton._singleton.get(owner, None) is None:
-             Singleton._singleton[owner] = super(Singleton, cls).__new__(cls, *args, **kwargs)
-          return Singleton._singleton[owner]
+          key = json.dumps(dict(owner=owner.__class__.__name__, cls=cls.__name__))
+          if Singleton._singleton.get(key, None) is None:
+             Singleton._singleton[key] = super(Singleton, cls).__new__(cls)
+          return Singleton._singleton[key]
 
 class State(Singleton, metaclass=ABCMeta):
 
