@@ -14,7 +14,7 @@ class AGZChessNet(NetworkBaseAGZ):
 
             def __init__(self, placeholder_X: tf.placeholder, placeholders_y: Dict = None, **params) -> None:
                 self._X = placeholder_X
-                p_out, v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(self._state)
+                p_out, v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(placeholder_X)
                 logits =  NetBlocks.layers.Dense(units=action_size, kernel_regularizer=regularizers.l2(1e-4))(p_out)
                 p_predicted = layers.Activation("softmax")(logits)
                 self._y_hat = [p_predicted, v_predicted]
