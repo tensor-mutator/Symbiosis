@@ -35,7 +35,8 @@ class DDQN(Agent):
           self._config = config
           self._flow = flow
           self._read_params(hyperparams)
-          self._progress = self.load_progress(Progress.DQN(self.total_steps, self.training_interval, self.observe, self.explore))
+          self._progress = self.load_progress(Progress.DQN, n_steps=self.total_steps, train_interval=self.training_interval, observe=self.observe,
+                                              explore=self.explore)
           self._alias = self._define_alias(network.type, hyperparams)
           self._epsilon_scheduler = EpsilonScheduler(self._epsilon_scheduler_scheme, self._epsilon_range, self._progress, self._config,
                                                         self.writer)
