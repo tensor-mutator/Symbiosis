@@ -335,12 +335,12 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
              self._reward_manager.save(self.workspace, self.alias, self._session)
              self.save()
 
-      def load_progress(self, progress: Progress) -> Progress:
+      def load_progress(self, progress: Progress, **params) -> Progress:
           if (self.config & config.LOAD_WEIGHTS) and os.path.exists(os.path.join(self.workspace,
                                                                                  "{}.progress".format(self.alias))):
              with open(os.path.join(self.workspace, "{}.progress".format(self.alias)), "rb") as f_obj:
                   return dill.load(f_obj)
-          return progress(self.total_steps, self.training_interval, self.observe, self.explore)
+          return progress(**params)
 
       def _save_hyperparams(self) -> None:
           if not self.config & config.SAVE_WEIGHTS:
