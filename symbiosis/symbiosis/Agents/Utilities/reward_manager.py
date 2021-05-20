@@ -25,7 +25,7 @@ class ELOManager:
           self._env = env
           self._agent = agent
           self._progress = progress
-          self._elo_event = config_ & config.ELO_EVENT
+          self._elo_event = config_ & config.REWARD_EVENT
           self._elo_buffer = deque()
           self._episode_indices = deque()
           self._writer = writer
