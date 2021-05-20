@@ -11,7 +11,7 @@ import tensorflow.compat.v1 as tf
 import numpy as np
 from .tree import Tree
 from ..network_base import NetworkBaseAGZ
-from ....environment import Environment
+from ...environment import Environment
 
 __all__ = ["MCTS"]
 
