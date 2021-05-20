@@ -5,7 +5,7 @@ description = ""
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.6.8"
+python = "^3.6.8"
 gym = "0.15.7"
 ple = { path = "PyGame-Learning-Environment/" }
 gym_ple = "^0.3"
