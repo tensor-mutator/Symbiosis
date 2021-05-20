@@ -19,7 +19,7 @@ from ..Utilities import Progress
 from ...environment import Environment
 from ...config import config
 
-@Agent.track(AGZChessNet)
+@AgentMCTS.track(AGZChessNet)
 class AGZ(AgentMCTS):
 
       def __init__(self, max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
