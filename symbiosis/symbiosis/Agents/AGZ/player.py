@@ -11,14 +11,16 @@ import tensorflow.compat.v1 as tf
 from ..agent import AgentForked
 from ..Utilities import Tree, Progress, MCTS, TauScheduler
 from ...environment import Environment
+from ...config import config
 
 class Player(AgentForked):
 
-      def __init__(self, env: Environment, alias: str, **hyperparams) -> None:
+      def __init__(self, env: Environment, alias: str, config: bin = config.DEFAULT, **hyperparams) -> None:
           self._env = env
           self._hyperparams = hyperparams
           self._read_params(hyperparams)
           self._alias = alias
+          self._config = config
 
       def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler, progress: Progress) -> None:
           self._mcts = self._initiate_tree(predict_p_v, self._hyperparams)
