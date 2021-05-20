@@ -41,7 +41,7 @@ class Pipeline:
           with tf.variable_scope("PREDICT"):
                placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
                model = model(placeholder_X=placeholder_X, shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)},
-                             placeholders_y=None, shapes_y=None, **params)
+                             placeholders_y=None, **params)
           return model, placeholder_X
 
       @contextmanager
