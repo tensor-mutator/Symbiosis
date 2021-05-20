@@ -3,7 +3,8 @@ import tensorflow.compat.v1.keras.regularizers as regularizers
 import tensorflow.compat.v1.keras.layers as layers
 from typing import Tuple, List
 from ..network_base import NetworkBaseAGZ
-from ..Utilities import NetBlocks, Model, Pipeline
+from ..model import Model
+from ..Utilities import NetBlocks, Pipeline
 
 class AGZChessNet(NetworkBaseAGZ):
 
