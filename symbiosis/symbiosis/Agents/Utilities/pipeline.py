@@ -33,14 +33,15 @@ class Pipeline:
           placeholder_X = placeholders[0]
           placeholders_y = {id: plc for id, plc in zip(self._y_ids, placeholders[1:])}
           with tf.variable_scope("FIT"):
-               model = model(placeholder_X=placeholder_X, placeholders_y=placeholders_y, 
-                             shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)}, **params)
+               model = model(placeholder_X=placeholder_X, shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)},
+                             placeholders_y=placeholders_y, **params)
           return model
 
       def _build_predict_graph(self, meta_X: Dict, model: Model, **params) -> Model:
           with tf.variable_scope("PREDICT"):
                placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
-               model = model(placeholder_X=placeholder_X, placeholders_y=None, shapes_y=None, **params)
+               model = model(placeholder_X=placeholder_X, shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)},
+                             placeholders_y=None, shapes_y=None, **params)
           return model, placeholder_X
 
       @contextmanager
