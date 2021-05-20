@@ -242,7 +242,7 @@ class Chess(Environment):
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
           fen = board.fen()
-          if self.action.turn == self.action.Turn.BLACK:
+          if self.action.turn == self.Turn.BLACK:
              fen = self._flip(fen)
           primary_planes = self._primary_planes(fen)
           ancillary_planes = self._ancillary_planes(fen)
