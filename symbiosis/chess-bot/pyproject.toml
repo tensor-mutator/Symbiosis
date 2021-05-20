@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "chess-bot"
 version = "0.1.0"
-description = ""
+description = "Chess Bot"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
