@@ -20,18 +20,17 @@ class Player(AgentForked):
           self._alias = alias
 
       def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
-          self._mcts, self._tree = self._initiate_tree(predict_p_v, self._hyperparams)
+          self._mcts = self._initiate_tree(predict_p_v, self._hyperparams)
           self._tau_scheduer = tau_scheduler
           self._buffer = buffer
 
-      def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> Tuple[MCTS, Tree]:
+      def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
           n_threads = hyperparams.get("n_threads", 3)
           n_simulations = hyperparams.get("n_simulations", 16)
-          tree = Tree()
-          mcts = MCTS(env=self._env, tree=tree, virtual_loss=virtual_loss, n_threads=n_threads,
+          mcts = MCTS(env=self._env, tree=Tree(), virtual_loss=virtual_loss, n_threads=n_threads,
                       n_simulations=n_simulations, predict=predict_p_v, **hyperparams)
-          return mcts, tree
+          return mcts
 
       def _read_params(self, hyperparams: Dict) -> None:
           self._resign_value = hyperparams.get("resign_value", -0.8)
@@ -52,7 +51,7 @@ class Player(AgentForked):
 
       def _policy_target(self) -> np.ndarray:
           policy = np.zeros(self._env.action.size, dtype=np.float32)
-          for action, stat in self._tree[self._env.state.observation].edges.items():
+          for action, stat in self._mcts.tree[self._env.state.observation].edges.items():
               policy[self._env.action.move2index(action)] = stat.n
           policy = policy/np.sum(policy)
           return policy
@@ -66,7 +65,7 @@ class Player(AgentForked):
           return policy/np.sum(policy)
 
       def save(self, workspace: str, alias: str) -> None:
-          self._tree.save(workspace, alias)
+          self._mcts.tree.save(workspace, alias)
 
       def load(self, workspace: str, alias: str) -> None:
-          self._tree.load(workspace, alias)
+          self._mcts.tree.load(workspace, alias)
