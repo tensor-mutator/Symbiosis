@@ -146,7 +146,7 @@ class Chess(Environment):
           other.__dict__.update(variables)
           return other
 
-      def copy(self) -> Chess:
+      def copy(self) -> "<Chess>":
           env = Chess()
           env.make()
           env = self._copy_vars(env)
