@@ -1,6 +1,6 @@
 import tensorflow.compat.v1 as tf
 import numpy as np
-from typing import Dict, Callable, List, Tuple
+from typing import Dict, Callable, List, Tuple, Generator
 from tqdm import tqdm
 from contextlib import contextmanager
 from ..model import Model
@@ -53,7 +53,7 @@ class Pipeline:
           return model, placeholder_X
 
       @contextmanager
-      def _fit_context(self) -> None:
+      def _fit_context(self) -> Generator:
           yield
           self._session.run(self._sync)
 
