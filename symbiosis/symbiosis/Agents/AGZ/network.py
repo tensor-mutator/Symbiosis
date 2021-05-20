@@ -36,6 +36,6 @@ class AGZChessNet(NetworkBaseAGZ):
                 return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
-          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=(action_size,), dtype=tf.float32),
-                                                                                                  v_target=dict(shape=(1,), dtype=tf.float32)),
+          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=action_size, dtype=tf.float32),
+                                                                                                  v_target=dict(shape=1, dtype=tf.float32)),
                                     model=AGZChessNet.AGZChessNetModel, **params)
