@@ -29,6 +29,10 @@ class MCTS:
           self._c_puct = params.get("c_puct", 1.5)
           self._dirichlet_alpha = params.get("dirichlet_alpha", 0.3)
 
+      @property
+      def tree(self) -> Tree:
+          return self._tree
+
       def search(self) -> float:
           """
               Returns:
