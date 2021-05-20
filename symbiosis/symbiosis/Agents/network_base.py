@@ -62,3 +62,7 @@ class NetworkBaseAGZ(metaclass=NetworkMeta):
       @property
       def graph(self) -> tf.Graph:
           return self._pipeline.graph
+
+      @property
+      def session(self) -> tf.Session:
+          return self._pipeline.session
