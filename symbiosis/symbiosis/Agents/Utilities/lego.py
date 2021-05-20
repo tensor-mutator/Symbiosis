@@ -127,7 +127,7 @@ class NetBlocks:
 
             @staticmethod
             def ChessNet(batch_norm: bool = False) -> Callable:
-                def _op(tensor: tf.Tensor) -> List[tf.Tensor, tf.Tensor]:
+                def _op(tensor: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
                     tensor_out = NetBlocks.layers.Conv2D(filters=256, kernel_size=(5, 5), padding="same", batch_norm=batch_norm,
                                                          kernel_regularizer=regularizers.l2(1e-4))(tensor)
                     for _ in range(7):
