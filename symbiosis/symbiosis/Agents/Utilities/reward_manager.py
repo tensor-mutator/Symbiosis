@@ -100,7 +100,6 @@ class RewardManager:
           self._n_steps = 0
           self._reward_event = config_ & config.REWARD_EVENT
           self._writer = writer
-          self._zero_sum = zero_sum
           self._console_summary = config_ & (config.VERBOSE_LITE+config.VERBOSE_HEAVY)
 
       def update(self, reward: float) -> None:
