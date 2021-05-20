@@ -36,5 +36,5 @@ class AGZChessNet(NetworkBaseAGZ):
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
           self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=action_size, dtype=tf.float32),
-                                                                                                  v_target=dict(shape=1, dtype=tf.float32)),
+                                                                                                  v_target=dict(shape=(1,), dtype=tf.float32)),
                                     model=AGZChessNet.AGZChessNetModel, **params)
