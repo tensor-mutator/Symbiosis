@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from typing import Dict, Any, Generator, Callable, List
+from typing import Dict, Any, Generator, Callable, List, Tuple
 from contextlib import contextmanager, suppress
 from glob import glob
 import tensorflow.compat.v1 as tf
@@ -438,6 +438,20 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           return config
 
 class AgentMCTS(Agent):
+
+      @staticmethod
+      def track(max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
+                network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
+          def outer(cls: Callable) -> Callable:
+              def inner(max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
+                        network: NetworkMeta = network, config: bin = config,
+                        flow: Flow = flow, **hyperparams) -> None:
+                  inst = cls(max_min_players, env, network, config, flow, **hyperparams)
+                  inst._params = dict(max_min_players=max_min_players, env=env, network=network,
+                                     config=config, flow=flow)
+                  return inst
+              return inner
+          return outer
 
       @property
       def predict_p_v(self) -> Callable:
