@@ -19,10 +19,11 @@ class Player(AgentForked):
           self._read_params(hyperparams)
           self._alias = alias
 
-      def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
+      def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler, progress: Progress) -> None:
           self._mcts = self._initiate_tree(predict_p_v, self._hyperparams)
           self._tau_scheduer = tau_scheduler
           self._buffer = buffer
+          self._progress = progress
 
       def _initiate_tree(self, predict_p_v: Callable, hyperparams: Dict) -> MCTS:
           virtual_loss = hyperparams.get("virtual_loss", 3)
@@ -43,7 +44,7 @@ class Player(AgentForked):
       def action(self, env: Environment) -> Any:
           value = self._mcts.search()
           policy = self._policy_target()
-          if value <= self._resign_value and env.n_halfmoves > self._min_resign_moves:
+          if value <= self._resign_value and self._progress.clock_half > self._min_resign_moves:
              return None
           self._buffer.append((env.state.canonical, policy, value))
           action_idx = np.random.choice(np.arange(env.action.size), p=self._policy_with_temperature(policy))
