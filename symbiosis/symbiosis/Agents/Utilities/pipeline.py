@@ -1,4 +1,5 @@
 import tensorflow.compat.v1 as tf
+import numpy as np
 from typing import Dict, Callable, List, Tuple
 from tqdm import tqdm
 from contextlib import contextmanager
