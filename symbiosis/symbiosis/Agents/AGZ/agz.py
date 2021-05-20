@@ -40,8 +40,8 @@ class AGZ(AgentMCTS):
           self._max_state = deque(max_len=1)
 
       def _initiate_players(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
-          self._max_player.initiate(predict_p_v, buffer, tau_scheduler)
-          self._min_player.initiate(predict_p_v, buffer, tau_scheduler)
+          self._max_player.initiate(predict_p_v, buffer, tau_scheduler, self._progress)
+          self._min_player.initiate(predict_p_v, buffer, tau_scheduler, self._progress)
 
       def _build_network_graph(self, network: NetworkBaseAGZ, hyperparams: Dict) -> tf.Session:
           return network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
