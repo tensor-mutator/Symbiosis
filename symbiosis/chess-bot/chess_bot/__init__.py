@@ -338,7 +338,7 @@ class Chess(Environment):
 
 def main():
     env = Chess()
-    max_player = Player(env, alias="WHITE")
-    min_player = Player(env, alias="BLACK")
+    max_player = Player(env, alias="WHITE", config=config.VERBOSE_LITE)
+    min_player = Player(env, alias="BLACK", config=config.VERBOSE_LITE)
     agent = AGZ(max_min_players=(max_player, min_player), env=env, config=config.VERBOSE_LITE)
     agent.run()
