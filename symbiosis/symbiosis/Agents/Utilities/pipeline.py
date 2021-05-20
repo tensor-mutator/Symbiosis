@@ -11,6 +11,7 @@ class Pipeline:
       def __init__(self, meta_X: Dict, meta_y: Dict, model: Model, batch_size: int = 32, **params) -> None:
           self._batch_size = batch_size
           self._y_ids = list(meta_y.keys())
+          self._y_shapes = list(map(lambda meta: meta["shape"], list(meta_y.values())))
           self._iterator, self._X_fit, self._ys_fit = self._generate_iterator(meta_X, meta_y, batch_size)
           self._fit_model = self._build_fit_graph(self._iterator, model, **params)
           self._predict_model, self._X_predict = self._build_predict_graph(meta_X, model, **params)
@@ -32,13 +33,14 @@ class Pipeline:
           placeholder_X = placeholders[0]
           placeholders_y = {id: plc for id, plc in zip(self._y_ids, placeholders[1:])}
           with tf.variable_scope("FIT"):
-               model = model(placeholder_X=placeholder_X, placeholders_y=placeholders_y, **params)
+               model = model(placeholder_X=placeholder_X, placeholders_y=placeholders_y, 
+                             shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)}, **params)
           return model
 
       def _build_predict_graph(self, meta_X: Dict, model: Model, **params) -> Model:
           with tf.variable_scope("PREDICT"):
                placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
-               model = model(placeholder_X=placeholder_X, placeholders_y=None, **params)
+               model = model(placeholder_X=placeholder_X, placeholders_y=None, shapes_y=None**params)
           return model, placeholder_X
 
       @contextmanager
