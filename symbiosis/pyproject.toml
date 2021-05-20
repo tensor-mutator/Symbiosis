@@ -9,6 +9,7 @@ python = "3.6.8"
 enduro-bot = { path = "enduro-bot/" }
 flappy-bird-bot = { path = "flappy-bird-bot/" }
 flappy-bird-with-gunnar-farneback-bot = { path = "flappy-bird-with-gunnar-farneback-bot/" }
+chess-bot = { path = "chess-bot/" }
 
 [tool.poetry.dev-dependencies]
 tensorflow-gpu = "2.2.0"
