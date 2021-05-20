@@ -29,7 +29,7 @@ class Pipeline:
       def _build_fit_graph(self, iterator: tf.data.Iterator, model: Model, **params) -> Model:
           placeholders = iterator.get_next()
           placeholder_X = placeholders[0]
-          placeholders_y = {id: plc for id, plc in zip(self_y_ids, placeholders[1:])}
+          placeholders_y = {id: plc for id, plc in zip(self._y_ids, placeholders[1:])}
           with tf.variable_scope("FIT"):
                model = model(placeholder_X=placeholder_X, placeholders_y=placeholders_y, **params)
           return model
