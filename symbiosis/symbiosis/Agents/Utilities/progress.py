@@ -1,6 +1,6 @@
 import numpy as np
 
-__all__ = ["Progress", "ProgressDQN"]
+__all__ = ["Progress", "ProgressDQN", "ProgressAGZ"]
 
 class _Progress:
 
@@ -97,8 +97,8 @@ class ProgressDQN(_Progress):
 
 class ProgressAGZ(_Progress):
 
-      def __init__(self, n_steps: int, train_interval: int, explore: float = np.inf) -> None:
-          super().__init__(n_steps, train_interval, explore)
+      def __init__(self, n_steps: int, explore: float = np.inf) -> None:
+          super().__init__(n_steps, 0, explore)
           self._clock_half = 0
           self._clock_full = 0
 
