@@ -46,6 +46,7 @@ class AGZ(AgentMCTS):
       def _build_network_graph(self, network: NetworkBaseAGZ, hyperparams: Dict) -> tf.Session:
           network = network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
           self._graph = network.graph
+          self._session = network.session
           return network
 
       def _predict_p_v(self, env: Environment) -> Tuple:
