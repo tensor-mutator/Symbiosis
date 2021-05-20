@@ -465,6 +465,24 @@ class AgentMCTS(Agent):
 
 class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
+      @staticmethod
+      def record(func: Callable) -> Callable:
+          def inner(inst: "<Agent inst>", env: Environment) -> List:
+              path = None
+              if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
+                 if state is None:
+                    path = inst._frame_inventory.init_path
+                 else:
+                    path = inst._frame_inventory.path
+                 frame = inst.env.state.frame
+                 inst._frame_buffer.append(dict(path=path, frame=frame))
+                 if len(inst._frame_buffer) == inst.frame_buffer_size:
+                    for frame in inst._frame_buffer:
+                        cv2.imwrite(frame["path"], frame["frame"])
+                    inst._frame_buffer.clear()
+              return func(inst, env), path
+          return inner
+
       @property
       def alias(self) -> str:
           return self._alias
