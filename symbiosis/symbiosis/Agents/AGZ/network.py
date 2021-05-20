@@ -1,7 +1,7 @@
 import tensorflow.compat.v1 as tf
 import tensorflow.compat.v1.keras.regularizers as regularizers
 import tensorflow.compat.v1.keras.layers as layers
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 from ..network_base import NetworkBaseAGZ
 from ..model import Model
 from ..Utilities import NetBlocks, Pipeline
