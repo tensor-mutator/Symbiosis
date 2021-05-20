@@ -5,7 +5,7 @@ A precise implementation of an AlphaGo Zero agent
 """
 
 import tensorflow.compat.v1 as tf
-from typing import Dict, Any, Tuple
+from typing import Dict, Any, Tuple, Callable
 from collections import deque
 import numpy as np
 import dill
