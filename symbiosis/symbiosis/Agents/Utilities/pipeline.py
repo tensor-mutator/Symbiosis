@@ -40,7 +40,7 @@ class Pipeline:
       def _build_predict_graph(self, meta_X: Dict, model: Model, **params) -> Model:
           with tf.variable_scope("PREDICT"):
                placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
-               model = model(placeholder_X=placeholder_X, placeholders_y=None, shapes_y=None**params)
+               model = model(placeholder_X=placeholder_X, placeholders_y=None, shapes_y=None, **params)
           return model, placeholder_X
 
       @contextmanager
