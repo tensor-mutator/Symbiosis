@@ -448,7 +448,7 @@ class AgentMCTS(Agent):
                         flow: Flow = flow, **hyperparams) -> None:
                   inst = cls(max_min_players, env, network, config, flow, **hyperparams)
                   inst._params = dict(max_min_players=max_min_players, env=env, network=network,
-                                     config=config, flow=flow)
+                                      config=config, flow=flow)
                   return inst
               return inner
           return outer
