@@ -58,3 +58,7 @@ class NetworkBaseAGZ(metaclass=NetworkMeta):
 
       def fit(self, X: np.ndarray, ys: List[np.ndarray]) -> float:
           return self._pipeline.fit(X, ys)
+
+      @property
+      def graph(self) -> tf.Graph:
+          return self._pipeline.graph
