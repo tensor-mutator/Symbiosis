@@ -1,6 +1,7 @@
 import tensorflow.compat.v1 as tf
 from typing import Dict, Callable, List
 from tqdm import tqdm
+from contextlib import contextmanager
 from ..model import Model
 from ...colors import COLORS
 
@@ -12,6 +13,7 @@ class Pipeline:
           self._iterator, self._X_fit, self._ys_fit = self._generate_iterator(meta_X, meta_y, batch_size)
           self._fit_model = self._build_fit_graph(self._iterator, model, **params)
           self._predict_model, self._X_predict = self._build_predict_graph(meta_X, model, **params)
+          self._sync = self._sync_ops()
           self._session = tf.Session(config=self._config())
 
       def _generate_iterator(self, meta_X: Dict, meta_y: Dict, batch_size: int) -> Tuple[tf.data.Iterator, tf.placeholder, List[tf.placeholder]]:
@@ -38,6 +40,11 @@ class Pipeline:
                model = model(placeholder_X=placeholder_X, placeholders_y=None, **params)
           return model, placeholder_X
 
+      @contextmanager
+      def _fit_context(self) -> None:
+          yield
+          self._session.run(self._sync)
+
       def _config(self) -> tf.ConfigProto:
           config = tf.ConfigProto()
           config.gpu_options.allow_growth = True
@@ -48,6 +55,11 @@ class Pipeline:
                return self._session.run(self._predict_model.y_hat, feed_dict={self._X_predict: X})
 
       def fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
+              ys_test: List[np.ndarray], n_epochs: int) -> float:
+          with self._fit_context():
+               self._fit(X_train, X_test, ys_train, ys_test, n_epochs)
+
+      def _fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
               ys_test: List[np.ndarray], n_epochs: int) -> float:
           def feed_dict(X: np.ndarray, ys: np.ndarray) -> Dict:
               feed_dict = {self._X_fit: X}
@@ -91,6 +103,14 @@ class Pipeline:
           print(f"\n\t\tLoss: {COLORS.GREEN}{train_loss}{COLORS.DEFAULT}")
           print(f"\n\tTest set:")
           print(f"\n\t\tLoss: {COLORS.MAGENTA}{test_loss/n_batches_test}{COLORS.DEFAULT}")
+
+      def _sync_ops(self) -> tf.group:
+          trainable_vars_predict = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="PREDICT")
+          trainable_vars_fit = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="FIT")
+          update_ops = list()
+          for from_ ,to_ in zip(trainable_vars_fit, trainable_vars_predict):
+              update_ops.append(to_.assign(from_))
+          return tf.group(update_ops)
 
       def __del__(self) -> None:
           self._session.close()
