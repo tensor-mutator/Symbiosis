@@ -37,7 +37,7 @@ class AGZ(AgentMCTS):
                                             self.writer)
           self._self_play_buffer = deque()
           self._initiate_players(self._predict_p_v, self._self_play_buffer, self._tau_scheduer)
-          self._max_state = deque(max_len=1)
+          self._max_state = deque(maxlen=1)
 
       def _initiate_players(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler) -> None:
           self._max_player.initiate(predict_p_v, buffer, tau_scheduler, self._progress)
