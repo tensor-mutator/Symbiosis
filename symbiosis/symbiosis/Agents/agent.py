@@ -442,9 +442,8 @@ class AgentMCTS(Agent):
       @staticmethod
       def track(network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
           def outer(cls: Callable) -> Callable:
-              def inner(max_min_players: Tuple["<AgentForked>", "<AgentForked>"], env: Environment,
-                        network: NetworkMeta = network, config: bin = config,
-                        flow: Flow = flow, **hyperparams) -> None:
+              def inner(max_min_players: Tuple, env: Environment, network: NetworkMeta = network,
+                        config: bin = config, flow: Flow = flow, **hyperparams) -> None:
                   inst = cls(max_min_players, env, network, config, flow, **hyperparams)
                   inst._params = dict(max_min_players=max_min_players, env=env, network=network,
                                       config=config, flow=flow)
