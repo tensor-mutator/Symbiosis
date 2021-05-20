@@ -440,10 +440,10 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
 class AgentMCTS(Agent):
 
       @staticmethod
-      def track(max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
+      def track(max_min_players: Tuple["<AgentForked>", "<AgentForked>"], env: Environment,
                 network: NetworkMeta, config: bin = config.DEFAULT, flow: Flow = None) -> Callable:
           def outer(cls: Callable) -> Callable:
-              def inner(max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
+              def inner(max_min_players: Tuple["<AgentForked>", "<AgentForked>"], env: Environment,
                         network: NetworkMeta = network, config: bin = config,
                         flow: Flow = flow, **hyperparams) -> None:
                   inst = cls(max_min_players, env, network, config, flow, **hyperparams)
