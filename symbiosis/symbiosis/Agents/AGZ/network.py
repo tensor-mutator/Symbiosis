@@ -12,10 +12,11 @@ class AGZChessNet(NetworkBaseAGZ):
 
       class AGZChessNetModel(Model):
 
-            def __init__(self, placeholder_X: tf.placeholder, placeholders_y: Dict = None, **params) -> None:
+            def __init__(self, placeholder_X: tf.placeholder, placeholders_y: Dict = None, shapes_y: Dict = None, **params) -> None:
                 self._X = placeholder_X
                 p_out, v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(placeholder_X)
-                logits =  NetBlocks.layers.Dense(units=action_size, kernel_regularizer=regularizers.l2(1e-4))(p_out)
+                logits =  NetBlocks.layers.Dense(units=shapes_y.get("p_target"),
+                                                 kernel_regularizer=regularizers.l2(1e-4))(p_out)
                 p_predicted = layers.Activation("softmax")(logits)
                 self._y_hat = [p_predicted, v_predicted]
                 if placeholders_y is not None:
