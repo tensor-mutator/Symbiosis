@@ -85,9 +85,9 @@ class NetBlocks:
             def ResidualBlock(filters: int, kernel_size: Tuple[int, int], strides: Tuple[int, int] = (1, 1),
                               batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
-                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
+                    tensor_out = NetBlocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
                                                          batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
-                    tensor_out = Netblocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
+                    tensor_out = NetBlocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
                                                          activation="linear", batch_norm=batch_norm,
                                                          time_distributed=time_distributed)(tensor_out)
                     skip_out = tf.add(tensor, tensor_out)
