@@ -224,7 +224,7 @@ class Chess(Environment):
                rgb = cv2.imread(png_file)
           return rgb
 
-      def _to_observation(self, board: chess.Board) -> "<Chess.Observation>":
+      def _to_observation(self, board: chess.Board) -> str:
           return board.fen()
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
