@@ -113,7 +113,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
       def _episode_context_mcts(self, env: Environment, progress: Progress,
                                 elo_manager: ELOManager) -> Generator:
           env.reset()
-          _, path = self.state(env)
+          _, path = self.state(env, init=True)
           yield env.state.frame, path
           elo_manager.elo(max_score=env.reward, min_score=1-env.reward)
           self.train()
