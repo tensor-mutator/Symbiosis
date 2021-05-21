@@ -43,6 +43,10 @@ class AGZ(AgentMCTS):
           self._max_player.initiate(predict_p_v, buffer, tau_scheduler, self._progress)
           self._min_player.initiate(predict_p_v, buffer, tau_scheduler, self._progress)
 
+      def _share_inventories(self) -> None:
+          self._max_player.inventories = self._min_player.inventories = self.inventories
+          self._max_player.frame_buffer_size = self._min_player.frame_buffer_size = self.frame_buffer_size
+
       def _build_network_graph(self, network: NetworkBaseAGZ, hyperparams: Dict) -> tf.Session:
           network = network(state_shape=self._env.state.shape, action_size=self._env.action.size, **hyperparams)
           self._graph = network.graph
