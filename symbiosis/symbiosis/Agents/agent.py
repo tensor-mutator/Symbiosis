@@ -140,6 +140,24 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           if self.writer:
              self.writer.close()
 
+      @contextmanager
+      def _run_context_mcts(self, reward_manager: Any) -> Generator:
+          self._check_hyperparams()
+          self._save_hyperparams()
+          self._create_handler()
+          self._reward_manager = reward_manager
+          self._initiate_inventories()
+          self._share_inventories()
+          self._load()
+          self._set_checkpoint_interval()
+          self.env.make()
+          yield
+          self.env.close()
+          self._save()
+          self._save_all_frames()
+          if self.writer:
+             self.writer.close()
+
       def _suite_dqn(self) -> None:
           with self._run_context(RewardManager(self.env, self.alias, self.config, self.progress, self.writer)):
                with suppress(Exception):
@@ -165,7 +183,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                      self.progress.bump()
 
       def _suite_agz(self) -> None:
-          with self._run_context(ELOManager(16, self.env, self.alias, self.config, self.progress, self.writer)):
+          with self._run_context_mcts(ELOManager(16, self.env, self.alias, self.config, self.progress, self.writer)):
                with suppress(Exception):
                     while self.progress.clock < self.total_steps:
                           self._episode_suite_agz()
