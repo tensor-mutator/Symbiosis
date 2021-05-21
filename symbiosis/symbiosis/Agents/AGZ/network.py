@@ -4,7 +4,7 @@ import tensorflow.compat.v1.keras.layers as layers
 from typing import Tuple, List, Dict
 from ..network_base import NetworkBaseAGZ
 from ..model import Model
-from ..Utilities import NetBlocks, Pipeline
+from ..Utilities import NetBlocks, Pipeline, Metrics
 
 class AGZChessNet(NetworkBaseAGZ):
 
@@ -36,6 +36,7 @@ class AGZChessNet(NetworkBaseAGZ):
                 return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
-          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p=dict(shape=action_size, dtype=tf.float32),
+          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p=dict(shape=action_size, dtype=tf.float32,
+                                                                                                         metrics=[Metrics.MicroF1Score, Metrics.MacroF1Score]),
                                                                                                   v=dict(shape=1, dtype=tf.float32)),
                                     model=AGZChessNet.AGZChessNetModel, **params)
