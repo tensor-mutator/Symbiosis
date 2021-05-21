@@ -262,6 +262,10 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
                 with open(os.path.join(self._flow_inventory.inventory_path, "flow.meta"), "w") as f_obj:
                      json.dump(flow_meta, f_obj)
 
+      @property
+      def inventories(self) -> Dict:
+          return dict(frame=self._frame_inventory, flow=self._flow_inventory)
+
       @abstractmethod
       @AgentDecorators.register(...)
       def run(self) -> None:
@@ -467,20 +471,20 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
 
       @staticmethod
       def record(func: Callable) -> Callable:
-          def inner(inst: "<Agent inst>", env: Environment) -> List:
+          def inner(inst: "<Agent inst>", env: Environment, init: bool) -> List:
               path = None
               if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
-                 if state is None:
-                    path = inst._frame_inventory.init_path
+                 if init is True:
+                    path = inst.inventories["frame"].init_path
                  else:
-                    path = inst._frame_inventory.path
+                    path = inst.inventories["frame"].path
                  frame = inst.env.state.frame
-                 inst._frame_buffer.append(dict(path=path, frame=frame))
-                 if len(inst._frame_buffer) == inst.frame_buffer_size:
-                    for frame in inst._frame_buffer:
+                 inst.inventories["frame"].append(dict(path=path, frame=frame))
+                 if len(inst.inventories["frame"]) == inst.frame_buffer_size:
+                    for frame in inst.inventories["frame"]:
                         cv2.imwrite(frame["path"], frame["frame"])
-                    inst._frame_buffer.clear()
-              return func(inst, env), path
+                    inst.inventories["frame"].clear()
+              return func(inst, env, init), path
           return inner
 
       @property
@@ -511,6 +515,18 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
       @abstractmethod
       def save(self) -> None:
           ...
+
+      @property
+      def env(self) -> Environment:
+          return self._env
+
+      @property
+      def inventories(self) -> Dict:
+          return self._inventories
+
+      @property
+      def frame_buffer_size(self) -> int:
+          self._frame_buffer_size
 
       @property
       def config(self) -> config:
