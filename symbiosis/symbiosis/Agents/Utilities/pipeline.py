@@ -12,9 +12,10 @@ class Pipeline:
       def __init__(self, meta_X: Dict, meta_y: Dict, model: Model, batch_size: int = 32, **params) -> None:
           self._batch_size = batch_size
           self._y_ids = list(meta_y.keys())
+          self._y_metrics = dict(map(lambda id, meta: (id, meta.get("metrics", None)), meta.items()))
           self._y_shapes = list(map(lambda meta: meta["shape"], list(meta_y.values())))
           self._iterator, self._X_fit, self._ys_fit = self._generate_iterator(meta_X, meta_y, batch_size)
-          self._fit_model = self._build_fit_graph(self._iterator, model, **params)
+          self._fit_model, self._metrics = self._build_fit_graph(self._iterator, model, **params)
           self._predict_model, self._X_predict = self._build_predict_graph(meta_X, model, **params)
           self._sync = self._sync_ops()
           self._session = tf.Session(config=self._config())
@@ -29,22 +30,27 @@ class Pipeline:
 
       def _generate_iterator(self, meta_X: Dict, meta_y: Dict, batch_size: int) -> Tuple[tf.data.Iterator, tf.placeholder, List[tf.placeholder]]:
           placeholder_X = tf.placeholder(shape=(None,)+meta_X["shape"], dtype=meta_X["dtype"])
-          placeholders_y = list()
+          placeholders_y = dict()
           for id, meta in meta_y.items():
               placeholder_y = tf.placeholder(shape=(None, meta["shape"],), dtype=meta["dtype"])
-              placeholders_y.append(placeholder_y)
-          dataset = tf.data.Dataset.from_tensor_slices((placeholder_X,)+tuple(placeholders_y))
+              placeholders_y.update({id: placeholder_y})
+          dataset = tf.data.Dataset.from_tensor_slices((placeholder_X,)+tuple(list(placeholders_y.values())))
           dataset = dataset.shuffle(tf.cast(tf.shape(placeholder_X)[0], tf.int64)).batch(batch_size).prefetch(1)
           return dataset.make_initializable_iterator(), placeholder_X, placeholders_y
 
-      def _build_fit_graph(self, iterator: tf.data.Iterator, model: Model, **params) -> Model:
+      def _build_fit_graph(self, iterator: tf.data.Iterator, model: Model, **params) -> Tuple[Model, Dict]:
           placeholders = iterator.get_next()
           placeholder_X = placeholders[0]
           placeholders_y = {id: plc for id, plc in zip(self._y_ids, placeholders[1:])}
           with tf.variable_scope("FIT"):
                model = model(placeholder_X=placeholder_X, shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)},
                              placeholders_y=placeholders_y, **params)
-          return model
+               metric_ops = dict()
+               for id, metrics in self._y_metrics.items():
+                   if metrics is not None:
+                      metric_ops.update({id: dict(list(map(lambda name, metric: (name, metric(self._ys_fit[id],),
+                                                                                 model.y_hat[id]), metrics.items())))})
+          return model, metric_ops
 
       def _build_predict_graph(self, meta_X: Dict, model: Model, **params) -> Model:
           with tf.variable_scope("PREDICT"):
@@ -76,15 +82,37 @@ class Pipeline:
                ys_test: List[np.ndarray], n_epochs: int) -> float:
           def feed_dict(X: np.ndarray, ys: np.ndarray) -> Dict:
               feed_dict = {self._X_fit: X}
-              for plc, y in zip(self._ys_fit, ys):
+              for plc, y in zip(list(self._ys_fit.values()), ys):
                   feed_dict.update({plc: y})
               return feed_dict
-          def fetch(train=True) -> float:
+          def ravel(metrics: Dict) -> List:
+              metric_ops = list()
+              for meta in list(metrics.values()):
+                  if isinstance(meta, dict):
+                     for op in list(meta.values()):
+                         metric_ops.extend(op)
+                  else:
+                     metric_ops.append(meta)
+          def unravel(metrics: List, dst_plc: Dict) -> Dict:
+              metrics_ = dict()
+              start = 0
+              for id, metrics_dst in dst_plc.items():
+                  if isinstance(metrics_dst, dict):
+                     metrics_.update({id: dict(zip(metrics_dst.keys(), metrics[start: len(metrics_dst)]))})
+                     start += len(metrics_dst)
+                  else:
+                     metrics_.update({id: metrics[start]})
+                     start += 1
+               return metrics
+          def fetch(scores, train=True) -> float:
+              prev_scores = ravel(scores)
               if train:
-                 loss, _ = self._session.run([self._fit_model.loss, self._fit_model.grad])
-                 return loss
-              loss = self._session.run(self._fit_model.loss)
-              return loss
+                 scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss, self._fit_model.grad])
+                 cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores[:-1]))
+                 return unravel(cum_scores, self._metrics)
+              scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss])
+              cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores[:-1]))
+              return unravel(cum_scores, self._metrics)
           n_batches_train = np.ceil(np.size(X_train, axis=0)/self._batch_size)
           n_batches_test = np.ceil(np.size(X_test, axis=0)/self._batch_size)
           with self._session.graph.as_default():
@@ -93,29 +121,40 @@ class Pipeline:
                    self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_train, ys_train))
                    with tqdm(total=len(X_train)) as progress:
                         try:
-                           train_losss = 0
+                           train_scores = dict(loss=0)
+                           train_scores.update({id: {metric: 0 for metric in list(metrics.keys())} for id, metrics in self._metrics.items()})
+                           train_loss = 0
                            while True:
-                                 train_loss += fetch()
+                                 train_scores += fetch(train_scores)
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
                    self._session.run(self._iterator.initializer, feed_dict=feed_dict(X_test, ys_test))
                    with tqdm(total=len(X_test)) as progress:
                         try:
-                           test_loss
+                           test_scores = dict(loss=0)
+                           test_scores.update({id: {metric: 0 for metric in list(metrics.keys())} for id, metrics in self._metrics.items()})
                            while True:
-                                 test_loss += fetch(train=False)
+                                 test_scores += fetch(test_scores, train=False)
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
                    self._print_summary(epoch+1, train_loss/n_batches_train, test_loss/n_batches_test)
 
-      def _print_summary(self, epoch: int, train_loss: float, test_loss: float) -> None:
+      def _print_summary(self, epoch: int, train_scores: Dict, test_scores: Dict, n_batches_train: int, n_batches_test: int) -> None:
+          def pretty_print(scores: Dict, n_batches: int) -> None:
+              for id, scores in train_scores.items():
+                  if isinstance(scores, dict):
+                     print(f"\n\t\t{id}:")
+                     for metric, score in scores.items():
+                         print(f"\n\t\t\t{metric}: {COLORS.GREEN}{score/n_batches}{COLORS.DEFAULT}")
+                  else:
+                     print(f"\n\t\\tt{id}: {COLORS.GREEN}{scores/n_batches}{COLORS.DEFAULT}")
           print(f"{COLORS.UP}\r{COLORS.WIPE}\n{COLORS.WIPE}EPOCH: {COLORS.CYAN}{epoch}{COLORS.DEFAULT}")
           print(f"\n\tTraining set:")
-          print(f"\n\t\tLoss: {COLORS.GREEN}{train_loss}{COLORS.DEFAULT}")
+          pretty_print(train_scores, n_batches_train)
           print(f"\n\tTest set:")
-          print(f"\n\t\tLoss: {COLORS.MAGENTA}{test_loss/n_batches_test}{COLORS.DEFAULT}")
+          pretty_print(test_scores, n_batches_test)
 
       def _sync_ops(self) -> tf.group:
           trainable_vars_predict = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="PREDICT")
