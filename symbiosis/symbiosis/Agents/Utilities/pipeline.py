@@ -3,6 +3,7 @@ import numpy as np
 from typing import Dict, Callable, List, Tuple, Generator
 from tqdm import tqdm
 from contextlib import contextmanager
+from .metrics import Metrics
 from ..model import Model
 from ...colors import COLORS
 
@@ -64,7 +65,7 @@ class Pipeline:
 
       def predict(self, X: np.ndarray) -> Tuple[np.ndarray]:
           with self._session.graph.as_default():
-               return self._session.run(self._predict_model.y_hat, feed_dict={self._X_predict: X})
+               return self._session.run(list(self._predict_model.y_hat.values()), feed_dict={self._X_predict: X})
 
       def fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
               ys_test: List[np.ndarray], n_epochs: int) -> float:
@@ -72,7 +73,7 @@ class Pipeline:
                self._fit(X_train, X_test, ys_train, ys_test, n_epochs)
 
       def _fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
-              ys_test: List[np.ndarray], n_epochs: int) -> float:
+               ys_test: List[np.ndarray], n_epochs: int) -> float:
           def feed_dict(X: np.ndarray, ys: np.ndarray) -> Dict:
               feed_dict = {self._X_fit: X}
               for plc, y in zip(self._ys_fit, ys):
