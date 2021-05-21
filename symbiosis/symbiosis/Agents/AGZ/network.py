@@ -1,3 +1,9 @@
+"""
+@author: Debajyoti Raychaudhuri
+
+A precise implementation of models to be used with AGZ algorithm
+"""
+
 import tensorflow.compat.v1 as tf
 import tensorflow.compat.v1.keras.regularizers as regularizers
 import tensorflow.compat.v1.keras.layers as layers
