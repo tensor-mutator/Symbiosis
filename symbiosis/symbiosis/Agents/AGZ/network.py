@@ -18,7 +18,7 @@ class AGZChessNet(NetworkBaseAGZ):
                 logits =  NetBlocks.layers.Dense(units=shapes_y.get("p_target"),
                                                  kernel_regularizer=regularizers.l2(1e-4))(p_out)
                 p_predicted = layers.Activation("softmax")(logits)
-                self._y_hat = [p_predicted, v_predicted]
+                self._y_hat = dict(p=p_predicted, v=v_predicted)
                 if placeholders_y is not None:
                    self._grad = self._build_training_ops(placeholders_y, logits, **params)
 
@@ -36,6 +36,6 @@ class AGZChessNet(NetworkBaseAGZ):
                 return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES))
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
-          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p_target=dict(shape=action_size, dtype=tf.float32),
-                                                                                                  v_target=dict(shape=1, dtype=tf.float32)),
+          self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p=dict(shape=action_size, dtype=tf.float32),
+                                                                                                  v=dict(shape=1, dtype=tf.float32)),
                                     model=AGZChessNet.AGZChessNetModel, **params)
