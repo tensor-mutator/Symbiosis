@@ -532,6 +532,14 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
       def frame_buffer_size(self) -> int:
           self._frame_buffer_size
 
+      @frame_buffer_size.setter
+      def frame_buffer_size(self, frame_buffer_size: int) -> int:
+          self._frame_buffer_size = frame_buffer_size
+
+      @property
+      def frame_buffer_size(self) -> int:
+          self._frame_buffer_size
+
       @property
       def config(self) -> config:
           return self._config
