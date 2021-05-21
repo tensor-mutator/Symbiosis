@@ -524,6 +524,10 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
       def inventories(self) -> Dict:
           return self._inventories
 
+      @inventories.setter
+      def inventories(self, inventories: Dict) -> None:
+          self._inventories = inventories
+
       @property
       def frame_buffer_size(self) -> int:
           self._frame_buffer_size
