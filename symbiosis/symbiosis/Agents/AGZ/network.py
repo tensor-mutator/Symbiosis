@@ -32,7 +32,7 @@ class AGZChessNet(NetworkBaseAGZ):
                 p_target, v_target = placeholders_y.get("p"), placeholders_y.get("v")
                 learning_rate = params.get("learning_rate", "0.001")
                 policy_error = tf.losses.softmax_cross_entropy(onehot_labels=p_target, logits=logits, weights=params.get("policy_weights", 1.25))
-                value_error = tf.losses.mean_squared_error(labels=v_target, predictions=self._y_hat[1], weights=params.get("value_weights", 1.0))
+                value_error = tf.losses.mean_squared_error(labels=v_target, predictions=self._y_hat.get('v'), weights=params.get("value_weights", 1.0))
                 self._loss = policy_error+value_error
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
                 if params.get("gradient_clip_norm") is not None:
