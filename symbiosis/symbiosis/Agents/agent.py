@@ -282,7 +282,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
 
       @property
       def inventories(self) -> Dict:
-          return dict(frame=self._frame_inventory, flow=self._flow_inventory)
+          return dict(frame=dict(inventory=self._frame_inventory, buffer=self._frame_buffer), flow=self._flow_inventory)
 
       @abstractmethod
       @AgentDecorators.register(...)
@@ -493,15 +493,15 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
               path = None
               if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
                  if init is True:
-                    path = inst.inventories["frame"].init_path
+                    path = inst.inventories["frame"]["inventory"].init_path
                  else:
-                    path = inst.inventories["frame"].path
+                    path = inst.inventories["frame"]["inventory"].path
                  frame = inst.env.state.frame
-                 inst.inventories["frame"].append(dict(path=path, frame=frame))
-                 if len(inst.inventories["frame"]) == inst.frame_buffer_size:
+                 inst.inventories["frame"]["buffer"].append(dict(path=path, frame=frame))
+                 if len(inst.inventories["frame"]["buffer"]) == inst.frame_buffer_size:
                     for frame in inst.inventories["frame"]:
                         cv2.imwrite(frame["path"], frame["frame"])
-                    inst.inventories["frame"].clear()
+                    inst.inventories["frame"]["buffer"].clear()
               return func(inst, env, init), path
           return inner
 
