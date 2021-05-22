@@ -12,7 +12,7 @@ class Pipeline:
       def __init__(self, meta_X: Dict, meta_y: Dict, model: Model, batch_size: int = 32, **params) -> None:
           self._batch_size = batch_size
           self._y_ids = list(meta_y.keys())
-          self._y_metrics = dict(map(lambda id, meta: (id, meta.get("metrics", None)), meta.items()))
+          self._y_metrics = dict(map(lambda id, meta: (id, meta.get("metrics", None)), meta_y.items()))
           self._y_shapes = list(map(lambda meta: meta["shape"], list(meta_y.values())))
           self._iterator, self._X_fit, self._ys_fit = self._generate_iterator(meta_X, meta_y, batch_size)
           self._fit_model, self._metrics = self._build_fit_graph(self._iterator, model, **params)
