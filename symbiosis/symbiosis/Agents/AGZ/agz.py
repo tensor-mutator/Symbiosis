@@ -9,6 +9,7 @@ from typing import Dict, Any, Tuple, Callable
 from collections import deque
 import numpy as np
 import dill
+import os
 from random import sample
 from sklearn.model_selection import train_test_split
 from .network import AGZChessNet
