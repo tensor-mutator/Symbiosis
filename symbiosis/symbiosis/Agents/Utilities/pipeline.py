@@ -48,8 +48,8 @@ class Pipeline:
                metric_ops = dict()
                for id, metrics in self._y_metrics.items():
                    if metrics is not None:
-                      metric_ops.update({id: dict(list(map(lambda name, metric: (name, metric(self._ys_fit[id],),
-                                                                                 model.y_hat[id]), metrics.items())))})
+                      metric_ops.update({id: dict(list(map(lambda name, metric: (name, metric(self._ys_fit[id],
+                                                                                              model.y_hat[id])), metrics.keys(), metrics.values())))})
           return model, metric_ops
 
       def _build_predict_graph(self, meta_X: Dict, model: Model, **params) -> Model:
