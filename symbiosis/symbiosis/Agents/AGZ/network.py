@@ -21,7 +21,7 @@ class AGZChessNet(NetworkBaseAGZ):
             def __init__(self, placeholder_X: tf.placeholder, shapes_y: Dict, placeholders_y: Dict = None, **params) -> None:
                 self._X = placeholder_X
                 p_out, v_predicted = NetBlocks.NN.ChessNet(batch_norm=True)(placeholder_X)
-                logits =  NetBlocks.layers.Dense(units=shapes_y.get("p_target"),
+                logits =  NetBlocks.layers.Dense(units=shapes_y.get("p"),
                                                  kernel_regularizer=regularizers.l2(1e-4))(p_out)
                 p_predicted = layers.Activation("softmax")(logits)
                 self._y_hat = dict(p=p_predicted, v=v_predicted)
@@ -29,7 +29,7 @@ class AGZChessNet(NetworkBaseAGZ):
                    self._grad = self._build_training_ops(placeholders_y, logits, **params)
 
             def _build_training_ops(self, placeholders_y: Dict, logits: tf.Tensor, **params) -> tf.Tensor:
-                p_target, v_target = placeholders_y.get("p_target"), placeholders_y.get("v_target")
+                p_target, v_target = placeholders_y.get("p"), placeholders_y.get("v")
                 learning_rate = params.get("learning_rate", "0.001")
                 policy_error = tf.losses.softmax_cross_entropy(onehot_labels=p_target, logits=logits, weights=params.get("policy_weights", 1.25))
                 value_error = tf.losses.mean_squared_error(labels=v_target, predictions=self._y_hat[1], weights=params.get("value_weights", 1.0))
