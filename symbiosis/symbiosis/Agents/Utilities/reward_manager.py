@@ -53,6 +53,17 @@ class ELOManager:
           self._elo_buffer.clear()
           self._episode_indices.clear()
 
+      def mem_size(self, buffer: deque) -> int:
+          mem_size = 0
+          for x in buffer:
+             if type(x).__name__ == 'list':
+                mem_size += self.mem_size(x)
+             elif type(x).__name__ == 'ndarray':
+                mem_size += x.nbytes
+             else:
+                mem_size += sys.getsizeof(x)
+          return mem_size
+
       def _elo(self, file: str, idx: int = None) -> str:
           if idx is None:
              return f'{file}.elo.*'
