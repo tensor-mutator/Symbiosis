@@ -20,8 +20,8 @@ class Metrics:
 
       @staticmethod
       def MicroF1Score(y: tf.Tensor, y_hat: tf.Tensor) -> tf.Tensor:
-          MicroPR = MicroPrecision(y, y_hat)
-          MicroRC = MicroRecall(y, y_hat)
+          MicroPR = Metrics.MicroPrecision(y, y_hat)
+          MicroRC = Metrics.MicroRecall(y, y_hat)
           return 2*MicroPR*MicroRC/(MicroPR+MicroRC)
 
       @staticmethod
@@ -42,8 +42,8 @@ class Metrics:
 
       @staticmethod
       def MacroF1Score(y: tf.Tensor, y_hat: tf.Tensor) -> tf.Tensor:
-          MacroPR = MacroPrecision(y, y_hat)
-          MacroRC = MacroRecall(y, y_hat)
+          MacroPR = Metrics.MacroPrecision(y, y_hat)
+          MacroRC = Metrics.MacroRecall(y, y_hat)
           return 2*MacroPR*MacroRC/(MacroPR+MacroRC)
 
       @staticmethod
