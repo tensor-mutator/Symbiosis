@@ -93,6 +93,7 @@ class Pipeline:
                          metric_ops.extend(op)
                   else:
                      metric_ops.append(meta)
+              return metric_ops
           def unravel(metrics: List, dst_plc: Dict) -> Dict:
               metrics_ = dict()
               start = 0
@@ -103,7 +104,7 @@ class Pipeline:
                   else:
                      metrics_.update({id: metrics[start]})
                      start += 1
-               return metrics
+              return metrics
           def fetch(scores, train=True) -> float:
               prev_scores = ravel(scores)
               if train:
