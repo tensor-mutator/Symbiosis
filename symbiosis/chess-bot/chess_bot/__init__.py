@@ -60,9 +60,9 @@ class ChessAction(Action):
           for file in range(8):
               for p in self._TRADE_WITH:
                   promotion_moves = [self._FILES[file]+'7'+self._FILES[file]+'8'+p, self._FILES[file]+'2'+self._FILES[file]+'1'+p]
-                  if x > 0:
+                  if file > 0:
                      promotion_moves.extend([self._FILES[file]+'7'+self._FILES[file-1]+'8'+p, self._FILES[file]+'2'+self._FILES[file-1]+'1'+p])
-                  if x < 7:
+                  if file < 7:
                      promotion_moves.extend([self._FILES[file]+'7'+self._FILES[file+1]+'8'+p, self._FILES[file]+'2'+self._FILES[file+1]+'1'+p])
               self._uci_labels.update(set(promotion_moves))
           flipped_labels = self._flip_labels(list(self._uci_labels))
