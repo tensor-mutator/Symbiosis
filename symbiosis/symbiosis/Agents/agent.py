@@ -485,7 +485,7 @@ class AgentMCTS(Agent):
       def tau_scheduler(self) -> Scheduler:
           return self._tau_scheduler
 
-class AgentForked(AgentDecorators, metaclass=ABCMeta):
+class MarkovPlayer(AgentDecorators, metaclass=ABCMeta):
 
       @staticmethod
       def record(func: Callable) -> Callable:
