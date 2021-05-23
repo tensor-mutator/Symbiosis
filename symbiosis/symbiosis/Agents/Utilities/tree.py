@@ -9,7 +9,6 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
 from io import FileIO
-import json
 import dill
 from .exceptions import *
 
@@ -54,7 +53,7 @@ class Tree:
           return state in self._tree.keys()
 
       def __repr__(self) -> str:
-          return json.dumps(self._tree)
+          return str(self._tree)
 
       def reset(self) -> None:
           self._tree = defaultdict(Node)
