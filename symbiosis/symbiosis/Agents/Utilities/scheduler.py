@@ -152,5 +152,5 @@ class TauScheduler(EventWriter, Scheduler):
 
       @property
       @EventWriter.registerwriter
-      def epsilon(self) -> float:
+      def tau(self) -> float:
           return max(self._final_tau, self._tau - (self._tau-self._final_tau)*(1-self.value(self._p)))
