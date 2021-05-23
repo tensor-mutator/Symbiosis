@@ -24,7 +24,7 @@ class Player(MarkovPlayer):
 
       def initiate(self, predict_p_v: Callable, buffer: deque, tau_scheduler: TauScheduler, progress: Progress) -> None:
           self._mcts = self._initiate_tree(predict_p_v, self._hyperparams)
-          self._tau_scheduer = tau_scheduler
+          self._tau_scheduler = tau_scheduler
           self._buffer = buffer
           self._progress = progress
 
