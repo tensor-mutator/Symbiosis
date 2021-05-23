@@ -8,12 +8,12 @@ from typing import Callable, Dict, Any
 import numpy as np
 from collections import deque
 import tensorflow.compat.v1 as tf
-from ..agent import AgentForked
+from ..agent import MarkovPlayer
 from ..Utilities import Tree, Progress, MCTS, TauScheduler
 from ...environment import Environment
 from ...config import config
 
-class Player(AgentForked):
+class Player(MarkovPlayer):
 
       def __init__(self, env: Environment, alias: str, config: bin = config.DEFAULT, **hyperparams) -> None:
           self._env = env
