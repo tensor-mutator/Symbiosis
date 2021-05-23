@@ -71,7 +71,7 @@ class Pipeline:
 
       def predict(self, X: np.ndarray) -> Tuple[np.ndarray]:
           with self._session.graph.as_default():
-               return self._session.run(list(self._predict_model.y_hat.values()), feed_dict={self._X_predict: X})
+               return self._session.run(list(self._predict_model.y_hat.values()), feed_dict={self._X_predict: np.expand_dims(X, axis=0)})
 
       def fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
               ys_test: List[np.ndarray], n_epochs: int) -> float:
