@@ -250,10 +250,10 @@ class Chess(Environment):
                  return piece.lower() if piece.isupper() else piece.upper()
               return piece   
           def toggle_pieces(pieces: str) -> str:
-              return "".join([swap_case(p) for p in pieces])
+              return ''.join([swap_case(p) for p in pieces])
           piece_pos, active, castle, en_passant, fifty_move, full_move = fen.split()
-          return "{} {} {} {} {} {}".format("/".join([toggle_pieces(row) for row in reversed(piece_pos.split("/"))]),
-                                            ('W' if active == 'b' else 'b'), sorted(toggle_pieces(castle)), en_passant,
+          return "{} {} {} {} {} {}".format('/'.join([toggle_pieces(row) for row in reversed(piece_pos.split('/'))]),
+                                            ('W' if active == 'b' else 'b'), ''.join(sorted(toggle_pieces(castle))), en_passant,
                                             fifty_move, full_move)
 
       def _ancillary_planes(self, fen: str) -> np.ndarray:
@@ -280,7 +280,7 @@ class Chess(Environment):
           passage_blocks = list(set(re.findall(r"[0-9]", piece_pos)))
           for block in passage_blocks:
               piece_pos = re.sub(block, '1'*int(block), piece_pos)
-          piece_pos = re.sub(r"/", "", piece_pos)
+          piece_pos = re.sub(r'/', '', piece_pos)
           planes = np.zeros(shape=(12, 8, 8), dtype=np.float32)
           for rank in range(8):
               for file in range(8):
