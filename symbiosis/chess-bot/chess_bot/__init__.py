@@ -71,7 +71,7 @@ class ChessAction(Action):
 
       @property
       def size(self) -> int:
-          return len(self._uci_labels)
+          return len(self.labels)
 
       @property
       def legal_moves(self) -> List[str]:
