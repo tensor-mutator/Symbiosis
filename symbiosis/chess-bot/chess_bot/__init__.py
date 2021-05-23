@@ -233,7 +233,7 @@ class Chess(Environment):
           return rgb
 
       def _to_observation(self, board: chess.Board) -> str:
-          return board.fen()
+          return board.fen().rsplit(' ', 1)[0]
 
       def _to_canonical(self, board: chess.Board) -> np.ndarray:
           fen = board.fen()
