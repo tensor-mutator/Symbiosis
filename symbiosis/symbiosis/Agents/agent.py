@@ -499,7 +499,7 @@ class AgentForked(AgentDecorators, metaclass=ABCMeta):
                  frame = inst.env.state.frame
                  inst.inventories["frame"]["buffer"].append(dict(path=path, frame=frame))
                  if len(inst.inventories["frame"]["buffer"]) == inst.frame_buffer_size:
-                    for frame in inst.inventories["frame"]:
+                    for frame in inst.inventories["frame"]["buffer"]:
                         cv2.imwrite(frame["path"], frame["frame"])
                     inst.inventories["frame"]["buffer"].clear()
               return func(inst, env, init), path
