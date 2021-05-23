@@ -71,19 +71,27 @@ class ChessAction(Action):
 
       @property
       def size(self) -> int:
-          return len(self.labels)
+          if not self._uci_labels:
+             _ = self.labels
+          return len(self._uci_labels)
 
       @property
       def legal_moves(self) -> List[str]:
           return list(map(lambda move: move.uci(), list(self._board.legal_moves)))
 
       def move2index(self, move: str) -> int:
+          if not self._uci_labels:
+             _ = self.labels
           return list(self._uci_labels).index(move)
 
       def moves2indices(self, moves: List[str]) -> List[int]:
+          if not self._uci_labels:
+             _ = self.labels
           return list(map(lambda mov: list(self._uci_labels).index(mov), moves))
 
       def flipped2unflipped(self, moves: Any = "all") -> Any:
+          if not self._uci_labels:
+             _ = self.labels
           if moves == "all":
              return self.moves2indices(list(self._uci_labels_flipped))
           if isinstance(moves, list):
