@@ -35,7 +35,7 @@ class ChessAction(Action):
 
       def _flip_labels(self, labels: Any) -> None:
           def flip(move: str) -> str:
-              return "".join([9-int(alg) if alg.isdigit() else alg for alg in move])
+              return "".join([str(9-int(alg)) if alg.isdigit() else alg for alg in move])
           flipped_labels = set()
           if isinstance(labels, list):
              for l in labels:
