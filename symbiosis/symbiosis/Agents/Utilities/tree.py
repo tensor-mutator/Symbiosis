@@ -81,7 +81,7 @@ class Tree:
               Traverses a node while applying virtual loss
           """
 
-          with self._lock(state):
+          with self._lock[state]:
                node = self._tree[state]
                node.sum_n += virtual_loss
                edge = node.edges[action]
@@ -94,7 +94,7 @@ class Tree:
               Updates the visitation frequency and the action value of a node
           """
 
-          with self._lock(state):
+          with self._lock[state]:
                node = self._tree[state]
                node.sum_n += -virtual_loss + 1
                edge = node.edges[action]
