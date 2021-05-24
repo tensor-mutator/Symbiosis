@@ -91,7 +91,7 @@ class Pipeline:
               for meta in list(metrics.values()):
                   if isinstance(meta, dict):
                      for op in list(meta.values()):
-                         metric_ops.extend(op)
+                         metric_ops.append(op)
                   else:
                      metric_ops.append(meta)
               return metric_ops
