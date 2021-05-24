@@ -13,7 +13,7 @@ import os
 from random import sample
 from sklearn.model_selection import train_test_split
 from .network import AGZChessNet
-from ..agent import AgentMCTS, AgentForked
+from ..agent import AgentMCTS, MarkovPlayer
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
 from ..Utilities import Progress, TauScheduler
@@ -23,7 +23,7 @@ from ...config import config
 @AgentMCTS.track(AGZChessNet)
 class AGZ(AgentMCTS):
 
-      def __init__(self, max_min_players: Tuple[AgentForked, AgentForked], env: Environment,
+      def __init__(self, max_min_players: Tuple[MarkovPlayer,  MarkovPlayer], env: Environment,
                    network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
                    **hyperparams) -> None:
           self._max_player, self._min_player = max_min_players
