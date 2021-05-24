@@ -23,7 +23,7 @@ from ...config import config
 @AgentMCTS.track(AGZChessNet)
 class AGZ(AgentMCTS):
 
-      def __init__(self, max_min_players: Tuple[MarkovPlayer,  MarkovPlayer], env: Environment,
+      def __init__(self, max_min_players: Tuple[MarkovPlayer, MarkovPlayer], env: Environment,
                    network: NetworkBaseAGZ = AGZChessNet, config: bin = config.DEFAULT, flow: Flow = None,
                    **hyperparams) -> None:
           self._max_player, self._min_player = max_min_players
