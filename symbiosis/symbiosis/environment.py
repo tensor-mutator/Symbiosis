@@ -2,6 +2,7 @@ from abc import ABCMeta, abstractmethod
 from typing import Any, Sequence, Dict, Tuple
 import numpy as np
 import json
+import threading
 from inspect import stack
 
 __all__ = ["Environment", "State", "Action"]
@@ -12,7 +13,7 @@ class Singleton:
 
       def __new__(cls, *args, **kwargs) -> "<Singleton inst>":
           owner = stack()[1][0].f_locals.get("self")
-          key = json.dumps(dict(owner=owner.__class__.__name__, cls=cls.__name__))
+          key = json.dumps(dict(owner=owner.__class__.__name__, cls=cls.__name__, thread=threading.current_thread().name))
           if Singleton._singleton.get(key, None) is None:
              Singleton._singleton[key] = super(Singleton, cls).__new__(cls)
           return Singleton._singleton[key]
