@@ -27,3 +27,7 @@ class Model:
       @property
       def loss(self) -> float:
           return self._loss
+
+      @property
+      def scope(self) -> "<Model.Scope>":
+          return Model.Scope
