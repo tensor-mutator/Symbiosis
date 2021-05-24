@@ -3,6 +3,11 @@ from typing import List
 
 class Model:
 
+      class Scope:
+
+            FIT: str = "FIT"
+            PREDICT: str = "PREDICT"
+
       @property
       def y_hat(self) -> List[tf.Tensor]:
           return self._y_hat
