@@ -56,8 +56,9 @@ class NetworkBaseAGZ(metaclass=NetworkMeta):
       def predict(self, X: np.ndarray) -> Tuple:
           return self._pipeline.predict(X)
 
-      def fit(self, X: np.ndarray, ys: List[np.ndarray]) -> float:
-          return self._pipeline.fit(X, ys)
+      def fit(self, X_train: np.ndarray, X_test: np.ndarray, ys_train: List[np.ndarray],
+              ys_test: List[np.ndarray], n_epochs: int) -> float:
+          return self._pipeline.fit(X_train, X_test, ys_train, ys_test, n_epochs)
 
       @property
       def graph(self) -> tf.Graph:
