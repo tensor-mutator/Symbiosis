@@ -127,7 +127,7 @@ class Pipeline:
                            train_scores.update({id: {metric: 0 for metric in list(metrics.keys())} for id, metrics in self._metrics.items()})
                            train_loss = 0
                            while True:
-                                 train_scores += fetch(train_scores)
+                                 train_scores = fetch(train_scores)
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
@@ -137,7 +137,7 @@ class Pipeline:
                            test_scores = dict(loss=0)
                            test_scores.update({id: {metric: 0 for metric in list(metrics.keys())} for id, metrics in self._metrics.items()})
                            while True:
-                                 test_scores += fetch(test_scores, train=False)
+                                 test_scores = fetch(test_scores, train=False)
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
