@@ -36,10 +36,10 @@ class AGZChessNet(NetworkBaseAGZ):
                 self._loss = policy_error+value_error
                 optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
                 if params.get("gradient_clip_norm") is not None:
-                   gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scoep=Model.Scope.FIT))
+                   gradients = optimizer.compute_gradients(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scoep=self.scope.FIT))
                    NetBlocks.clip_grads_by_norm(gradients, params.get("gradient_clip_norm"))
                    return optimizer.apply_gradients(gradients)
-                return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=Model.Scope.FIT))
+                return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope.FIT))
 
       def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
           self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p=dict(shape=action_size, dtype=tf.float32,
