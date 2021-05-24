@@ -40,7 +40,7 @@ class Player(MarkovPlayer):
           self._resign_value = hyperparams.get("resign_value", -0.8)
           self._min_resign_moves = hyperparams.get("min_resign_moves", 5)
 
-      @AgentForked.record
+      @MarkovPlayer.record
       def state(self, env: Environment, init: bool = False) -> np.ndarray:
           return env.state.frame
 
