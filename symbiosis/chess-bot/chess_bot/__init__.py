@@ -212,14 +212,6 @@ class Chess(Environment):
           self._board = None
 
       @property
-      def progress(self) -> Progress:
-          return self._progress
-
-      @progress.setter
-      def progress(self, progress: Progress) -> None:
-          self._progress = progress
-
-      @property
       def name(self) -> str:
           return "Chess-v0"
 
