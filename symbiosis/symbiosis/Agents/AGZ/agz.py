@@ -76,7 +76,9 @@ class AGZ(AgentMCTS):
 
       def state(self, env: Environment, init: bool = False) -> np.ndarray:
           min_state, min_path = self._min_player.state(env, init)
-          return (min_state, min_path,)+tuple(self._max_state[0])
+          if self._max_state:
+             return (min_state, min_path,)+tuple(self._max_state[0])
+          return (min_state, min_path,)
 
       def train(self) -> None:
           self_play_data = np.array(self._self_play_buffer, dtype=np.float32)
