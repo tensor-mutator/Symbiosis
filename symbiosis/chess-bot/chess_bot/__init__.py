@@ -17,6 +17,92 @@ import chess.pgn
 
 class ChessState(State):
 
+      _PIECE2INDEX: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
+
+      def __init__(self, board: chess.Board) -> None:
+          self._board = board
+
+      @property
+      def observation(self) -> str:
+          return self._to_observation(self._board)
+
+      @property
+      def frame(self) -> str:
+          return self._to_rgb(self._board)
+
+      @property
+      def canonical(self) -> str:
+          return self._to_canonical(self._board)
+
+      def _to_rgb(self, board: chess.Board) -> np.ndarray:
+          svg = chess.svg.board(self._board, size=700)
+          with tempfile.TemporaryDirectory() as dir:
+               svg_file = os.path.join(dir, "board.svg")
+               with open(svg_file, 'w') as f:
+                    f.write(svg)
+               drawing = svg2rlg(svg_file)
+               png_file = os.path.join(dir, "board.png")
+               renderPM.drawToFile(drawing, png_file, fmt="PNG")
+               rgb = cv2.imread(png_file)
+          return rgb
+
+      def _to_observation(self, board: chess.Board) -> str:
+          return board.fen().rsplit(' ', 1)[0]
+
+      def _to_canonical(self, board: chess.Board) -> np.ndarray:
+          fen = board.fen()
+          if board.turn == chess.BLACK:
+             fen = self._flip(fen)
+          primary_planes = self._primary_planes(fen)
+          ancillary_planes = self._ancillary_planes(fen)
+          planes = np.vstack((primary_planes, ancillary_planes))
+          return np.transpose(planes, [1, 2, 0])
+
+      def _flip(self, fen: str) -> str:
+          def swap_case(piece: str) -> str:
+              if piece.isalpha():
+                 return piece.lower() if piece.isupper() else piece.upper()
+              return piece   
+          def toggle_pieces(pieces: str) -> str:
+              return ''.join([swap_case(p) for p in pieces])
+          piece_pos, active, castle, en_passant, fifty_move, full_move = fen.split()
+          return "{} {} {} {} {} {}".format('/'.join([toggle_pieces(row) for row in reversed(piece_pos.split('/'))]),
+                                            ('W' if active == 'b' else 'b'), ''.join(sorted(toggle_pieces(castle))), en_passant,
+                                            fifty_move, full_move)
+
+      def _ancillary_planes(self, fen: str) -> np.ndarray:
+          def alg_to_coordn(alg: str):
+              rank = 8 - int(alg[1])
+              file = ord(alg[0]) - ord('a')
+              return rank, file
+          _, _, castle, en_passant, fifty_move, _ = fen.split()
+          en_passant_plane = np.zeros(shape=(1, 8, 8), dtype=np.float32)
+          if en_passant != '-':
+             rank, file = alg_to_coordn(en_passant)
+             en_passant_plane[0][rank][file] = 1
+          fifty_move_plane = np.full((1, 8, 8), int(fifty_move), dtype=np.float32)
+          castle_K_plane = np.full((1, 8, 8), int('K' in castle), dtype=np.float32)
+          castle_Q_plane = np.full((1, 8, 8), int('Q' in castle), dtype=np.float32)
+          castle_k_plane = np.full((1, 8, 8), int('k' in castle), dtype=np.float32)
+          castle_q_plane = np.full((1, 8, 8), int('q' in castle), dtype=np.float32)
+          planes = np.concatenate([castle_K_plane, castle_Q_plane, castle_k_plane, castle_q_plane, fifty_move_plane,
+                                   en_passant_plane], axis=0)
+          return planes
+
+      def _primary_planes(self, fen: str) -> np.ndarray:
+          piece_pos = fen.split()[0]
+          passage_blocks = list(set(re.findall(r"[0-9]", piece_pos)))
+          for block in passage_blocks:
+              piece_pos = re.sub(block, '1'*int(block), piece_pos)
+          piece_pos = re.sub(r'/', '', piece_pos)
+          planes = np.zeros(shape=(12, 8, 8), dtype=np.float32)
+          for rank in range(8):
+              for file in range(8):
+                  p = piece_pos[rank * 8 + file]
+                  if p.isalpha():
+                     planes[self._PIECE2INDEX[p]][rank][file] = 1
+          return planes
+
       @property
       def shape(self) -> Tuple[int, int]:
           return (8, 8, 18,)
@@ -106,7 +192,6 @@ class ChessAction(Action):
 
 class Chess(Environment):
 
-      _PIECE2INDEX: Dict = {p: i for i, p in enumerate("KQRBNPkqrbnp")}
       _PIECE2VALUE: Dict = dict(K=3, Q=14, R=5, B=3.25, N=3, P=1, k=3, q=14, r=5, b=3.25, n=3, p=1)
 
       class Turn(IntEnum):
@@ -132,9 +217,6 @@ class Chess(Environment):
 
       def make(self) -> None:
           self._board = chess.Board()
-          self.state.frame = self._to_rgb(self._board)
-          self.state.canonical = self._to_canonical(self._board)
-          self.state.observation = self._to_observation(self._board)
           self._winner = Chess.Winner.NONE
           self._ended = False
 
@@ -152,9 +234,6 @@ class Chess(Environment):
 
       def reset(self) -> np.ndarray:
           self._board.reset_board()
-          self.state.frame = self._to_rgb(self._board)
-          self.state.canonical = self._to_canonical(self._board)
-          self.state.observation = self._to_observation(self._board)
           self._winner = Chess.Winner.NONE
           self._ended = False
           return self.state.frame
@@ -170,9 +249,6 @@ class Chess(Environment):
           else:
              self._board.push_uci(action)
              self._ended, info, self._reward, self._winner = self._check_ended()
-          self.state.frame = self._to_rgb(self._board)
-          self.state.canonical = self._to_canonical(self._board)
-          self.state.observation = self._to_observation(self._board)
           return self.state.frame, self._reward, self._ended, info
 
       def _adjudicate(self) -> None:
@@ -220,79 +296,7 @@ class Chess(Environment):
              winner, reward = Chess.Winner.WHITE, 1
           return dict(winner=winner), reward, winner
 
-      def _to_rgb(self, board: chess.Board) -> np.ndarray:
-          svg = chess.svg.board(self._board, size=700)
-          with tempfile.TemporaryDirectory() as dir:
-               svg_file = os.path.join(dir, "board.svg")
-               with open(svg_file, 'w') as f:
-                    f.write(svg)
-               drawing = svg2rlg(svg_file)
-               png_file = os.path.join(dir, "board.png")
-               renderPM.drawToFile(drawing, png_file, fmt="PNG")
-               rgb = cv2.imread(png_file)
-          return rgb
-
-      def _to_observation(self, board: chess.Board) -> str:
-          return board.fen().rsplit(' ', 1)[0]
-
-      def _to_canonical(self, board: chess.Board) -> np.ndarray:
-          fen = board.fen()
-          if self.action.turn == self.Turn.BLACK:
-             fen = self._flip(fen)
-          primary_planes = self._primary_planes(fen)
-          ancillary_planes = self._ancillary_planes(fen)
-          planes = np.vstack((primary_planes, ancillary_planes))
-          return np.transpose(planes, [1, 2, 0])
-          
-      def _flip(self, fen: str) -> str:
-          def swap_case(piece: str) -> str:
-              if piece.isalpha():
-                 return piece.lower() if piece.isupper() else piece.upper()
-              return piece   
-          def toggle_pieces(pieces: str) -> str:
-              return ''.join([swap_case(p) for p in pieces])
-          piece_pos, active, castle, en_passant, fifty_move, full_move = fen.split()
-          return "{} {} {} {} {} {}".format('/'.join([toggle_pieces(row) for row in reversed(piece_pos.split('/'))]),
-                                            ('W' if active == 'b' else 'b'), ''.join(sorted(toggle_pieces(castle))), en_passant,
-                                            fifty_move, full_move)
-
-      def _ancillary_planes(self, fen: str) -> np.ndarray:
-          def alg_to_coordn(alg: str):
-              rank = 8 - int(alg[1])
-              file = ord(alg[0]) - ord('a')
-              return rank, file
-          _, _, castle, en_passant, fifty_move, _ = fen.split()
-          en_passant_plane = np.zeros(shape=(1, 8, 8), dtype=np.float32)
-          if en_passant != '-':
-             rank, file = alg_to_coordn(en_passant)
-             en_passant_plane[0][rank][file] = 1
-          fifty_move_plane = np.full((1, 8, 8), int(fifty_move), dtype=np.float32)
-          castle_K_plane = np.full((1, 8, 8), int('K' in castle), dtype=np.float32)
-          castle_Q_plane = np.full((1, 8, 8), int('Q' in castle), dtype=np.float32)
-          castle_k_plane = np.full((1, 8, 8), int('k' in castle), dtype=np.float32)
-          castle_q_plane = np.full((1, 8, 8), int('q' in castle), dtype=np.float32)
-          planes = np.concatenate([castle_K_plane, castle_Q_plane, castle_k_plane, castle_q_plane, fifty_move_plane,
-                                   en_passant_plane], axis=0)
-          return planes
-
-      def _primary_planes(self, fen: str) -> np.ndarray:
-          piece_pos = fen.split()[0]
-          passage_blocks = list(set(re.findall(r"[0-9]", piece_pos)))
-          for block in passage_blocks:
-              piece_pos = re.sub(block, '1'*int(block), piece_pos)
-          piece_pos = re.sub(r'/', '', piece_pos)
-          planes = np.zeros(shape=(12, 8, 8), dtype=np.float32)
-          for rank in range(8):
-              for file in range(8):
-                  p = piece_pos[rank * 8 + file]
-                  if p.isalpha():
-                     planes[self._PIECE2INDEX[p]][rank][file] = 1
-          return planes
-
       def render(self, mode=None) -> np.ndarray:
-          self.state.frame = self._to_rgb(self._board)
-          self.state.canonical = self._to_canonical(self._board)
-          self.state.observation = self._to_observation(self._board)
           if mode == "ascii":
              print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
           if mode == "fen":
@@ -301,7 +305,7 @@ class Chess(Environment):
 
       @property
       def state(self) -> State:
-          return ChessState()
+          return ChessState(self._board)
 
       @property
       def action(self) -> Action:
@@ -326,9 +330,6 @@ class Chess(Environment):
 
       def close(self) -> bool:
           self._board = None
-          self.state.canonical = None
-          self.state.observation = None
-          self.state.frame = None
           self._winner = Chess.Winner.NONE
 
 def main():
