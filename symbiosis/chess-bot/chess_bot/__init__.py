@@ -206,10 +206,18 @@ class Chess(Environment):
             WHITE: int = 2
             DRAW: int = 3
 
-      def __init__(self, max_moves: int = None, progress: Progress = None) -> None:
+      def __init__(self, max_moves: int = None) -> None:
           self._max_moves = max_moves
-          self._progress = progress
+          self._progress = None
           self._board = None
+
+      @property
+      def progress(self) -> Progress:
+          return self._progress
+
+      @progress.setter
+      def progress(self, progress: Progress) -> None:
+          self._progress = progress
 
       @property
       def name(self) -> str:
@@ -333,7 +341,7 @@ class Chess(Environment):
           self._winner = Chess.Winner.NONE
 
 def main():
-    env = Chess()
+    env = Chess(max_moves=1000)
     max_player = Player(env, alias="WHITE", config=config.VERBOSE_LITE)
     min_player = Player(env, alias="BLACK", config=config.VERBOSE_LITE)
     agent = AGZ(max_min_players=(max_player, min_player), env=env, config=config.VERBOSE_LITE)
