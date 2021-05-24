@@ -489,7 +489,7 @@ class MarkovPlayer(AgentDecorators, metaclass=ABCMeta):
 
       @staticmethod
       def record(func: Callable) -> Callable:
-          def inner(inst: "<Agent inst>", env: Environment, init: bool) -> List:
+          def inner(inst: "<Agent inst>", env: Environment, init: bool = False) -> List:
               path = None
               if inst.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
                  if init is True:
