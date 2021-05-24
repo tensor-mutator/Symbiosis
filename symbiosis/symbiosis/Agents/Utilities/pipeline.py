@@ -41,7 +41,7 @@ class Pipeline:
       def _build_fit_graph(self, iterator: tf.data.Iterator, model: Model, **params) -> Tuple[Model, Dict]:
           placeholders = iterator.get_next()
           placeholder_X = placeholders[0]
-          placeholders_y = {id: plc for id, plc in zip(self._y_ids, placeholders[1:])}
+          placeholders_y = dict(zip(self._y_ids, placeholders[1:]))
           with tf.variable_scope("FIT"):
                model = model(placeholder_X=placeholder_X, shapes_y={id: shape for id, shape in zip(self._y_ids, self._y_shapes)},
                              placeholders_y=placeholders_y, **params)
