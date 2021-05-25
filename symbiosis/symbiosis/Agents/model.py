@@ -1,5 +1,5 @@
 import tensorflow.compat.v1 as tf
-from typing import List, Dict
+from typing import Dict
 
 class Model:
 
@@ -19,10 +19,6 @@ class Model:
       @property
       def X(self) -> tf.Tensor:
           return self._X
-
-      @property
-      def y_id(self) -> List[str]:
-          return self._y_id
 
       @property
       def grad(self) -> tf.Tensor:
