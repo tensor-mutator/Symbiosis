@@ -113,7 +113,7 @@ class Pipeline:
                  cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores[:-1]))
                  return unravel(cum_scores, self._metrics)
               scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss])
-              cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores[:-1]))
+              cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores))
               return unravel(cum_scores, self._metrics)
           n_batches_train = np.ceil(np.size(X_train, axis=0)/self._batch_size)
           n_batches_test = np.ceil(np.size(X_test, axis=0)/self._batch_size)
