@@ -41,7 +41,7 @@ class AGZChessNet(NetworkBaseAGZ):
                    return optimizer.apply_gradients(gradients)
                 return optimizer.minimize(self._loss, var_list=tf.get_collection(tf.GraphKeys.GLOBAL_VARIABLES, scope=self.scope.FIT))
 
-      def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> Pipeline:
+      def __init__(self, state_shape: Tuple[int, int, int], action_size: int, **params) -> None:
           self._pipeline = Pipeline(meta_X=dict(shape=state_shape, dtype=tf.float32), meta_y=dict(p=dict(shape=action_size, dtype=tf.float32,
                                                                                                          metrics=dict(MicroF1Score=Metrics.MicroF1Score,
                                                                                                                       MacroF1Score=Metrics.MacroF1Score)),
