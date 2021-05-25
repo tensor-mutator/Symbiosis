@@ -85,7 +85,7 @@ class AGZ(AgentMCTS):
           self_play_data = np.array(self._self_play_buffer, dtype=np.object)
           state = np.stack(self_play_data[:, 0])
           p_target = np.stack(self_play_data[:, 1])
-          v_target = np.stack(self_play_data[:, 2])
+          v_target = np.expand_dims(np.stack(self_play_data[:, 2]), axis=1)
           state_train, state_test, p_target_train, p_target_test, v_target_train, v_target_test = train_test_split(state, p_target, v_target,
                                                                                                                    train_size=0.8, test_size=0.2)
           self._model.fit(X_train=state_train, X_test=state_test, ys_train=[p_target_train, v_target_train],
