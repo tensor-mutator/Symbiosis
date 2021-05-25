@@ -89,7 +89,7 @@ class AGZ(AgentMCTS):
           state_train, state_test, p_target_train, p_target_test, v_target_train, v_target_test = train_test_split(state, p_target, v_target,
                                                                                                                    train_size=0.8, test_size=0.2)
           self._model.fit(X_train=state_train, X_test=state_test, ys_train=[p_target_train, v_target_train],
-                                    ys_test=[p_target_test, v_target_test], n_epochs=self._n_epochs)
+                          ys_test=[p_target_test, v_target_test], n_epochs=self._n_epochs)
 
       @AgentMCTS.register("suite_agz")
       def run(self) -> None:
