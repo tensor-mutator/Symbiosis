@@ -25,6 +25,7 @@ class AGZChessNet(NetworkBaseAGZ):
                                                  kernel_regularizer=regularizers.l2(1e-4))(p_out)
                 p_predicted = layers.Activation("softmax")(logits)
                 self._y_hat = dict(p=p_predicted, v=v_predicted)
+                self._y = placeholders_y
                 if placeholders_y is not None:
                    self._grad = self._build_training_ops(placeholders_y, logits, **params)
 
