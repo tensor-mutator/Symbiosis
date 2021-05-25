@@ -83,7 +83,7 @@ class DuelingDQNNet(NetworkBaseDQN):
                if scope == "local":
                   self._grad = self._build_training_ops(action_size, **params)
 
-      def _fuse_adv_val(advantage_tensor: tf.Tensor, value_tensor: tf.Tensor, action_size: int) -> tf.Tensor:
+      def _fuse_adv_val(self, advantage_tensor: tf.Tensor, value_tensor: tf.Tensor, action_size: int) -> tf.Tensor:
           state_value = NetBlocks.layers.Dense(units=1, activation="linear")(value_tensor)
           action_advantage = NetBlocks.layers.Dense(units=action_size, activation="linear")(advantage_tensor)
           action_advantage = action_advantage-tf.reduce_mean(action_advantage, axis=1, keep_dims=True)
