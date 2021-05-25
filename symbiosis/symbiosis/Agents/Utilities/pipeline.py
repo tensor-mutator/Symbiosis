@@ -125,7 +125,6 @@ class Pipeline:
                         try:
                            train_scores = dict(loss=0)
                            train_scores.update({id: {metric: 0 for metric in list(metrics.keys())} for id, metrics in self._metrics.items()})
-                           train_loss = 0
                            while True:
                                  train_scores = fetch(train_scores)
                                  progress.update(self._batch_size)
@@ -141,7 +140,7 @@ class Pipeline:
                                  progress.update(self._batch_size)
                         except tf.errors.OutOfRangeError:
                            ...
-                   self._print_summary(epoch+1, train_loss/n_batches_train, test_loss/n_batches_test)
+                   self._print_summary(epoch+1, train_scores, test_scores, n_batches_train, n_batches_test)
 
       def _print_summary(self, epoch: int, train_scores: Dict, test_scores: Dict, n_batches_train: int, n_batches_test: int) -> None:
           def pretty_print(scores: Dict, n_batches: int) -> None:
