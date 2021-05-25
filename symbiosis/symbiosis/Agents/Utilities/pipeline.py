@@ -105,7 +105,7 @@ class Pipeline:
                   else:
                      metrics_.update({id: metrics[start]})
                      start += 1
-              return metrics
+              return metrics_
           def fetch(scores, train=True) -> float:
               prev_scores = ravel(scores)
               if train:
