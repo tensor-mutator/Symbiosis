@@ -30,7 +30,7 @@ class AGZChessNet(NetworkBaseAGZ):
 
             def _build_training_ops(self, placeholders_y: Dict, logits: tf.Tensor, **params) -> tf.Tensor:
                 p_target, v_target = placeholders_y.get("p"), placeholders_y.get("v")
-                learning_rate = params.get("learning_rate", "0.001")
+                learning_rate = params.get("learning_rate", 0.001)
                 policy_error = tf.losses.softmax_cross_entropy(onehot_labels=p_target, logits=logits, weights=params.get("policy_weights", 1.25))
                 value_error = tf.losses.mean_squared_error(labels=v_target, predictions=self._y_hat.get('v'), weights=params.get("value_weights", 1.0))
                 self._loss = policy_error+value_error
