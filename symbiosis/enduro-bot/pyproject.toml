@@ -5,7 +5,6 @@ description = "Enduro Bot"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6.8"
 gym = "0.15.7"
 atari-py = "^0.2.6"
 
