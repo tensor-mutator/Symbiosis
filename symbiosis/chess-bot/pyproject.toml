@@ -5,7 +5,6 @@ description = "Chess Bot"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6.8"
 python-chess = "^0.31.4"
 svglib = "^1.1.0"
 Cython = "^0.29.23"
