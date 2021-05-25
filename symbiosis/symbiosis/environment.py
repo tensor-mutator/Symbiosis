@@ -4,7 +4,6 @@ import numpy as np
 import json
 import threading
 from inspect import stack
-from .Agents.Utilities import Progress
 
 __all__ = ["Environment", "State", "Action"]
 
@@ -49,11 +48,11 @@ class Environment(metaclass=ABCMeta):
           ...
 
       @property
-      def progress(self) -> Progress:
+      def progress(self) -> "<Progress>":
           return self._progress
 
       @progress.setter
-      def progress(self, progress: Progress) -> None:
+      def progress(self, progress: "<Progress>") -> None:
           self._progress = progress
 
       @abstractmethod
