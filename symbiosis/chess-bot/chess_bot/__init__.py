@@ -298,9 +298,9 @@ class Chess(Environment):
 
       def render(self, mode=None) -> np.ndarray:
           if mode == "ascii":
-             print(f"{COLOR.BOLD_MAGENTA}{self._board}{COLOR.DEFAULT}")
+             print(f"{COLORS.BOLD_MAGENTA}{self._board}{COLORS.DEFAULT}")
           if mode == "fen":
-             print(f"{COLOR.BOLD_MAGENTA}{self._board.fen()}{COLOR.DEFAULT}")
+             print(f"{COLORS.BOLD_MAGENTA}{self._board.fen()}{COLORS.DEFAULT}")
           return self.state.frame
 
       @property
