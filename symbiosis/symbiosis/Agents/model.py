@@ -1,5 +1,5 @@
 import tensorflow.compat.v1 as tf
-from typing import List
+from typing import List, Dict
 
 class Model:
 
@@ -9,8 +9,12 @@ class Model:
             PREDICT: str = "PREDICT"
 
       @property
-      def y_hat(self) -> List[tf.Tensor]:
+      def y_hat(self) -> Dict:
           return self._y_hat
+
+      @property
+      def y(self) -> Dict:
+          return self._y
 
       @property
       def X(self) -> tf.Tensor:
