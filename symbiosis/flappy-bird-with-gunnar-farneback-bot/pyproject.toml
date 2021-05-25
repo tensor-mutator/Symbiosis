@@ -5,7 +5,6 @@ description = "Flappy Bird With gunnar-farneback Bot"
 authors = ["Debajyoti Raychaudhuri <draychaudhuri1086@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.6.8"
 
 [tool.poetry.dev-dependencies]
 
