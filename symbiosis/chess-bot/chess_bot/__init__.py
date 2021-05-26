@@ -4,8 +4,7 @@ from symbiosis.colors import COLORS
 from symbiosis.Agents.Utilities import Progress
 from typing import Tuple, Sequence, Any, List, Dict
 import numpy as np
-from svglib.svglib import svg2rlg
-from reportlab.graphics import renderPM
+import cairosvg
 from dataclasses import dataclass
 import numpy as np
 import cv2
@@ -40,9 +39,8 @@ class ChessState(State):
                svg_file = os.path.join(dir, "board.svg")
                with open(svg_file, 'w') as f:
                     f.write(svg)
-               drawing = svg2rlg(svg_file)
                png_file = os.path.join(dir, "board.png")
-               renderPM.drawToFile(drawing, png_file, fmt="PNG")
+               cairosvg.svg2png(url=svg_file, write_to=png_file)
                rgb = cv2.imread(png_file)
           return rgb
 
