@@ -107,14 +107,14 @@ class Pipeline:
                      start += 1
               return metrics_
           def fetch(scores, train=True) -> float:
-              prev_scores = ravel(scores)
+              cum_prev_scores = ravel(scores)
               if train:
-                 scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss, self._fit_model.grad])
-                 cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores[:-1]))
-                 return unravel(cum_scores, self._metrics)
-              scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss])
-              cum_scores = list(map(lambda prev_score, score: prev_score+score, prev_scores, scores))
-              return unravel(cum_scores, self._metrics)
+                 recent_scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss, self._fit_model.grad])
+                 cum_scores = list(map(lambda cum_prev_score, recent_score: cum_prev_score+recent_score, cum_prev_scores, recent_scores[:-1]))
+                 return unravel(cum_scores, scores)
+              recent_scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss])
+              cum_scores = list(map(lambda cum_prev_score, recent_score: cum_prev_score+recent_score, cum_prev_scores, recent_scores))
+              return unravel(cum_scores, scores)
           n_batches_train = np.ceil(np.size(X_train, axis=0)/self._batch_size)
           n_batches_test = np.ceil(np.size(X_test, axis=0)/self._batch_size)
           with self._session.graph.as_default():
@@ -150,7 +150,7 @@ class Pipeline:
                      for metric, score in scores.items():
                          print(f"\n\t\t\t{metric}: {COLORS.GREEN}{score/n_batches}{COLORS.DEFAULT}")
                   else:
-                     print(f"\n\t\\tt{id}: {COLORS.GREEN}{scores/n_batches}{COLORS.DEFAULT}")
+                     print(f"\n\t\t{id}: {COLORS.GREEN}{scores/n_batches}{COLORS.DEFAULT}")
           print(f"{COLORS.UP}\r{COLORS.WIPE}\n{COLORS.WIPE}EPOCH: {COLORS.CYAN}{epoch}{COLORS.DEFAULT}")
           print(f"\n\tTraining set:")
           pretty_print(train_scores, n_batches_train)
