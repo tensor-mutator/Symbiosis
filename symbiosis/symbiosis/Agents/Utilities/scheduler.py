@@ -1,5 +1,6 @@
 from typing import Callable, Tuple, List
 import tensorflow.compat.v1 as tf
+from functools import partial
 from .progress import Progress
 from .exceptions import *
 from .event_writer import EventWriter
@@ -120,7 +121,7 @@ class EpsilonScheduler(EventWriter, Scheduler):
           self._progress = progress
           self._scheme = scheme
           if scheme == "exponential":
-             self.value = lambda p: self.value(p, decay_factor=1-epsilon_range[1])
+             self.value = partial(self.value, decay_factor=1-epsilon_range[1])
           self._set_writer("Hyperparams Schedule/Steps - Epsilon", config_ & config.EPSILON_EVENT,
                            writer, progress, "clock")
 
@@ -142,7 +143,7 @@ class TauScheduler(EventWriter, Scheduler):
           self._progress = progress
           self._scheme = scheme
           if scheme == "exponential":
-             self.value = lambda p: self.value(p, decay_factor=1-tau_range[1])
+             self.value = partial(self.value, decay_factor=1-tau_range[1])
           self._set_writer("Hyperparams Schedule/Steps - Tau", config_ & config.TAU_EVENT,
                            writer, progress, "clock")
 
