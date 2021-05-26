@@ -146,7 +146,7 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           self._save_hyperparams()
           self._create_handler()
           self._reward_manager = reward_manager
-          self._initiate_inventories()
+          self._initiate_inventories(zero_sum=True)
           self._share_inventories()
           self._load()
           self._set_checkpoint_interval()
@@ -224,14 +224,14 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           if not getattr(self, "checkpoint_interval"):
              self.checkpoint_interval = 1
 
-      def _initiate_inventories(self) -> None:
+      def _initiate_inventories(self, zero_sum: bool = False) -> None:
           if self.config & (config.SAVE_FRAMES+config.SAVE_FLOW):
              if not getattr(self, "frame_buffer_size"):
                 self.frame_buffer_size = 1
              self._frame_buffer = deque()
-             self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress)
+             self._frame_inventory = Inventory("FRAMES", "frame", "PNG", self.env, self.alias, self.progress, zero_sum=zero_sum)
              if self.config & config.SAVE_FLOW:
-                self._flow_inventory = Inventory("FLOW", "flow", "FLO", self.env, self.alias, self.progress)
+                self._flow_inventory = Inventory("FLOW", "flow", "FLO", self.env, self.alias, self.progress, zero_sum=zero_sum)
                 self._buffer_len = self.flow_skip if getattr(self, "flow_skip") else 1
                 self._buffer_len = max(1, self._buffer_len)
                 self._flow_skip_buffer = deque(maxlen=self._buffer_len)
