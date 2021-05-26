@@ -114,7 +114,7 @@ class ProgressAGZ(_Progress):
           super().bump()
           self._clock_half += 1
 
-      def bump_full(self) -> None:
+      def bump(self) -> None:
           super().bump()
           self._clock_half += 1
           self._clock_full = self._clock_half//2
