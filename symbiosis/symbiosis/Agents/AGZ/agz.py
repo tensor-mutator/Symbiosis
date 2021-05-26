@@ -69,6 +69,7 @@ class AGZ(AgentMCTS):
       def action(self, env: Environment) -> Tuple[str, Any]:
           max_action = self._max_player.action(env)
           env.step(max_action)
+          self._progress.bump_half()
           self._max_state.append(self._max_player.state(env)+(env.reward,))
           min_action = None
           if not env.ended:
