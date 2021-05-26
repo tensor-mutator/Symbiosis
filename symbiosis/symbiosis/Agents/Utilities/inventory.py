@@ -5,13 +5,14 @@ import os
 class Inventory:
 
       def __init__(self, name: str, file_name: str, extension: str,
-                   env: Environment, agent: str, progress: Progress) -> None:
+                   env: Environment, agent: str, progress: Progress, zero_sum: bool = False) -> None:
           self._name = name
           self._file_name = file_name
           self._extension = extension
           self._env = env
           self._agent = agent
           self._progress = progress
+          self._zero_sum = zero_sum
           self._inventory_path = self._make_path()
 
       def _make_path(self) -> str:
@@ -28,7 +29,10 @@ class Inventory:
       def path(self) -> str:
           if not os.path.exists(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)))):
              os.mkdir(os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10))))
-          extension = "{}.{}.{}".format(self._file_name, str(self._progress.epi_clock).zfill(10), self._extension)
+          if self._zero_sum:
+             extension = "{}.{}.{}".format(self._file_name, str(self._progress.half_clock).zfill(10), self._extension)
+          else:
+             extension = "{}.{}.{}".format(self._file_name, str(self._progress.epi_clock).zfill(10), self._extension)
           return os.path.join(self._inventory_path, "EPISODE {}".format(str(self._progress.episode).zfill(10)), extension)
 
       @property
