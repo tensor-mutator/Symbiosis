@@ -6,12 +6,12 @@ A Reinforcement Learning library for solving custom environments
 (symbiosis) poetry install
 ```
 
-#### Invoking <i>Chess-v0</i> <i>AlphaGo Zero</i> agent with implicit rewards
+#### Invoking <i>Chess-v0</i> <i>AlphaGo Zero</i> agent
 ```bash
 (symbiosis) poetry run python3.6 -m chess_bot
 ```
 
-#### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent with implicit rewards
+#### Invoking <i>FlappyBird-v0</i> <i>DQN</i> agent
 ```bash
 (symbiosis) poetry run python3.6 -m flappy_bird_bot
 ```
