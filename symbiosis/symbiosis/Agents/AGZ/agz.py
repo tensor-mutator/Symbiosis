@@ -7,6 +7,7 @@ A precise implementation of an AlphaGo Zero agent
 import tensorflow.compat.v1 as tf
 from typing import Dict, Any, Tuple, Callable
 from collections import deque
+from glob import glob
 import numpy as np
 import dill
 import os
@@ -16,7 +17,7 @@ from .network import AGZChessNet
 from ..agent import AgentMCTS, MarkovPlayer
 from ..flow_base import Flow
 from ..network_base import NetworkBaseAGZ
-from ..Utilities import Progress, TauScheduler
+from ..Utilities import Progress, TauScheduler, MissingDataError
 from ...environment import Environment
 from ...config import config
 
