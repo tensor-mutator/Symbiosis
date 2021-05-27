@@ -100,7 +100,7 @@ class Pipeline:
               start = 0
               for id, metrics_dst in dst_plc.items():
                   if isinstance(metrics_dst, dict):
-                     metrics_.update({id: dict(zip(metrics_dst.keys(), metrics[start: len(metrics_dst)]))})
+                     metrics_.update({id: dict(zip(metrics_dst.keys(), metrics[start: start+len(metrics_dst)]))})
                      start += len(metrics_dst)
                   else:
                      metrics_.update({id: metrics[start]})
@@ -109,10 +109,10 @@ class Pipeline:
           def fetch(scores, train=True) -> float:
               cum_prev_scores = ravel(scores)
               if train:
-                 recent_scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss, self._fit_model.grad])
+                 recent_scores = self._session.run([self._fit_model.loss]+ravel(self._metrics)+[self._fit_model.grad])
                  cum_scores = list(map(lambda cum_prev_score, recent_score: cum_prev_score+recent_score, cum_prev_scores, recent_scores[:-1]))
                  return unravel(cum_scores, scores)
-              recent_scores = self._session.run(ravel(self._metrics)+[self._fit_model.loss])
+              recent_scores = self._session.run([self._fit_model.loss]+ravel(self._metrics))
               cum_scores = list(map(lambda cum_prev_score, recent_score: cum_prev_score+recent_score, cum_prev_scores, recent_scores))
               return unravel(cum_scores, scores)
           n_batches_train = np.ceil(np.size(X_train, axis=0)/self._batch_size)
