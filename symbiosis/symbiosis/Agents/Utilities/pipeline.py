@@ -150,7 +150,7 @@ class Pipeline:
                      for metric, score in scores.items():
                          print(f"\n\t\t\t{metric}: {color}{score/n_batches}{COLORS.DEFAULT}")
                   else:
-                     print(f"\n\t\t{id}: {COLORS.GREEN}{scores/n_batches}{COLORS.DEFAULT}")
+                     print(f"\n\t\t{id}: {color}{scores/n_batches}{COLORS.DEFAULT}")
           print(f"{COLORS.UP}\r{COLORS.WIPE}\n{COLORS.WIPE}EPOCH: {COLORS.CYAN}{epoch}{COLORS.DEFAULT}")
           print(f"\n\tTraining set:")
           pretty_print(train_scores, n_batches_train, COLORS.GREEN)
