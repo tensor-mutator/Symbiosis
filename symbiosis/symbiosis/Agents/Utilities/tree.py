@@ -9,6 +9,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import List, Iterator, Dict
 from io import FileIO
+from glob import glob
 import dill
 from .exceptions import *
 
