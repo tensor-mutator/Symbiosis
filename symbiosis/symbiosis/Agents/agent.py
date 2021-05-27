@@ -116,11 +116,11 @@ class Agent(AgentDecorators, metaclass=ABCMeta):
           _, path = self.state(env, init=True)
           yield env.state.frame, path
           elo_manager.elo(max_score=env.reward, min_score=1-env.reward)
-          self.train()
           if self.config & config.SAVE_FLOW:
              self._flow_skip_buffer.clear()
           progress.bump_episode()
           if self.progress.episode%self.checkpoint_interval==0:
+             self.train()
              self._save()
 
       @contextmanager
