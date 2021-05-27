@@ -143,19 +143,19 @@ class Pipeline:
                    self._print_summary(epoch+1, train_scores, test_scores, n_batches_train, n_batches_test)
 
       def _print_summary(self, epoch: int, train_scores: Dict, test_scores: Dict, n_batches_train: int, n_batches_test: int) -> None:
-          def pretty_print(scores: Dict, n_batches: int) -> None:
+          def pretty_print(scores: Dict, n_batches: int, color: str) -> None:
               for id, scores in train_scores.items():
                   if isinstance(scores, dict):
                      print(f"\n\t\t{id}:")
                      for metric, score in scores.items():
-                         print(f"\n\t\t\t{metric}: {COLORS.GREEN}{score/n_batches}{COLORS.DEFAULT}")
+                         print(f"\n\t\t\t{metric}: {color}{score/n_batches}{COLORS.DEFAULT}")
                   else:
                      print(f"\n\t\t{id}: {COLORS.GREEN}{scores/n_batches}{COLORS.DEFAULT}")
           print(f"{COLORS.UP}\r{COLORS.WIPE}\n{COLORS.WIPE}EPOCH: {COLORS.CYAN}{epoch}{COLORS.DEFAULT}")
           print(f"\n\tTraining set:")
-          pretty_print(train_scores, n_batches_train)
+          pretty_print(train_scores, n_batches_train, COLORS.GREEN)
           print(f"\n\tTest set:")
-          pretty_print(test_scores, n_batches_test)
+          pretty_print(test_scores, n_batches_test, COLORS.MAGENTA)
 
       def _sync_ops(self) -> tf.group:
           trainable_vars_predict = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES, scope="PREDICT")
