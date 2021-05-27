@@ -86,10 +86,12 @@ class NetBlocks:
                               batch_norm: bool = False, time_distributed: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> tf.Tensor:
                     tensor_out = NetBlocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
-                                                         batch_norm=batch_norm, time_distributed=time_distributed)(tensor)
+                                                         batch_norm=batch_norm, time_distributed=time_distributed, kernel_initializer=tf.initializers.glorot_uniform,
+                                                         use_bias=False)(tensor)
                     tensor_out = NetBlocks.layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=strides, padding="same",
                                                          activation="linear", batch_norm=batch_norm,
-                                                         time_distributed=time_distributed)(tensor_out)
+                                                         time_distributed=time_distributed, kernel_initializer=tf.initializers.glorot_uniform,
+                                                         use_bias=False)(tensor_out)
                     skip_out = tf.add(tensor, tensor_out)
                     if time_distributed:
                        return layers.TimeDistributed(layers.Activation("relu"))(skip_out)
@@ -129,14 +131,17 @@ class NetBlocks:
             def ChessNet(batch_norm: bool = False) -> Callable:
                 def _op(tensor: tf.Tensor) -> Tuple[tf.Tensor, tf.Tensor]:
                     tensor_out = NetBlocks.layers.Conv2D(filters=256, kernel_size=(5, 5), padding="same", batch_norm=batch_norm,
-                                                         kernel_regularizer=regularizers.l2(1e-4))(tensor)
+                                                         kernel_regularizer=regularizers.l2(1e-4), kernel_initializer=tf.initializers.glorot_uniform,
+                                                         use_bias=False)(tensor)
                     for _ in range(7):
                         tensor_out = NetBlocks.layers.ResidualBlock(filters=256, kernel_size=(3, 3), batch_norm=batch_norm)(tensor_out)
                     policy_out = NetBlocks.layers.Conv2D(filters=2, kernel_size=(1, 1), batch_norm=batch_norm,
-                                                         kernel_regularizer=regularizers.l2(1e-4))(tensor_out)
+                                                         kernel_regularizer=regularizers.l2(1e-4), kernel_initializer=tf.initializers.glorot_uniform,
+                                                         use_bias=False)(tensor_out)
                     policy_out = layers.Flatten()(policy_out)
                     value_out = NetBlocks.layers.Conv2D(filters=4, kernel_size=(1, 1), batch_norm=batch_norm,
-                                                        kernel_regularizer=regularizers.l2(1e-4))(tensor_out)
+                                                        kernel_regularizer=regularizers.l2(1e-4), kernel_initializer=tf.initializers.glorot_uniform,
+                                                         use_bias=False)(tensor_out)
                     value_out = layers.Flatten()(value_out)
                     value_out = NetBlocks.layers.Dense(units=256, kernel_regularizer=regularizers.l2(1e-4))(value_out)
                     value_out = NetBlocks.layers.Dense(units=1, activation="tanh", kernel_regularizer=regularizers.l2(1e-4))(value_out)
